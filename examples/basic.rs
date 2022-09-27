@@ -1,14 +1,14 @@
 use stanza::model::{Cell, Col, Row, Table};
 use stanza::renderer::markdown::Markdown;
 use stanza::renderer::Renderer;
-use stanza::style::{HAlignment, MaxWidthSpec, MinWidthSpec, Style, Styles};
+use stanza::style::{HAlign, MaxWidth, MinWidth, StyleKind, Styles};
 
 fn main() {
     let table = Table::default()
         .with_cols(vec![
-            Col::Body(Styles::default().with(Style::HAlign(HAlignment::Right))),
-            Col::Body(Styles::default().with(Style::MinWidth(MinWidthSpec(20))).with(Style::HAlign(HAlignment::Centred))),
-            Col::Body(Styles::default().with(Style::MinWidth(MinWidthSpec(10))).with(Style::MaxWidth(MaxWidthSpec(20)))),
+            Col::Body(Styles::default().with(StyleKind::HAlign(HAlign::Right))),
+            Col::Body(Styles::default().with(StyleKind::MinWidth(MinWidth(20))).with(StyleKind::HAlign(HAlign::Centred))),
+            Col::Body(Styles::default().with(StyleKind::MinWidth(MinWidth(10))).with(StyleKind::MaxWidth(MaxWidth(20)))),
         ])
         .with_row(Row::Header(
             Styles::default(),

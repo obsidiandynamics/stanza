@@ -1,5 +1,5 @@
 use crate::model::Table;
-use crate::style::{HAlignment, MaxWidthSpec, MinWidthSpec, StyleSpec};
+use crate::style::{HAlign, MaxWidth, MinWidth, Style};
 use std::borrow::Cow;
 use std::fmt::Display;
 use std::mem;
@@ -17,22 +17,6 @@ pub trait Renderer {
 
 impl Table {
     pub fn col_widths(&self) -> Vec<usize> {
-        // let (num_cols, num_rows) = (self.num_cols(), self.num_rows());
-        // let mut widths = Vec::with_capacity(num_cols);
-        // for col in 0..num_cols {
-        //     let mut max_width = 0;
-        //     for row in 0..num_rows {
-        //         let cell = self.cell(col, row);
-        //         if let Some(cell) = cell {
-        //             let data_len = cell.data().len();
-        //             if data_len > max_width {
-        //                 max_width = data_len;
-        //             }
-        //         }
-        //     }
-        //     widths.push(max_width);
-        // }
-        // widths
         (0..self.num_cols())
             .into_iter()
             .map(|col| self.col_width(col))
@@ -46,31 +30,19 @@ impl Table {
             .map(|cell| {
                 cell.map_or(0, |cell| {
                     let min_width =
-                        MinWidthSpec::resolve(&cell.combined_styles()).map_or(0, |s| s.0);
+                        MinWidth::resolve(&cell.combined_styles()).map_or(0, |s| s.0);
                     let max_width =
-                        MaxWidthSpec::resolve(&cell.combined_styles()).map_or(usize::MAX, |s| s.0);
+                        MaxWidth::resolve(&cell.combined_styles()).map_or(usize::MAX, |s| s.0);
                     let data_len = cell.data().len();
                     usize::min(usize::max(min_width,data_len), max_width)
                 })
             })
             .max()
             .unwrap_or(0)
-
-        // let mut max_width = 0;
-        // for row in 0..self.num_rows() {
-        //     let cell = self.cell(col, row);
-        //     if let Some(cell) = cell {
-        //         let data_len = cell.data().len();
-        //         if data_len > max_width {
-        //             max_width = data_len;
-        //         }
-        //     }
-        // }
-        // max_width
     }
 }
 
-pub fn pad<'a>(s: &'a str, p: char, width: usize, alignment: &HAlignment) -> Cow<'a, str> {
+pub fn pad<'a>(s: &'a str, p: char, width: usize, alignment: &HAlign) -> Cow<'a, str> {
     let chars = s.chars().collect::<Vec<_>>();
     if chars.len() >= width {
         Cow::Borrowed(s)
@@ -82,12 +54,12 @@ pub fn pad<'a>(s: &'a str, p: char, width: usize, alignment: &HAlignment) -> Cow
             consumed += 1;
         }
         match alignment {
-            HAlignment::Left => {
+            HAlign::Left => {
                 for _ in consumed..width {
                     buf.push(p);
                 }
             }
-            HAlignment::Centred => {
+            HAlign::Centred => {
                 let mut added = 0;
                 for _ in consumed..width {
                     if added % 2 == 0 {
@@ -98,7 +70,7 @@ pub fn pad<'a>(s: &'a str, p: char, width: usize, alignment: &HAlignment) -> Cow
                     added += 1;
                 }
             }
-            HAlignment::Right => {
+            HAlign::Right => {
                 for _ in consumed..width {
                     buf.insert(0, p);
                 }

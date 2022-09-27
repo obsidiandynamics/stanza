@@ -2,42 +2,82 @@ use std::borrow::Cow;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
-pub struct MinWidthSpec(pub usize);
+pub struct Bold(pub bool);
 
-impl StyleSpec for MinWidthSpec {
+impl Style for Bold {
     fn key() -> Cow<'static, str> {
-        Cow::Borrowed("min_width")
+        Cow::Borrowed("bold")
     }
 }
 
-impl<'a> From<&'a Style> for Option<&'a MinWidthSpec> {
-    fn from(style: &'a Style) -> Self {
+impl<'a> From<&'a StyleKind> for Option<&'a Bold> {
+    fn from(style: &'a StyleKind) -> Self {
         match style {
-            Style::MinWidth(spec) => Some(spec),
+            StyleKind::Bold(spec) => Some(spec),
             _ => None
         }
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct MaxWidthSpec(pub usize);
+pub enum HAlign {
+    Left,
+    Centred,
+    Right,
+}
 
-impl StyleSpec for MaxWidthSpec {
+impl Style for HAlign {
     fn key() -> Cow<'static, str> {
-        Cow::Borrowed("min_width")
+        Cow::Borrowed("h_align")
     }
 }
 
-impl<'a> From<&'a Style> for Option<&'a MaxWidthSpec> {
-    fn from(style: &'a Style) -> Self {
+impl<'a> From<&'a StyleKind> for Option<&'a HAlign> {
+    fn from(style: &'a StyleKind) -> Self {
         match style {
-            Style::MaxWidth(spec) => Some(spec),
+            StyleKind::HAlign(spec) => Some(spec),
             _ => None
         }
     }
 }
 
-pub trait StyleSpec where Self: Sized, for <'a> Option<&'a Self>: From<&'a Style> {
+#[derive(Debug, Clone)]
+pub struct MinWidth(pub usize);
+
+impl Style for MinWidth {
+    fn key() -> Cow<'static, str> {
+        Cow::Borrowed("min_width")
+    }
+}
+
+impl<'a> From<&'a StyleKind> for Option<&'a MinWidth> {
+    fn from(style: &'a StyleKind) -> Self {
+        match style {
+            StyleKind::MinWidth(spec) => Some(spec),
+            _ => None
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct MaxWidth(pub usize);
+
+impl Style for MaxWidth {
+    fn key() -> Cow<'static, str> {
+        Cow::Borrowed("min_width")
+    }
+}
+
+impl<'a> From<&'a StyleKind> for Option<&'a MaxWidth> {
+    fn from(style: &'a StyleKind) -> Self {
+        match style {
+            StyleKind::MaxWidth(spec) => Some(spec),
+            _ => None
+        }
+    }
+}
+
+pub trait Style where Self: Sized, for <'a> Option<&'a Self>: From<&'a StyleKind> {
     fn key() -> Cow<'static, str>;
 
     fn resolve(styles: &Styles) -> Option<&Self> {
@@ -49,54 +89,30 @@ pub trait StyleSpec where Self: Sized, for <'a> Option<&'a Self>: From<&'a Style
     }
 }
 
-pub const KEY_BOLD: &str = "bold";
-pub const KEY_H_ALIGN: &str = "h_align";
-
 #[derive(Debug, Clone)]
-pub enum Style {
-    Bold(bool),
-    HAlign(HAlignment),
-    MinWidth(MinWidthSpec),
-    MaxWidth(MaxWidthSpec)
+pub enum StyleKind {
+    Bold(Bold),
+    HAlign(HAlign),
+    MinWidth(MinWidth),
+    MaxWidth(MaxWidth)
 }
 
-impl Style {
+impl StyleKind {
     pub fn key(&self) -> String {
         match self {
-            Style::Bold(_) => KEY_BOLD.into(),
-            Style::HAlign(_) => KEY_H_ALIGN.into(),
-            Style::MinWidth(_) => MinWidthSpec::key().into_owned(),
-            Style::MaxWidth(_) => MaxWidthSpec::key().into_owned()
+            StyleKind::Bold(_) => Bold::key().into(),
+            StyleKind::HAlign(_) => HAlign::key().into(),
+            StyleKind::MinWidth(_) => MinWidth::key().into(),
+            StyleKind::MaxWidth(_) => MaxWidth::key().into()
         }
     }
-
-    pub fn as_bold(&self) -> Option<bool> {
-        match self {
-            Style::Bold(val) => Some(*val),
-            _ => None
-        }
-    }
-
-    pub fn as_h_align(&self) -> Option<&HAlignment> {
-        match self {
-            Style::HAlign(align) => Some(align),
-            _ => None
-        }
-    }
-}
-
-#[derive(Debug, Clone)]
-pub enum HAlignment {
-    Left,
-    Centred,
-    Right,
 }
 
 #[derive(Default)]
-pub struct Styles(HashMap<String, Style>);
+pub struct Styles(HashMap<String, StyleKind>);
 
-impl From<Vec<Style>> for Styles {
-    fn from(vec: Vec<Style>) -> Self {
+impl From<Vec<StyleKind>> for Styles {
+    fn from(vec: Vec<StyleKind>) -> Self {
         let mut styles = Styles::default();
         for style in vec {
             styles.insert(style);
@@ -106,12 +122,12 @@ impl From<Vec<Style>> for Styles {
 }
 
 impl Styles {
-    pub fn with(mut self, style: Style) -> Self {
+    pub fn with(mut self, style: StyleKind) -> Self {
         self.insert(style);
         self
     }
 
-    pub fn insert(&mut self, style: Style) -> Option<Style> {
+    pub fn insert(&mut self, style: StyleKind) -> Option<StyleKind> {
         self.0.insert(style.key(), style)
     }
 
@@ -121,11 +137,11 @@ impl Styles {
         }
     }
 
-    pub fn get(&self, key: &str) -> Option<&Style> {
+    pub fn get(&self, key: &str) -> Option<&StyleKind> {
         self.0.get(key)
     }
 
-    pub fn take(&mut self, key: &str) -> Option<Style> {
+    pub fn take(&mut self, key: &str) -> Option<StyleKind> {
         self.0.remove(key)
     }
 }
