@@ -35,6 +35,22 @@ impl Table {
             .max()
             .unwrap_or(0)
     }
+
+    pub fn cell(&self, col: usize, row: usize) -> Option<&Cell> {
+        if row >= self.rows.len() {
+            return None;
+        }
+        let row = &self.rows[row];
+        let cells = row.cells();
+        match cells {
+            None => None,
+            Some(cells) => cells.get(col)
+        }
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.num_rows() == 0 || self.num_cols() == 0
+    }
 }
 
 pub enum Row {
@@ -55,13 +71,13 @@ impl Row {
 
 // #[derive(Default)]
 // pub struct Cells(Vec<Cell>);
-// 
+//
 // impl From<Vec<Cell>> for Cells {
 //     fn from(vec: Vec<Cell>) -> Self {
 //         Self(vec)
 //     }
 // }
-// 
+//
 // impl Cells {
 //     pub fn slice(&self) -> &[Cell] {
 //         &self.0
