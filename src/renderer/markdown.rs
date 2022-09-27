@@ -32,11 +32,24 @@ const DEF_ALIGNMENT: HAlign = HAlign::Left;
 
 fn print_header_format(table: &Table, col_widths: &[usize], buf: &mut String) {
     buf.push('|');
-    for (col, width) in col_widths.iter().enumerate() {
+    for (col, &width) in col_widths.iter().enumerate() {
         let col = table.col(col).unwrap();
         let styles = col.combined_styles();
         let alignment = HAlign::resolve(&styles).unwrap_or(&DEF_ALIGNMENT);
-        buf.push_str(&pad(":", '-', *width, alignment));
+        match alignment {
+            HAlign::Left | HAlign::Right => {
+                // the smallest format is `-:` or `:-`; i.e., no fewer than 2 characters wide
+                let width = usize::max(2, width);
+                buf.push_str(&pad(":", '-', width, alignment));
+            }
+            _ => {
+                // the smallest format is `:-:`; i.e., no fewer than 3 characters wide
+                let width = usize::max(3, width);
+                buf.push(':');
+                (2..width).for_each(|_| buf.push('-'));
+                buf.push(':');
+            }
+        }
         buf.push('|');
     }
     buf.push_str(NEWLINE);
