@@ -1,10 +1,13 @@
-use stanza::model::{Cell, Row, Table};
+use stanza::model::{Cell, Col, Row, Table};
 use stanza::renderer::markdown::Markdown;
 use stanza::renderer::Renderer;
-use stanza::style::Styles;
+use stanza::style::{HAlignment, Style, Styles};
 
 fn main() {
     let table = Table::default()
+        .with_cols(vec![Col::Body(
+            Styles::default().with(Style::HAlign(HAlignment::Right)),
+        )])
         .with_row(Row::Header(
             Styles::default(),
             vec![Cell::from("Department"), Cell::from("Personnel")],

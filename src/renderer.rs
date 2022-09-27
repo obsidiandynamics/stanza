@@ -1,6 +1,7 @@
 use std::borrow::Cow;
 use crate::model::Table;
 use std::fmt::Display;
+use crate::style::HAlignment;
 
 pub mod ansi;
 pub mod markdown;
@@ -59,7 +60,7 @@ impl Table {
     }
 }
 
-pub fn pad(s: &str, p: char, width: usize) -> Cow<str> {
+pub fn pad<'a>(s: &'a str, p: char, width: usize, alignment: &HAlignment) -> Cow<'a, str> {
     let chars = s.chars().collect::<Vec<_>>();
     if chars.len() >= width {
         Cow::Borrowed(s)
@@ -70,8 +71,28 @@ pub fn pad(s: &str, p: char, width: usize) -> Cow<str> {
             buf.push(ch);
             consumed += 1;
         }
-        for _ in consumed..width {
-            buf.push(p);
+        match alignment {
+            HAlignment::Left => {
+                for _ in consumed..width {
+                    buf.push(p);
+                }
+            }
+            HAlignment::Centred => {
+                let mut added = 0;
+                for _ in consumed..width {
+                    if added % 2 == 0 {
+                        buf.push(p);
+                    } else {
+                        buf.insert(0, p);
+                    }
+                    added += 1;
+                }
+            }
+            HAlignment::Right => {
+                for _ in consumed..width {
+                    buf.insert(0, p);
+                }
+            }
         }
         Cow::Owned(buf)
     }
