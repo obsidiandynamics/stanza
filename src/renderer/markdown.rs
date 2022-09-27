@@ -1,6 +1,6 @@
 use crate::model::Table;
 use crate::renderer::{pad, Renderer, NEWLINE};
-use crate::style::{HAlignment, Style, Styled, KEY_H_ALIGN};
+use crate::style::{HAlignment, Style, KEY_H_ALIGN};
 
 #[derive(Default)]
 pub struct Markdown();
