@@ -1,3 +1,4 @@
+use std::ops::Deref;
 use crate::style::{Styled, Styles};
 
 #[derive(Default)]
@@ -5,6 +6,12 @@ pub struct Table {
     styles: Styles,
     cols: Vec<Col>,
     rows: Vec<Row>,
+}
+
+impl Styled for Table {
+    fn styles(&self) -> &Styles {
+        &self.styles
+    }
 }
 
 impl Table {
@@ -74,7 +81,7 @@ impl Table {
         }
     }
 
-    pub fn cell(&self, col: usize, row: usize) -> Option<Cell> {
+    pub fn cell(&self, col: usize, row: usize) -> Option<Element<Cell>> {
         if row >= self.rows.len() {
             return None;
         }
@@ -87,12 +94,13 @@ impl Table {
                 match cell {
                     None => None,
                     Some(cell) => {
-                        let mut styles = Styles::default();
-                        styles.insert_all(&self.styles);
-                        styles.insert_all(self.cols[col].styles());
-                        styles.insert_all(row.styles());
-                        styles.insert_all(&cell.styles);
-                        Some(Cell::new(styles, cell.data.clone()))
+                        let parent_styles = vec![
+                            &self.styles,
+                            self.cols[col].styles(),
+                            row.styles(),
+                            &cell.styles,
+                        ];
+                        Some(Element { parent_styles, element: cell })
                     }
                 }
             }
@@ -134,8 +142,10 @@ impl Row {
             Row::Separator(_) => None,
         }
     }
+}
 
-    pub fn styles(&self) -> &Styles {
+impl Styled for Row {
+    fn styles(&self) -> &Styles {
         match self {
             Row::Header(styles, _) => styles,
             Row::Body(styles, _) => styles,
@@ -149,13 +159,15 @@ pub struct Cell {
     data: String,
 }
 
+impl Styled for Cell {
+    fn styles(&self) -> &Styles {
+        &self.styles
+    }
+}
+
 impl Cell {
     pub fn new(styles: Styles, data: String) -> Self {
         Self { styles, data }
-    }
-
-    pub fn styles(&self) -> &Styles {
-        &self.styles
     }
 
     pub fn data(&self) -> &str {
@@ -179,10 +191,6 @@ impl<'a, T: Styled> Element<'a, T> {
         &self.parent_styles
     }
 
-    pub fn get(&self) -> &T {
-        &self.element
-    }
-
     pub fn combined_styles(&self) -> Styles {
         let mut styles = Styles::default();
         for &s in &self.parent_styles {
@@ -190,5 +198,13 @@ impl<'a, T: Styled> Element<'a, T> {
         }
         styles.insert_all(self.element.styles());
         styles
+    }
+}
+
+impl<'a, T: Styled> Deref for Element<'a, T> {
+    type Target = T;
+
+    fn deref(&self) -> &Self::Target {
+        &self.element
     }
 }

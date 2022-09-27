@@ -71,6 +71,10 @@ impl Styles {
     pub fn get(&self, key: &str) -> Option<&Style> {
         self.0.get(key)
     }
+
+    pub fn take(&mut self, key: &str) -> Option<Style> {
+        self.0.remove(key)
+    }
 }
 
 pub trait Styled {

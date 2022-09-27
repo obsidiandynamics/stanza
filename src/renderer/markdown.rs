@@ -1,6 +1,6 @@
 use crate::model::Table;
 use crate::renderer::{pad, Renderer, NEWLINE};
-use crate::style::{HAlignment, KEY_H_ALIGN, Style};
+use crate::style::{HAlignment, Style, Styled, KEY_H_ALIGN};
 
 #[derive(Default)]
 pub struct Markdown();
@@ -20,7 +20,15 @@ impl Renderer for Markdown {
         for col in 0..col_widths.len() {
             let cell = table.cell(col, 0);
             let data = cell.as_ref().map(|cell| cell.data()).unwrap_or("");
-            let data = pad(data, ' ', col_widths[col], &HAlignment::Centred);
+            let alignment = cell
+                .as_ref()
+                .map(|cell| {
+                    cell.combined_styles()
+                        .take(KEY_H_ALIGN)
+                        .unwrap_or(DEF_ALIGNMENT)
+                })
+                .unwrap_or(DEF_ALIGNMENT);
+            let data = pad(data, ' ', col_widths[col], alignment.as_h_align().unwrap());
             buf.push_str(&data);
             buf.push('|');
         }
@@ -43,11 +51,14 @@ impl Renderer for Markdown {
             for col in 0..col_widths.len() {
                 let cell = table.cell(col, row);
                 let data = cell.as_ref().map(|cell| cell.data()).unwrap_or("");
-                let alignment = cell.as_ref().map(|cell| {
-                    cell.styles()
-                        .get(KEY_H_ALIGN)
-                        .unwrap_or(&DEF_ALIGNMENT)
-                }).unwrap_or(&DEF_ALIGNMENT);
+                let alignment = cell
+                    .as_ref()
+                    .map(|cell| {
+                        cell.combined_styles()
+                            .take(KEY_H_ALIGN)
+                            .unwrap_or(DEF_ALIGNMENT)
+                    })
+                    .unwrap_or(DEF_ALIGNMENT);
                 let data = pad(data, ' ', col_widths[col], alignment.as_h_align().unwrap());
                 buf.push_str(&data);
                 buf.push('|');
