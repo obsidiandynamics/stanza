@@ -6,13 +6,13 @@ use stanza::style::{HAlign, MinWidth, StyleKind, Styles};
 fn main() {
     let table = Table::default()
         .with_cols(vec![
+            Col::Body(Styles::default().with(StyleKind::MinWidth(MinWidth(20))).with(StyleKind::HAlign(HAlign::Centred))),
+            Col::Body(Styles::default().with(StyleKind::MinWidth(MinWidth(20))).with(StyleKind::HAlign(HAlign::Centred))),
             Col::Header(Styles::default().with(StyleKind::MinWidth(MinWidth(20))).with(StyleKind::HAlign(HAlign::Centred))),
             Col::Body(Styles::default().with(StyleKind::MinWidth(MinWidth(20))).with(StyleKind::HAlign(HAlign::Centred))),
             Col::Body(Styles::default().with(StyleKind::MinWidth(MinWidth(20))).with(StyleKind::HAlign(HAlign::Centred))),
-            Col::Body(Styles::default().with(StyleKind::MinWidth(MinWidth(20))).with(StyleKind::HAlign(HAlign::Centred))),
-            Col::Header(Styles::default().with(StyleKind::MinWidth(MinWidth(20))).with(StyleKind::HAlign(HAlign::Centred))),
         ])
-        .with_row(Row::Header(
+        .with_row(Row::Body(
             Styles::default(),
             vec![
                 Cell::from("W"),
@@ -32,7 +32,7 @@ fn main() {
                 Cell::from(""),
             ],
         ))
-        .with_row(Row::Body(
+        .with_row(Row::Header(
             Styles::default(),
             vec![
                 Cell::from(""),
@@ -52,7 +52,7 @@ fn main() {
                 Cell::from(""),
             ],
         ))
-        .with_row(Row::Header(
+        .with_row(Row::Body(
             Styles::default(),
             vec![
                 Cell::from("Y"),
