@@ -8,27 +8,27 @@ fn main() {
         .with_cols(vec![
             Col::Body(
                 Styles::default()
-                    .with(StyleKind::MinWidth(MinWidth(20)))
+                    .with(StyleKind::MinWidth(MinWidth(5)))
                     .with(StyleKind::HAlign(HAlign::Centred)),
             ),
             Col::Body(
                 Styles::default()
-                    .with(StyleKind::MinWidth(MinWidth(20)))
+                    .with(StyleKind::MinWidth(MinWidth(5)))
                     .with(StyleKind::HAlign(HAlign::Centred)),
             ),
             Col::Body(
                 Styles::default()
-                    .with(StyleKind::MinWidth(MinWidth(20)))
+                    .with(StyleKind::MinWidth(MinWidth(5)))
                     .with(StyleKind::HAlign(HAlign::Centred)),
             ),
             Col::Body(
                 Styles::default()
-                    .with(StyleKind::MinWidth(MinWidth(20)))
+                    .with(StyleKind::MinWidth(MinWidth(5)))
                     .with(StyleKind::HAlign(HAlign::Centred)),
             ),
             Col::Body(
                 Styles::default()
-                    .with(StyleKind::MinWidth(MinWidth(20)))
+                    .with(StyleKind::MinWidth(MinWidth(5)))
                     .with(StyleKind::HAlign(HAlign::Centred)),
             ),
         ])
