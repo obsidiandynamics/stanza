@@ -1,5 +1,5 @@
 use stanza::model::{Cell, Col, Row, Table};
-use stanza::renderer::markdown::Markdown;
+use stanza::renderer::console::Console;
 use stanza::renderer::Renderer;
 use stanza::style::{HAlign, MaxWidth, MinWidth, StyleKind, Styles};
 
@@ -36,8 +36,8 @@ fn main() {
             vec![
                 Cell::from(""),
                 Cell::from(""),
-                Cell::from("The quick brown fox jumped over the lazy dog."),
+                Cell::from("The quick brown fox jumped over the lazy dog.\n The end!"),
             ],
         ));
-    println!("{}", Markdown::default().render(&table));
+    println!("{}", Console::default().render(&table));
 }

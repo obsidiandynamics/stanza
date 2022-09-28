@@ -81,6 +81,20 @@ impl Table {
         }
     }
 
+    pub fn row(&self, row: usize) -> Option<Element<Row>> {
+        let row = self.rows.get(row);
+        match row {
+            None => None,
+            Some(row) => {
+                let parent_styles = vec![&self.styles, row.styles()];
+                Some(Element {
+                    parent_styles,
+                    element: row,
+                })
+            }
+        }
+    }
+
     pub fn cell(&self, col: usize, row: usize) -> Option<Element<Cell>> {
         if row >= self.rows.len() {
             return None;
@@ -128,6 +142,16 @@ impl Styled for Col {
     }
 }
 
+impl Col {
+    pub fn is_header(&self) -> bool {
+        matches!(self, Col::Header(_))
+    }
+
+    pub fn is_separator(&self) -> bool {
+        matches!(self, Col::Separator(_))
+    }
+}
+
 pub enum Row {
     Header(Styles, Vec<Cell>),
     Body(Styles, Vec<Cell>),
@@ -141,6 +165,14 @@ impl Row {
             Row::Body(_, cells) => Some(cells),
             Row::Separator(_) => None,
         }
+    }
+
+    pub fn is_header(&self) -> bool {
+        matches!(self, Row::Header(_, _))
+    }
+
+    pub fn is_separator(&self) -> bool {
+        matches!(self, Row::Separator(_))
     }
 }
 

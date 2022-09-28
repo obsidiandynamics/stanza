@@ -75,6 +75,26 @@ fn wrap() {
             input: ("abc abcdefghijk tiny pair", 10),
             expect: vec!["abc abcdef", "ghijk tiny", "pair"]
         },
+        Case {
+            input: ("abc\ndef", 10),
+            expect: vec!["abc", "def"]
+        },
+        Case {
+            input: ("abc\n\ndef", 10),
+            expect: vec!["abc", "", "def"]
+        },
+        Case {
+            input: ("abc\n\ndef\n", 10), // single trailing newline is ignored
+            expect: vec!["abc", "", "def"]
+        },
+        Case {
+            input: ("abc\n\ndef\n\n", 10),
+            expect: vec!["abc", "", "def", ""]
+        },
+        Case {
+            input: ("abc\n\ndef ghi jkl", 10),
+            expect: vec!["abc", "", "def ghi", "jkl"]
+        },
     ] {
         let actual = super::wrap(case.input.0, case.input.1);
         assert_eq!(case.expect, actual, "for {:?}", &case);
