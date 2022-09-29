@@ -23,6 +23,10 @@ pub struct Decor {
     up_bold_right_bold_down_bold_left_bold: char,
     right_norm_left_norm: char,
     up_norm_down_norm: char,
+    right_norm_down_norm: char,
+    down_norm_left_norm: char,
+    up_norm_right_norm: char,
+    up_norm_left_norm: char,
     up_norm_right_norm_down_norm: char,
     up_norm_down_norm_left_norm: char,
     right_norm_down_norm_left_norm: char,
@@ -59,6 +63,10 @@ impl Decor {
             up_bold_right_bold_down_bold_left_bold: '╬',
             right_norm_left_norm: '─',
             up_norm_down_norm: '│',
+            right_norm_down_norm: '┌',
+            down_norm_left_norm: '┐',
+            up_norm_right_norm: '└',
+            up_norm_left_norm: '┘',
             up_norm_right_norm_down_norm: '├',
             up_norm_down_norm_left_norm: '┤',
             right_norm_down_norm_left_norm: '┬',
@@ -90,6 +98,10 @@ impl Decor {
             (Line::Bold, Line::Bold, Line::Bold, Line::Bold) => self.up_bold_right_bold_down_bold_left_bold,
             (Line::None, Line::Norm, Line::None, Line::Norm) => self.right_norm_left_norm,
             (Line::Norm, Line::None, Line::Norm, Line::None) => self.up_norm_down_norm,
+            (Line::None, Line::Norm, Line::Norm, Line::None) => self.right_norm_down_norm,
+            (Line::None, Line::None, Line::Norm, Line::Norm) => self.down_norm_left_norm,
+            (Line::Norm, Line::Norm, Line::None, Line::None) => self.up_norm_right_norm,
+            (Line::Norm, Line::None, Line::None, Line::Norm) => self.up_norm_left_norm,
             (Line::Norm, Line::Norm, Line::Norm, Line::None) => self.up_norm_right_norm_down_norm,
             (Line::Norm, Line::None, Line::Norm, Line::Norm) => self.up_norm_down_norm_left_norm,
             (Line::None, Line::Norm, Line::Norm, Line::Norm) => self.right_norm_down_norm_left_norm,
@@ -146,9 +158,13 @@ impl Renderer for Console {
 
             // lines comprising the row
             for line in 0..max_lines {
+                // right outer vertical separator
                 buf.push(decor.up_bold_down_bold);
+
                 for col in 0..col_widths.len() {
                     let grid_cell = &grid_row[col];
+
+                    // cell data
                     let line = grid_cell
                         .lines
                         .get(line)
@@ -157,17 +173,21 @@ impl Renderer for Console {
                     let alignment = HAlign::resolve(&grid_cell.styles).unwrap_or(&DEF_ALIGNMENT);
                     let line = pad(line, ' ', col_widths[col], &alignment);
                     buf.push_str(&line);
+
+                    // vertical cell separator
                     if col < col_widths.len() - 1 {
-                        let (up, down) = if row_separator {
-                            (Line::None, Line::None)
-                        } else if is_header_col(col) {
+                        let (up, down) = if is_header_col(col) {
                             (Line::Bold, Line::Bold)
+                        } else if row_separator {
+                            (Line::None, Line::None)
                         } else {
-                            (Line:: Norm, Line::Norm)
+                            (Line::Norm, Line::Norm)
                         };
                         buf.push(decor.lookup(up, Line::None, down, Line::None));
                     }
                 }
+
+                // right outer vertical separator
                 buf.push(decor.up_bold_down_bold);
                 buf.push_str(NEWLINE);
             }
