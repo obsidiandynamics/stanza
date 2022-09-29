@@ -36,7 +36,7 @@ fn main() {
             vec![
                 Cell::from(""),
                 Cell::from(""),
-                Cell::from("The quick brown fox jumped over the lazy dog.\n The end!"),
+                Cell::from("The quick brown fox jumped over the lazy dog.\nThe end!"),
             ],
         ));
     println!("{}", Console::default().render(&table));

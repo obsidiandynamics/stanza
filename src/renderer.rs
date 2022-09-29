@@ -3,7 +3,7 @@ use crate::style::{HAlign, MaxWidth, MinWidth, Style};
 use std::borrow::Cow;
 use std::fmt::Display;
 use std::mem;
-use crate::memoized::Memoized;
+use crate::lazy::Lazy;
 
 pub mod console;
 pub mod markdown;
@@ -25,7 +25,7 @@ impl Table {
     }
 
     pub fn col_width(&self, col: usize) -> usize {
-        let mut min_col_width = Memoized::new(|| {
+        let mut min_col_width = Lazy::new(|| {
             let col = self.col(col).unwrap();
             let styles = col.combined_styles();
             MinWidth::resolve(&styles).map_or(0, |min_width| min_width.0)
@@ -48,8 +48,8 @@ impl Table {
                             MinWidth::resolve(&cell.combined_styles()).map_or(0, |s| s.0);
                         let max_width =
                             MaxWidth::resolve(&cell.combined_styles()).map_or(usize::MAX, |s| s.0);
-                        let widest_line = split_preserving_whitespace(cell.data())
-                            .iter()
+                        let widest_line =
+                            cell.data().lines()
                             .map(|line| line.chars().count())
                             .max()
                             .unwrap_or(0);

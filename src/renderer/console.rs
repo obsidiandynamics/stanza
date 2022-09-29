@@ -23,6 +23,8 @@ pub struct Decor {
     up_bold_right_bold_down_bold_left_bold: char,
     right_norm_left_norm: char,
     up_norm_down_norm: char,
+    up_norm_right_norm_down_norm: char,
+    up_norm_down_norm_left_norm: char,
     right_norm_down_norm_left_norm: char,
     up_norm_right_norm_left_norm: char,
     up_norm_right_norm_down_norm_left_norm: char,
@@ -57,6 +59,8 @@ impl Decor {
             up_bold_right_bold_down_bold_left_bold: '╬',
             right_norm_left_norm: '─',
             up_norm_down_norm: '│',
+            up_norm_right_norm_down_norm: '├',
+            up_norm_down_norm_left_norm: '┤',
             right_norm_down_norm_left_norm: '┬',
             up_norm_right_norm_left_norm: '┴',
             up_norm_right_norm_down_norm_left_norm: '┼',
@@ -86,6 +90,8 @@ impl Decor {
             (Line::Bold, Line::Bold, Line::Bold, Line::Bold) => self.up_bold_right_bold_down_bold_left_bold,
             (Line::None, Line::Norm, Line::None, Line::Norm) => self.right_norm_left_norm,
             (Line::Norm, Line::None, Line::Norm, Line::None) => self.up_norm_down_norm,
+            (Line::Norm, Line::Norm, Line::Norm, Line::None) => self.up_norm_right_norm_down_norm,
+            (Line::Norm, Line::None, Line::Norm, Line::Norm) => self.up_norm_down_norm_left_norm,
             (Line::None, Line::Norm, Line::Norm, Line::Norm) => self.right_norm_down_norm_left_norm,
             (Line::Norm, Line::Norm, Line::None, Line::Norm) => self.up_norm_right_norm_left_norm,
             (Line::Norm, Line::Norm, Line::Norm, Line::Norm) => self.up_norm_right_norm_down_norm_left_norm,
@@ -170,21 +176,28 @@ impl Renderer for Console {
             if row < table.num_rows() - 1 {
                 let header_row = is_header_row(row);
                 let row_separator_below = table.row(row + 1).unwrap().is_separator();
-                let right = if header_row { Line::Bold } else { Line::Norm };
+                let col_separator_right = table.col(0).unwrap().is_separator();
+                let right = if header_row { Line::Bold } else if col_separator_right { Line::None } else { Line::Norm };
                 buf.push(decor.lookup(Line::Bold, right, Line::Bold, Line::None));
                 for (col, &width) in col_widths.iter().enumerate() {
-                    let (right, left) = if header_row { (Line::Bold, Line::Bold) } else { (Line::Norm, Line::Norm) };
+                    let col_separator = table.col(col).unwrap().is_separator();
+                    let (right, left) = if header_row { (Line::Bold, Line::Bold) } else if col_separator { (Line::None, Line::None) } else { (Line::Norm, Line::Norm) };
+                    // let left = if header_row { Line::Bold } else if col_separator { Line::None } else { Line::Norm };
                     let border = decor.lookup(Line::None, right, Line::None, left);
                     (0..width).for_each(|_| buf.push(border));
                     if col < col_widths.len() - 1 {
                         let header_col = is_header_col(col);
+                        let col_separator_right = table.col(col + 1).unwrap().is_separator();
                         let up = if header_col { Line::Bold } else if row_separator { Line::None } else { Line::Norm };
                         let down = if header_col { Line::Bold } else if row_separator_below { Line::None } else { Line::Norm };
-                        let (right, left) = if header_row { (Line::Bold, Line::Bold) } else { (Line::Norm, Line::Norm ) };
+                        let right = if header_row { Line::Bold } else if col_separator_right { Line::None } else { Line::Norm };
+                        let left = if header_row { Line::Bold } else if col_separator { Line::None } else { Line::Norm };
+                        // let (right, left) = if header_row { (Line::Bold, Line::Bold) } else { (Line::Norm, Line::Norm ) };
                         buf.push(decor.lookup(up, right, down, left));
                     }
                 }
-                let left = if header_row { Line::Bold } else { Line::Norm };
+                let col_separator_left = table.col(col_widths.len() - 1).unwrap().is_separator();
+                let left = if header_row { Line::Bold } else if col_separator_left { Line::None } else { Line::Norm };
                 buf.push(decor.lookup(Line::Bold, Line::None, Line::Bold, left));
                 buf.push_str(NEWLINE);
             }
