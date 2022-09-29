@@ -1,7 +1,7 @@
 use stanza::model::{Cell, Col, Row, Table};
 use stanza::renderer::console::Console;
 use stanza::renderer::Renderer;
-use stanza::style::{HAlign, MinWidth, StyleKind, Styles};
+use stanza::style::{HAlign, Header, MinWidth, StyleKind, Styles};
 use std::mem;
 
 fn main() {
@@ -78,8 +78,9 @@ fn cross_headers() -> Table {
                     .with(StyleKind::MinWidth(MinWidth(5)))
                     .with(StyleKind::HAlign(HAlign::Centred)),
             ),
-            Col::Header(
+            Col::Body(
                 Styles::default()
+                    .with(StyleKind::Header(Header(true)))
                     .with(StyleKind::MinWidth(MinWidth(5)))
                     .with(StyleKind::HAlign(HAlign::Centred)),
             ),
@@ -114,8 +115,8 @@ fn cross_headers() -> Table {
                 Cell::from(""),
             ],
         ))
-        .with_row(Row::Header(
-            Styles::default(),
+        .with_row(Row::Body(
+            Styles::default().with(StyleKind::Header(Header(true))),
             vec![
                 Cell::from("W"),
                 Cell::from(""),
@@ -149,8 +150,9 @@ fn cross_headers() -> Table {
 fn outer_headers() -> Table {
     Table::default()
         .with_cols(vec![
-            Col::Header(
+            Col::Body(
                 Styles::default()
+                    .with(StyleKind::Header(Header(true)))
                     .with(StyleKind::MinWidth(MinWidth(5)))
                     .with(StyleKind::HAlign(HAlign::Centred)),
             ),
@@ -169,14 +171,15 @@ fn outer_headers() -> Table {
                     .with(StyleKind::MinWidth(MinWidth(5)))
                     .with(StyleKind::HAlign(HAlign::Centred)),
             ),
-            Col::Header(
+            Col::Body(
                 Styles::default()
+                    .with(StyleKind::Header(Header(true)))
                     .with(StyleKind::MinWidth(MinWidth(5)))
                     .with(StyleKind::HAlign(HAlign::Centred)),
             ),
         ])
-        .with_row(Row::Header(
-            Styles::default(),
+        .with_row(Row::Body(
+            Styles::default().with(StyleKind::Header(Header(true))),
             vec![
                 Cell::from("NW"),
                 Cell::from(""),
@@ -215,8 +218,8 @@ fn outer_headers() -> Table {
                 Cell::from(""),
             ],
         ))
-        .with_row(Row::Header(
-            Styles::default(),
+        .with_row(Row::Body(
+            Styles::default().with(StyleKind::Header(Header(true))),
             vec![
                 Cell::from("SW"),
                 Cell::from(""),
@@ -584,8 +587,9 @@ fn grid_separators() -> Table {
 fn grid_separators_outer_headers() -> Table {
     Table::default()
         .with_cols(vec![
-            Col::Header(
+            Col::Body(
                 Styles::default()
+                    .with(StyleKind::Header(Header(true)))
                     .with(StyleKind::MinWidth(MinWidth(5)))
                     .with(StyleKind::HAlign(HAlign::Centred)),
             ),
@@ -604,14 +608,15 @@ fn grid_separators_outer_headers() -> Table {
                     .with(StyleKind::MinWidth(MinWidth(5)))
                     .with(StyleKind::HAlign(HAlign::Centred)),
             ),
-            Col::Header(
+            Col::Body(
                 Styles::default()
+                    .with(StyleKind::Header(Header(true)))
                     .with(StyleKind::MinWidth(MinWidth(5)))
                     .with(StyleKind::HAlign(HAlign::Centred)),
             ),
         ])
-        .with_row(Row::Header(
-            Styles::default(),
+        .with_row(Row::Body(
+            Styles::default().with(StyleKind::Header(Header(true))),
             vec![
                 Cell::from("NW"),
                 Cell::from(""),
@@ -636,8 +641,8 @@ fn grid_separators_outer_headers() -> Table {
         .with_row(Row::Separator(
             Styles::default(),
         ))
-        .with_row(Row::Header(
-            Styles::default(),
+        .with_row(Row::Body(
+            Styles::default().with(StyleKind::Header(Header(true))),
             vec![
                 Cell::from("SW"),
                 Cell::from(""),
@@ -661,8 +666,9 @@ fn grid_seps_cross_headers() -> Table {
                     .with(StyleKind::MinWidth(MinWidth(5)))
                     .with(StyleKind::HAlign(HAlign::Centred)),
             ),
-            Col::Header(
+            Col::Body(
                 Styles::default()
+                    .with(StyleKind::Header(Header(true)))
                     .with(StyleKind::MinWidth(MinWidth(5)))
                     .with(StyleKind::HAlign(HAlign::Centred)),
             ),
@@ -690,8 +696,8 @@ fn grid_seps_cross_headers() -> Table {
         .with_row(Row::Separator(
             Styles::default(),
         ))
-        .with_row(Row::Header(
-            Styles::default(),
+        .with_row(Row::Body(
+            Styles::default().with(StyleKind::Header(Header(true))),
             vec![
                 Cell::from("W"),
                 Cell::from(""),

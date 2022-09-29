@@ -1,7 +1,7 @@
 use stanza::model::{Cell, Col, Row, Table};
 use stanza::renderer::console::Console;
 use stanza::renderer::Renderer;
-use stanza::style::{HAlign, MaxWidth, MinWidth, StyleKind, Styles};
+use stanza::style::{HAlign, Header, MaxWidth, MinWidth, StyleKind, Styles};
 
 fn main() {
     let table = Table::default()
@@ -10,8 +10,8 @@ fn main() {
             Col::Body(Styles::default().with(StyleKind::MinWidth(MinWidth(20))).with(StyleKind::HAlign(HAlign::Centred))),
             Col::Body(Styles::default().with(StyleKind::MinWidth(MinWidth(10))).with(StyleKind::MaxWidth(MaxWidth(20)))),
         ])
-        .with_row(Row::Header(
-            Styles::default(),
+        .with_row(Row::Body(
+            Styles::default().with(StyleKind::Header(Header(true))),
             vec![
                 Cell::from("Department"),
                 Cell::from("Personnel"),

@@ -1,7 +1,7 @@
 use std::borrow::Cow;
 use std::collections::HashMap;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct Bold(pub bool);
 
 impl Style for Bold {
@@ -11,9 +11,27 @@ impl Style for Bold {
 }
 
 impl<'a> From<&'a StyleKind> for Option<&'a Bold> {
-    fn from(style: &'a StyleKind) -> Self {
-        match style {
-            StyleKind::Bold(spec) => Some(spec),
+    fn from(kind: &'a StyleKind) -> Self {
+        match kind {
+            StyleKind::Bold(style) => Some(style),
+            _ => None
+        }
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct Header(pub bool);
+
+impl Style for Header {
+    fn key() -> Cow<'static, str> {
+        Cow::Borrowed("header")
+    }
+}
+
+impl<'a> From<&'a StyleKind> for Option<&'a Header> {
+    fn from(kind: &'a StyleKind) -> Self {
+        match kind {
+            StyleKind::Header(style) => Some(style),
             _ => None
         }
     }
@@ -26,6 +44,22 @@ pub enum HAlign {
     Right,
 }
 
+impl HAlign {
+    /// The `const` default value of [`HAlign`].
+    ///
+    /// Note, since `const fn` cannot be used in traits, an explicit `const` default value
+    /// is provided here.
+    pub const fn default() -> Self {
+        HAlign::Left
+    }
+}
+
+impl Default for HAlign {
+    fn default() -> Self {
+        Self::default()
+    }
+}
+
 impl Style for HAlign {
     fn key() -> Cow<'static, str> {
         Cow::Borrowed("h_align")
@@ -33,15 +67,15 @@ impl Style for HAlign {
 }
 
 impl<'a> From<&'a StyleKind> for Option<&'a HAlign> {
-    fn from(style: &'a StyleKind) -> Self {
-        match style {
-            StyleKind::HAlign(spec) => Some(spec),
+    fn from(kind: &'a StyleKind) -> Self {
+        match kind {
+            StyleKind::HAlign(style) => Some(style),
             _ => None
         }
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct MinWidth(pub usize);
 
 impl Style for MinWidth {
@@ -51,9 +85,9 @@ impl Style for MinWidth {
 }
 
 impl<'a> From<&'a StyleKind> for Option<&'a MinWidth> {
-    fn from(style: &'a StyleKind) -> Self {
-        match style {
-            StyleKind::MinWidth(spec) => Some(spec),
+    fn from(kind: &'a StyleKind) -> Self {
+        match kind {
+            StyleKind::MinWidth(style) => Some(style),
             _ => None
         }
     }
@@ -62,6 +96,12 @@ impl<'a> From<&'a StyleKind> for Option<&'a MinWidth> {
 #[derive(Debug, Clone)]
 pub struct MaxWidth(pub usize);
 
+impl Default for MaxWidth {
+    fn default() -> Self {
+        Self(usize::MAX)
+    }
+}
+
 impl Style for MaxWidth {
     fn key() -> Cow<'static, str> {
         Cow::Borrowed("min_width")
@@ -69,28 +109,37 @@ impl Style for MaxWidth {
 }
 
 impl<'a> From<&'a StyleKind> for Option<&'a MaxWidth> {
-    fn from(style: &'a StyleKind) -> Self {
-        match style {
-            StyleKind::MaxWidth(spec) => Some(spec),
+    fn from(kind: &'a StyleKind) -> Self {
+        match kind {
+            StyleKind::MaxWidth(style) => Some(style),
             _ => None
         }
     }
 }
 
-pub trait Style where Self: Sized, for <'a> Option<&'a Self>: From<&'a StyleKind> {
+pub trait Style where Self: Clone, for <'a> Option<&'a Self>: From<&'a StyleKind> {
     fn key() -> Cow<'static, str>;
 
     fn resolve(styles: &Styles) -> Option<&Self> {
-        let style = styles.get(&Self::key());
-        match style {
+        let kind = styles.get(&Self::key());
+        match kind {
             None => None,
-            Some(style) => style.into()
+            Some(kind) => kind.into()
+        }
+    }
+
+    fn resolve_or_default(styles: &Styles) -> Cow<Self> where Self: Default {
+        let style = Self::resolve(styles);
+        match style {
+            None => Cow::Owned(Self::default()),
+            Some(style) => Cow::Borrowed(style)
         }
     }
 }
 
 #[derive(Debug, Clone)]
 pub enum StyleKind {
+    Header(Header),
     Bold(Bold),
     HAlign(HAlign),
     MinWidth(MinWidth),
@@ -100,6 +149,7 @@ pub enum StyleKind {
 impl StyleKind {
     pub fn key(&self) -> String {
         match self {
+            StyleKind::Header(_) => Header::key().into(),
             StyleKind::Bold(_) => Bold::key().into(),
             StyleKind::HAlign(_) => HAlign::key().into(),
             StyleKind::MinWidth(_) => MinWidth::key().into(),

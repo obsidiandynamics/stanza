@@ -28,7 +28,7 @@ impl Renderer for Markdown {
     }
 }
 
-const DEF_ALIGNMENT: HAlign = HAlign::Left;
+const DEF_ALIGNMENT: HAlign = HAlign::default();
 
 fn print_header_format(table: &Table, col_widths: &[usize], buf: &mut String) {
     buf.push('|');
