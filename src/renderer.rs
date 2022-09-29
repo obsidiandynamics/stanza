@@ -3,6 +3,7 @@ use crate::style::{HAlign, MaxWidth, MinWidth, Style};
 use std::borrow::Cow;
 use std::fmt::Display;
 use std::mem;
+use crate::memoized::Memoized;
 
 pub mod console;
 pub mod markdown;
@@ -24,21 +25,37 @@ impl Table {
     }
 
     pub fn col_width(&self, col: usize) -> usize {
+        let mut min_col_width = Memoized::new(|| {
+            let col = self.col(col).unwrap();
+            let styles = col.combined_styles();
+            MinWidth::resolve(&styles).map_or(0, |min_width| min_width.0)
+        });
+
         (0..self.num_rows())
             .into_iter()
             .map(|row| self.cell(col, row))
             .map(|cell| {
-                cell.map_or(0, |cell| {
-                    let min_width = MinWidth::resolve(&cell.combined_styles()).map_or(0, |s| s.0);
-                    let max_width =
-                        MaxWidth::resolve(&cell.combined_styles()).map_or(usize::MAX, |s| s.0);
-                    let widest_line = split_preserving_whitespace(cell.data())
-                        .iter()
-                        .map(|line| line.chars().count())
-                        .max()
-                        .unwrap_or(0);
-                    usize::min(usize::max(min_width, widest_line), max_width)
-                })
+                cell.map_or_else(
+                    || {
+                        // if there is no cell at the given col/row coordinate, fall back to the
+                        // column MinWidth constraint
+                        *min_col_width.get()
+                    },
+                    |cell| {
+                        // if a cell exists at the given col/row coordinate, calculate the width from the combination
+                        // of its data and the MinWidth/MaxWidth constraints
+                        let min_width =
+                            MinWidth::resolve(&cell.combined_styles()).map_or(0, |s| s.0);
+                        let max_width =
+                            MaxWidth::resolve(&cell.combined_styles()).map_or(usize::MAX, |s| s.0);
+                        let widest_line = split_preserving_whitespace(cell.data())
+                            .iter()
+                            .map(|line| line.chars().count())
+                            .max()
+                            .unwrap_or(0);
+                        usize::min(usize::max(min_width, widest_line), max_width)
+                    },
+                )
             })
             .max()
             .unwrap_or(0)
