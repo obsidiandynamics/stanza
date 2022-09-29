@@ -32,8 +32,12 @@ impl Table {
                     let min_width = MinWidth::resolve(&cell.combined_styles()).map_or(0, |s| s.0);
                     let max_width =
                         MaxWidth::resolve(&cell.combined_styles()).map_or(usize::MAX, |s| s.0);
-                    let data_len = cell.data().len();
-                    usize::min(usize::max(min_width, data_len), max_width)
+                    let widest_line = split_preserving_whitespace(cell.data())
+                        .iter()
+                        .map(|line| line.chars().count())
+                        .max()
+                        .unwrap_or(0);
+                    usize::min(usize::max(min_width, widest_line), max_width)
                 })
             })
             .max()
@@ -86,7 +90,7 @@ pub fn wrap(s: &str, width: usize) -> Vec<String> {
         wrapped_lines_before = wrapped_lines.len();
         let mut buf_chars = 0;
         let mut buf = String::new();
-        for word in input_line.split_whitespace() {
+        for word in split_preserving_whitespace(input_line) {
             let chars = word.chars();
             let word_chars = chars.count();
             let needed_width = if buf_chars > 0 {
@@ -121,7 +125,7 @@ pub fn wrap(s: &str, width: usize) -> Vec<String> {
                 let current_buf = mem::replace(&mut buf, String::new());
                 wrapped_lines.push(current_buf);
                 buf_chars = word_chars;
-                buf.push_str(word)
+                buf.push_str(&word)
             } else {
                 // can fit on this line
                 if buf_chars > 0 {
@@ -129,7 +133,7 @@ pub fn wrap(s: &str, width: usize) -> Vec<String> {
                     buf_chars += 1;
                     buf.push(' ');
                 }
-                buf.push_str(word);
+                buf.push_str(&word);
                 buf_chars += word_chars;
             }
         }
@@ -148,6 +152,49 @@ pub fn wrap(s: &str, width: usize) -> Vec<String> {
     }
 
     wrapped_lines
+}
+
+/// Splits a string slice by whitespace, while preserving extraneous whitespace that
+/// appears after the first encountered separator.
+///
+/// This splitter has the convenient property that the number of whitespace characters
+/// in the input can be deterministically obtained by counting the number of whitespace
+/// characters in the output fragments and adding the number of fragments, less one.
+///
+/// # Examples
+/// ```
+/// use stanza::renderer::split_preserving_whitespace;
+///
+/// let input = " what a  wonderful day ";
+/// let output = split_preserving_whitespace(input);
+/// assert_eq!(vec![" what", "a", " wonderful", "day", ""], output);
+///
+/// fn count_whitespace(s: &str) -> usize {
+///     s.chars().filter(|ch| ch.is_whitespace()).count()
+/// }
+///
+/// let whitespace_in_input = count_whitespace(input);
+/// let whitespace_in_output = output.iter().map(|frag| count_whitespace(frag)).sum::<usize>();
+/// assert_eq!(whitespace_in_input, whitespace_in_output + output.len() - 1);
+/// ```
+pub fn split_preserving_whitespace(s: &str) -> Vec<String> {
+    let mut frags = Vec::new();
+    let mut buf = String::new();
+
+    let mut prev_whitespace = true;
+    for ch in s.chars() {
+        let whitespace = ch.is_whitespace();
+        if prev_whitespace || !whitespace {
+            buf.push(ch);
+            prev_whitespace = whitespace;
+        } else {
+            frags.push(mem::replace(&mut buf, String::new()));
+            prev_whitespace = true;
+        }
+    }
+
+    frags.push(buf);
+    frags
 }
 
 #[cfg(test)]
