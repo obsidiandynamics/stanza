@@ -7,11 +7,11 @@ use stanza::style::{HAlign, Header, MaxWidth, MinWidth, Separator, StyleKind, St
 fn main() {
     let table = Table::default()
         .with_cols(vec![
-            Col::Body(Styles::default().with(StyleKind::HAlign(HAlign::Right))),
-            Col::Body(Styles::default().with(StyleKind::MinWidth(MinWidth(20))).with(StyleKind::HAlign(HAlign::Centred))),
-            Col::Body(Styles::default().with(StyleKind::MinWidth(MinWidth(10))).with(StyleKind::MaxWidth(MaxWidth(20)))),
+            Col::new(Styles::default().with(StyleKind::HAlign(HAlign::Right))),
+            Col::new(Styles::default().with(StyleKind::MinWidth(MinWidth(20))).with(StyleKind::HAlign(HAlign::Centred))),
+            Col::new(Styles::default().with(StyleKind::MinWidth(MinWidth(10))).with(StyleKind::MaxWidth(MaxWidth(20)))),
         ])
-        .with_row(Row::Body(
+        .with_row(Row::new(
             Styles::default().with(StyleKind::Header(Header(true))),
             vec![
                 Cell::from("Department"),
@@ -19,11 +19,11 @@ fn main() {
                 Cell::from("Budget"),
             ],
         ))
-        .with_row(Row::Body(
+        .with_row(Row::new(
             Styles::default(),
             vec![Cell::from("Sales"), Cell::from(39), Cell::from(300_000.0)],
         ))
-        .with_row(Row::Body(
+        .with_row(Row::new(
             Styles::default(),
             vec![
                 Cell::from("Engineering"),
@@ -31,8 +31,8 @@ fn main() {
                 Cell::from(1_150_000.0),
             ],
         ))
-        .with_row(Row::Body(Styles::default().with(StyleKind::Separator(Separator(true))), vec![]))
-        .with_row(Row::Body(
+        .with_row(Row::new(Styles::default().with(StyleKind::Separator(Separator(true))), vec![]))
+        .with_row(Row::new(
             Styles::default(),
             vec![
                 Cell::from(""),

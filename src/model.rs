@@ -29,10 +29,8 @@ impl Table {
     }
 
     pub fn with_row(mut self, row: Row) -> Self {
-        if let Some(cells) = row.cells() {
-            while self.cols.len() < cells.len() {
-                self.cols.push(Col::Body(Styles::default()))
-            }
+        while self.cols.len() < row.1.len() {
+            self.cols.push(Col::new(Styles::default()))
         }
         self.push_row(row);
         self
@@ -62,7 +60,7 @@ impl Table {
     fn compute_widest_row(&self) -> usize {
         self.rows
             .iter()
-            .map(|row| row.cells().map_or(0, |cells| cells.len()))
+            .map(|row| row.1.len())
             .max()
             .unwrap_or(0)
     }
@@ -100,23 +98,17 @@ impl Table {
             return None;
         }
         let row = &self.rows[row];
-        let cells = row.cells();
-        match cells {
+        let cell = row.1.get(col);
+        match cell {
             None => None,
-            Some(cells) => {
-                let cell = cells.get(col);
-                match cell {
-                    None => None,
-                    Some(cell) => {
-                        let parent_styles = vec![
-                            &self.styles,
-                            self.cols[col].styles(),
-                            row.styles(),
-                            &cell.styles,
-                        ];
-                        Some(Element { parent_styles, element: cell })
-                    }
-                }
+            Some(cell) => {
+                let parent_styles = vec![
+                    &self.styles,
+                    self.cols[col].styles(),
+                    row.styles(),
+                    &cell.styles,
+                ];
+                Some(Element { parent_styles, element: cell })
             }
         }
     }
@@ -126,45 +118,35 @@ impl Table {
     }
 }
 
-pub enum Col {
-    Header(Styles),
-    Body(Styles),
-    Separator(Styles),
+pub struct Col(Styles);
+
+impl Col {
+    pub fn new(styles: Styles) -> Self {
+        Self(styles)
+    }
 }
 
 impl Styled for Col {
     fn styles(&self) -> &Styles {
-        match self {
-            Col::Header(styles) => styles,
-            Col::Body(styles) => styles,
-            Col::Separator(styles) => styles,
-        }
+        &self.0
     }
 }
 
-pub enum Row {
-    Header(Styles, Vec<Cell>),
-    Body(Styles, Vec<Cell>),
-    Separator(Styles),
-}
+pub struct Row(Styles, Vec<Cell>);
 
 impl Row {
-    pub fn cells(&self) -> Option<&[Cell]> {
-        match self {
-            Row::Header(_, cells) => Some(cells),
-            Row::Body(_, cells) => Some(cells),
-            Row::Separator(_) => None,
-        }
+    pub fn new(styles: Styles, cells: Vec<Cell>) -> Self {
+        Self(styles, cells)
+    }
+
+    pub fn cells(&self) -> &[Cell] {
+        &self.1
     }
 }
 
 impl Styled for Row {
     fn styles(&self) -> &Styles {
-        match self {
-            Row::Header(styles, _) => styles,
-            Row::Body(styles, _) => styles,
-            Row::Separator(styles) => styles,
-        }
+        &self.0
     }
 }
 
