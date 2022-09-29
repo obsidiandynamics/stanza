@@ -137,20 +137,29 @@ impl Renderer for Console {
         let is_header_row =
             |row| table.row(row).unwrap().is_header() || table.row(row + 1).unwrap().is_header();
 
-        // upper outside border
-        buf.push(decor.right_bold_down_bold);
+        // upper outside border...
+        // top-left corner
+        let top_left = decor.lookup(Line::None, Line::Bold, Line::Bold, Line::None);
+        buf.push(top_left);
+        let horizontal_line = decor.lookup(Line::None, Line::Bold, Line::None, Line::Bold);
         for (col, &width) in col_widths.iter().enumerate() {
-            (0..width).for_each(|_| buf.push(decor.right_bold_left_bold));
+            // horizontal line
+            (0..width).for_each(|_| buf.push(horizontal_line));
+
             if col < col_widths.len() - 1 {
+                // junction between cells
                 let row_separator_below = table.row(0).unwrap().is_separator();
                 let down = if is_header_col(col) { Line::Bold } else if row_separator_below { Line::None } else { Line::Norm };
                 buf.push(decor.lookup(Line::None, Line::Bold, down, Line::Bold));
             }
         }
-        buf.push(decor.down_bold_left_bold);
+        // bottom-right corner
+        let top_right = decor.lookup(Line::None, Line::None, Line::Bold, Line::Bold);
+        buf.push(top_right);
         buf.push_str(NEWLINE);
 
-        // table (incl. headers and body)
+        // table (incl. headers and body)...
+        let vertical_line = decor.lookup(Line::Bold, Line::None, Line::Bold, Line::None);
         for row in 0..table.num_rows() {
             let row_separator = table.row(row).unwrap().is_separator();
             let grid_row = &grid[row];
@@ -159,7 +168,7 @@ impl Renderer for Console {
             // lines comprising the row
             for line in 0..max_lines {
                 // right outer vertical separator
-                buf.push(decor.up_bold_down_bold);
+                buf.push(vertical_line);
 
                 for col in 0..col_widths.len() {
                     let grid_cell = &grid_row[col];
@@ -188,7 +197,7 @@ impl Renderer for Console {
                 }
 
                 // right outer vertical separator
-                buf.push(decor.up_bold_down_bold);
+                buf.push(vertical_line);
                 buf.push_str(NEWLINE);
             }
 
@@ -196,26 +205,32 @@ impl Renderer for Console {
             if row < table.num_rows() - 1 {
                 let header_row = is_header_row(row);
                 let row_separator_below = table.row(row + 1).unwrap().is_separator();
+
+                // vertical line with possible right junction
                 let col_separator_right = table.col(0).unwrap().is_separator();
                 let right = if header_row { Line::Bold } else if col_separator_right { Line::None } else { Line::Norm };
                 buf.push(decor.lookup(Line::Bold, right, Line::Bold, Line::None));
+
+                // horizontal line below the cell
                 for (col, &width) in col_widths.iter().enumerate() {
                     let col_separator = table.col(col).unwrap().is_separator();
                     let (right, left) = if header_row { (Line::Bold, Line::Bold) } else if col_separator { (Line::None, Line::None) } else { (Line::Norm, Line::Norm) };
-                    // let left = if header_row { Line::Bold } else if col_separator { Line::None } else { Line::Norm };
                     let border = decor.lookup(Line::None, right, Line::None, left);
                     (0..width).for_each(|_| buf.push(border));
+
                     if col < col_widths.len() - 1 {
+                        // junction between cells
                         let header_col = is_header_col(col);
                         let col_separator_right = table.col(col + 1).unwrap().is_separator();
                         let up = if header_col { Line::Bold } else if row_separator { Line::None } else { Line::Norm };
                         let down = if header_col { Line::Bold } else if row_separator_below { Line::None } else { Line::Norm };
                         let right = if header_row { Line::Bold } else if col_separator_right { Line::None } else { Line::Norm };
                         let left = if header_row { Line::Bold } else if col_separator { Line::None } else { Line::Norm };
-                        // let (right, left) = if header_row { (Line::Bold, Line::Bold) } else { (Line::Norm, Line::Norm ) };
                         buf.push(decor.lookup(up, right, down, left));
                     }
                 }
+
+                // vertical line with possible left junction
                 let col_separator_left = table.col(col_widths.len() - 1).unwrap().is_separator();
                 let left = if header_row { Line::Bold } else if col_separator_left { Line::None } else { Line::Norm };
                 buf.push(decor.lookup(Line::Bold, Line::None, Line::Bold, left));
@@ -223,17 +238,24 @@ impl Renderer for Console {
             }
         }
 
-        // lower outside border
-        buf.push(decor.up_bold_right_bold);
+        // lower outside border...
+        // bottom-left corner
+        let bottom_left = decor.lookup(Line::Bold, Line::Bold, Line::None, Line::None);
+        buf.push(bottom_left);
         for (col, &width) in col_widths.iter().enumerate() {
-            (0..width).for_each(|_| buf.push(decor.right_bold_left_bold));
+            // horizontal line
+            (0..width).for_each(|_| buf.push(horizontal_line));
+
             if col < col_widths.len() - 1 {
+                // junction between cells
                 let row_separator_above = table.row(table.num_rows() - 1).unwrap().is_separator();
                 let up = if is_header_col(col) { Line::Bold } else if row_separator_above { Line::None } else { Line::Norm };
                 buf.push(decor.lookup(up, Line::Bold, Line::None, Line::Bold));
             }
         }
-        buf.push(decor.up_bold_left_bold);
+        // bottom-right corner
+        let bottom_right = decor.lookup(Line::Bold, Line::None, Line::None, Line::Bold);
+        buf.push(bottom_right);
         buf.push_str(NEWLINE);
 
         buf

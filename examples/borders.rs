@@ -6,12 +6,13 @@ use std::mem;
 
 fn main() {
     const NUM_ROWS: usize = 4;
-    const EXAMPLES: &[(&str, fn() -> Table); 16] = &[
+    const EXAMPLES: &[(&str, fn() -> Table); 17] = &[
         ("cross_headers", || cross_headers()),
         ("outer_headers", || outer_headers()),
         ("inner_row_separator", || inner_row_separator()),
         ("inner_col_separator", || inner_col_separator()),
         ("cross_separators", || cross_separators()),
+        ("window_separators", || window_separators()),
         ("grid_separators", || grid_separators()),
         ("grid_seps_outer_headers", || grid_separators_outer_headers()),
         ("grid_seps_cross_headers", || grid_seps_cross_headers()),
@@ -453,6 +454,66 @@ fn cross_separators() -> Table {
         ))
 }
 
+fn window_separators() -> Table {
+    Table::default()
+        .with_cols(vec![
+            Col::Separator(
+                Styles::default()
+                    .with(StyleKind::MinWidth(MinWidth(5)))
+                    .with(StyleKind::HAlign(HAlign::Centred)),
+            ),
+            Col::Body(
+                Styles::default()
+                    .with(StyleKind::MinWidth(MinWidth(5)))
+                    .with(StyleKind::HAlign(HAlign::Centred)),
+            ),
+            Col::Separator(
+                Styles::default()
+                    .with(StyleKind::MinWidth(MinWidth(5)))
+                    .with(StyleKind::HAlign(HAlign::Centred)),
+            ),
+            Col::Body(
+                Styles::default()
+                    .with(StyleKind::MinWidth(MinWidth(5)))
+                    .with(StyleKind::HAlign(HAlign::Centred)),
+            ),
+            Col::Separator(
+                Styles::default()
+                    .with(StyleKind::MinWidth(MinWidth(5)))
+                    .with(StyleKind::HAlign(HAlign::Centred)),
+            ),
+        ])
+        .with_row(Row::Separator(
+            Styles::default(),
+        ))
+        .with_row(Row::Body(
+            Styles::default(),
+            vec![
+                Cell::from(""),
+                Cell::from("NW"),
+                Cell::from(""),
+                Cell::from("NE"),
+                Cell::from(""),
+            ],
+        ))
+        .with_row(Row::Separator(
+            Styles::default(),
+        ))
+        .with_row(Row::Body(
+            Styles::default(),
+            vec![
+                Cell::from(""),
+                Cell::from("SW"),
+                Cell::from(""),
+                Cell::from("SE"),
+                Cell::from(""),
+            ],
+        ))
+        .with_row(Row::Separator(
+            Styles::default(),
+        ))
+}
+
 fn grid_separators() -> Table {
     Table::default()
         .with_cols(vec![
@@ -487,7 +548,7 @@ fn grid_separators() -> Table {
             vec![
                 Cell::from("NW"),
                 Cell::from(""),
-                Cell::from(""),
+                Cell::from("N"),
                 Cell::from(""),
                 Cell::from("NE"),
             ],
@@ -498,11 +559,11 @@ fn grid_separators() -> Table {
         .with_row(Row::Body(
             Styles::default(),
             vec![
+                Cell::from("W"),
                 Cell::from(""),
+                Cell::from("C"),
                 Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
+                Cell::from("E"),
             ],
         ))
         .with_row(Row::Separator(
@@ -513,7 +574,7 @@ fn grid_separators() -> Table {
             vec![
                 Cell::from("SW"),
                 Cell::from(""),
-                Cell::from(""),
+                Cell::from("S"),
                 Cell::from(""),
                 Cell::from("SE"),
             ],
@@ -554,7 +615,7 @@ fn grid_separators_outer_headers() -> Table {
             vec![
                 Cell::from("NW"),
                 Cell::from(""),
-                Cell::from(""),
+                Cell::from("N"),
                 Cell::from(""),
                 Cell::from("NE"),
             ],
@@ -565,11 +626,11 @@ fn grid_separators_outer_headers() -> Table {
         .with_row(Row::Body(
             Styles::default(),
             vec![
+                Cell::from("W"),
                 Cell::from(""),
+                Cell::from("C"),
                 Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
+                Cell::from("E"),
             ],
         ))
         .with_row(Row::Separator(
@@ -580,7 +641,7 @@ fn grid_separators_outer_headers() -> Table {
             vec![
                 Cell::from("SW"),
                 Cell::from(""),
-                Cell::from(""),
+                Cell::from("S"),
                 Cell::from(""),
                 Cell::from("SE"),
             ],
@@ -621,7 +682,7 @@ fn grid_seps_cross_headers() -> Table {
             vec![
                 Cell::from("NW"),
                 Cell::from(""),
-                Cell::from(""),
+                Cell::from("N"),
                 Cell::from(""),
                 Cell::from("NE"),
             ],
@@ -632,11 +693,11 @@ fn grid_seps_cross_headers() -> Table {
         .with_row(Row::Header(
             Styles::default(),
             vec![
+                Cell::from("W"),
                 Cell::from(""),
+                Cell::from("C"),
                 Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
+                Cell::from("E"),
             ],
         ))
         .with_row(Row::Separator(
@@ -647,7 +708,7 @@ fn grid_seps_cross_headers() -> Table {
             vec![
                 Cell::from("SW"),
                 Cell::from(""),
-                Cell::from(""),
+                Cell::from("S"),
                 Cell::from(""),
                 Cell::from("SE"),
             ],
@@ -687,21 +748,21 @@ fn outer_row_separators() -> Table {
         .with_row(Row::Body(
             Styles::default(),
             vec![
-                Cell::from("NW"),
+                Cell::from("WNW"),
                 Cell::from(""),
                 Cell::from(""),
                 Cell::from(""),
-                Cell::from("NE"),
+                Cell::from("ENE"),
             ],
         ))
         .with_row(Row::Body(
             Styles::default(),
             vec![
-                Cell::from("SW"),
+                Cell::from("WSW"),
                 Cell::from(""),
                 Cell::from(""),
                 Cell::from(""),
-                Cell::from("SE"),
+                Cell::from("ESE"),
             ],
         ))
         .with_row(Row::Separator(Styles::default()))
@@ -735,8 +796,8 @@ fn outer_col_separators() -> Table {
             Styles::default(),
             vec![
                 Cell::from(""),
-                Cell::from("NW"),
-                Cell::from("NE"),
+                Cell::from("NNW"),
+                Cell::from("NNE"),
                 Cell::from(""),
             ],
         ))
@@ -771,8 +832,8 @@ fn outer_col_separators() -> Table {
             Styles::default(),
             vec![
                 Cell::from(""),
-                Cell::from("SW"),
-                Cell::from("SE"),
+                Cell::from("SSW"),
+                Cell::from("SSE"),
                 Cell::from(""),
             ],
         ))
