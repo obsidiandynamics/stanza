@@ -1,3 +1,4 @@
+use std::borrow::Borrow;
 use crate::model::Table;
 use crate::renderer::{pad, wrap, Renderer, NEWLINE};
 use crate::style::{HAlign, Style};
@@ -28,14 +29,13 @@ impl Renderer for Markdown {
     }
 }
 
-const DEF_ALIGNMENT: HAlign = HAlign::default();
-
 fn print_header_format(table: &Table, col_widths: &[usize], buf: &mut String) {
     buf.push('|');
     for (col, &width) in col_widths.iter().enumerate() {
         let col = table.col(col).unwrap();
         let styles = col.combined_styles();
-        let alignment = HAlign::resolve(&styles).unwrap_or(&DEF_ALIGNMENT);
+        let alignment = HAlign::resolve_or_default(&styles);
+        let alignment = alignment.borrow();
         match alignment {
             HAlign::Left | HAlign::Right => {
                 // the smallest format is `-:` or `:-`; i.e., no fewer than 2 characters wide
@@ -84,7 +84,7 @@ fn print_row(table: &Table, col_widths: &[usize], row: usize, buf: &mut String) 
         for col in 0..col_widths.len() {
             let line = cell_lines[col].get(line).map(|line| &line[..]).unwrap_or("");
             let styles = &cell_styles[col];
-            let alignment = HAlign::resolve(styles).unwrap_or(&DEF_ALIGNMENT);
+            let alignment = HAlign::resolve_or_default(styles);
             let line = pad(line, ' ', col_widths[col], &alignment);
             buf.push_str(&line);
             buf.push('|');

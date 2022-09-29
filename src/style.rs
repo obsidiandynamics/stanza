@@ -37,6 +37,24 @@ impl<'a> From<&'a StyleKind> for Option<&'a Header> {
     }
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct Separator(pub bool);
+
+impl Style for Separator {
+    fn key() -> Cow<'static, str> {
+        Cow::Borrowed("header")
+    }
+}
+
+impl<'a> From<&'a StyleKind> for Option<&'a Separator> {
+    fn from(kind: &'a StyleKind) -> Self {
+        match kind {
+            StyleKind::Separator(style) => Some(style),
+            _ => None
+        }
+    }
+}
+
 #[derive(Debug, Clone)]
 pub enum HAlign {
     Left,
@@ -44,19 +62,19 @@ pub enum HAlign {
     Right,
 }
 
-impl HAlign {
-    /// The `const` default value of [`HAlign`].
-    ///
-    /// Note, since `const fn` cannot be used in traits, an explicit `const` default value
-    /// is provided here.
-    pub const fn default() -> Self {
-        HAlign::Left
-    }
-}
+// impl HAlign {
+//     /// The `const` default value of [`HAlign`].
+//     ///
+//     /// Note, since `const fn` cannot be used in traits, an explicit `const` default value
+//     /// is provided here.
+//     pub const fn default() -> Self {
+//         HAlign::Left
+//     }
+// }
 
 impl Default for HAlign {
     fn default() -> Self {
-        Self::default()
+        Self::Left
     }
 }
 
@@ -140,6 +158,7 @@ pub trait Style where Self: Clone, for <'a> Option<&'a Self>: From<&'a StyleKind
 #[derive(Debug, Clone)]
 pub enum StyleKind {
     Header(Header),
+    Separator(Separator),
     Bold(Bold),
     HAlign(HAlign),
     MinWidth(MinWidth),
@@ -150,6 +169,7 @@ impl StyleKind {
     pub fn key(&self) -> String {
         match self {
             StyleKind::Header(_) => Header::key().into(),
+            StyleKind::Separator(_) => Separator::key().into(),
             StyleKind::Bold(_) => Bold::key().into(),
             StyleKind::HAlign(_) => HAlign::key().into(),
             StyleKind::MinWidth(_) => MinWidth::key().into(),

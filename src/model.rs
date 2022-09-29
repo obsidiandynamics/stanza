@@ -142,16 +142,6 @@ impl Styled for Col {
     }
 }
 
-impl Col {
-    pub fn is_header(&self) -> bool {
-        matches!(self, Col::Header(_))
-    }
-
-    pub fn is_separator(&self) -> bool {
-        matches!(self, Col::Separator(_))
-    }
-}
-
 pub enum Row {
     Header(Styles, Vec<Cell>),
     Body(Styles, Vec<Cell>),
@@ -165,14 +155,6 @@ impl Row {
             Row::Body(_, cells) => Some(cells),
             Row::Separator(_) => None,
         }
-    }
-
-    pub fn is_header(&self) -> bool {
-        matches!(self, Row::Header(_, _))
-    }
-
-    pub fn is_separator(&self) -> bool {
-        matches!(self, Row::Separator(_))
     }
 }
 

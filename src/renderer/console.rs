@@ -1,6 +1,6 @@
 use crate::model::Table;
 use crate::renderer::{pad, wrap, Renderer, NEWLINE};
-use crate::style::{HAlign, Header, Style, Styles};
+use crate::style::{HAlign, Header, Separator, Style, Styles};
 
 pub struct Decor {
     blank: char,
@@ -126,8 +126,6 @@ impl Renderer for Console {
     type Output = String;
 
     fn render(&self, table: &Table) -> Self::Output {
-        const DEF_ALIGNMENT: HAlign = HAlign::default();
-
         assert!(!table.is_empty(), "Table cannot be empty");
         let col_widths = table.col_widths();
         let decor = &self.0;
@@ -150,7 +148,7 @@ impl Renderer for Console {
 
             if col < col_widths.len() - 1 {
                 // junction between cells
-                let row_separator_below = table.row(0).unwrap().is_separator();
+                let row_separator_below = grid.is_separator_row(0);
                 let down = if is_header_col_pair(col) { Line::Bold } else if row_separator_below { Line::None } else { Line::Norm };
                 buf.push(decor.lookup(Line::None, Line::Bold, down, Line::Bold));
             }
@@ -163,7 +161,7 @@ impl Renderer for Console {
         // table (incl. headers and body)...
         let vertical_line = decor.lookup(Line::Bold, Line::None, Line::Bold, Line::None);
         for row in 0..table.num_rows() {
-            let row_separator = table.row(row).unwrap().is_separator();
+            let row_separator = grid.is_separator_row(row);
             let grid_row = &grid.cells[row];
             let max_lines = grid_row.iter().map(|cell| cell.lines.len()).max().unwrap();
 
@@ -181,7 +179,7 @@ impl Renderer for Console {
                         .get(line)
                         .map(|line| &line[..])
                         .unwrap_or("");
-                    let alignment = HAlign::resolve(&grid_cell.styles).unwrap_or(&DEF_ALIGNMENT);
+                    let alignment = HAlign::resolve_or_default(&grid_cell.styles);
                     let line = pad(line, ' ', col_widths[col], &alignment);
                     buf.push_str(&line);
 
@@ -206,16 +204,16 @@ impl Renderer for Console {
             // border below the row
             if row < table.num_rows() - 1 {
                 let header_row = is_header_row_pair(row);
-                let row_separator_below = table.row(row + 1).unwrap().is_separator();
+                let row_separator_below = grid.is_separator_row(row + 1);
 
                 // vertical line with possible right junction
-                let col_separator_right = table.col(0).unwrap().is_separator();
+                let col_separator_right = grid.is_separator_col(0);
                 let right = if header_row { Line::Bold } else if col_separator_right { Line::None } else { Line::Norm };
                 buf.push(decor.lookup(Line::Bold, right, Line::Bold, Line::None));
 
                 // horizontal line below the cell
                 for (col, &width) in col_widths.iter().enumerate() {
-                    let col_separator = table.col(col).unwrap().is_separator();
+                    let col_separator = grid.is_separator_col(col);
                     let (right, left) = if header_row { (Line::Bold, Line::Bold) } else if col_separator { (Line::None, Line::None) } else { (Line::Norm, Line::Norm) };
                     let border = decor.lookup(Line::None, right, Line::None, left);
                     (0..width).for_each(|_| buf.push(border));
@@ -223,7 +221,7 @@ impl Renderer for Console {
                     if col < col_widths.len() - 1 {
                         // junction between cells
                         let header_col = is_header_col_pair(col);
-                        let col_separator_right = table.col(col + 1).unwrap().is_separator();
+                        let col_separator_right = grid.is_separator_col(col + 1);
                         let up = if header_col { Line::Bold } else if row_separator { Line::None } else { Line::Norm };
                         let down = if header_col { Line::Bold } else if row_separator_below { Line::None } else { Line::Norm };
                         let right = if header_row { Line::Bold } else if col_separator_right { Line::None } else { Line::Norm };
@@ -233,7 +231,7 @@ impl Renderer for Console {
                 }
 
                 // vertical line with possible left junction
-                let col_separator_left = table.col(col_widths.len() - 1).unwrap().is_separator();
+                let col_separator_left = grid.is_separator_col(col_widths.len() - 1);
                 let left = if header_row { Line::Bold } else if col_separator_left { Line::None } else { Line::Norm };
                 buf.push(decor.lookup(Line::Bold, Line::None, Line::Bold, left));
                 buf.push_str(NEWLINE);
@@ -250,7 +248,7 @@ impl Renderer for Console {
 
             if col < col_widths.len() - 1 {
                 // junction between cells
-                let row_separator_above = table.row(table.num_rows() - 1).unwrap().is_separator();
+                let row_separator_above = grid.is_separator_row(table.num_rows() - 1);
                 let up = if is_header_col_pair(col) { Line::Bold } else if row_separator_above { Line::None } else { Line::Norm };
                 buf.push(decor.lookup(up, Line::Bold, Line::None, Line::Bold));
             }
@@ -311,6 +309,13 @@ impl Grid {
 
     fn is_header_row(&self, row: usize) -> bool {
         Header::resolve_or_default(&self.row_styles[row]).0
+    }
+    fn is_separator_col(&self, col: usize) -> bool {
+        Separator::resolve_or_default(&self.col_styles[col]).0
+    }
+
+    fn is_separator_row(&self, row: usize) -> bool {
+        Separator::resolve_or_default(&self.row_styles[row]).0
     }
 }
 

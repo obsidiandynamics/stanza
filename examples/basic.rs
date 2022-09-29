@@ -1,7 +1,8 @@
 use stanza::model::{Cell, Col, Row, Table};
 use stanza::renderer::console::Console;
+use stanza::renderer::markdown::Markdown;
 use stanza::renderer::Renderer;
-use stanza::style::{HAlign, Header, MaxWidth, MinWidth, StyleKind, Styles};
+use stanza::style::{HAlign, Header, MaxWidth, MinWidth, Separator, StyleKind, Styles};
 
 fn main() {
     let table = Table::default()
@@ -30,7 +31,7 @@ fn main() {
                 Cell::from(1_150_000.0),
             ],
         ))
-        .with_row(Row::Separator(Styles::default()))
+        .with_row(Row::Body(Styles::default().with(StyleKind::Separator(Separator(true))), vec![]))
         .with_row(Row::Body(
             Styles::default(),
             vec![
@@ -40,4 +41,5 @@ fn main() {
             ],
         ));
     println!("{}", Console::default().render(&table));
+    println!("{}", Markdown::default().render(&table));
 }

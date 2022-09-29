@@ -1,7 +1,7 @@
 use stanza::model::{Cell, Col, Row, Table};
 use stanza::renderer::console::Console;
 use stanza::renderer::Renderer;
-use stanza::style::{HAlign, Header, MinWidth, StyleKind, Styles};
+use stanza::style::{HAlign, Header, MinWidth, Separator, StyleKind, Styles};
 use std::mem;
 
 fn main() {
@@ -279,7 +279,7 @@ fn inner_row_separator() -> Table {
                 Cell::from(""),
             ],
         ))
-        .with_row(Row::Separator(Styles::default()))
+        .with_row(Row::Body(Styles::default().with(StyleKind::Separator(Separator(true))), vec![]))
         .with_row(Row::Body(
             Styles::default(),
             vec![
@@ -315,10 +315,11 @@ fn inner_col_separator() -> Table {
                     .with(StyleKind::MinWidth(MinWidth(5)))
                     .with(StyleKind::HAlign(HAlign::Centred)),
             ),
-            Col::Separator(
+            Col::Body(
                 Styles::default()
+                    .with(StyleKind::Separator(Separator(true)))
                     .with(StyleKind::MinWidth(MinWidth(5)))
-                    .with(StyleKind::HAlign(HAlign::Centred)),
+                    .with(StyleKind::HAlign(HAlign::Centred))
             ),
             Col::Body(
                 Styles::default()
@@ -396,8 +397,9 @@ fn cross_separators() -> Table {
                     .with(StyleKind::MinWidth(MinWidth(5)))
                     .with(StyleKind::HAlign(HAlign::Centred)),
             ),
-            Col::Separator(
+            Col::Body(
                 Styles::default()
+                    .with(StyleKind::Separator(Separator(true)))
                     .with(StyleKind::MinWidth(MinWidth(5)))
                     .with(StyleKind::HAlign(HAlign::Centred)),
             ),
@@ -432,8 +434,9 @@ fn cross_separators() -> Table {
                 Cell::from(""),
             ],
         ))
-        .with_row(Row::Separator(
-            Styles::default(),
+        .with_row(Row::Body(
+            Styles::default().with(StyleKind::Separator(Separator(true))),
+            vec![]
         ))
         .with_row(Row::Body(
             Styles::default(),
@@ -460,8 +463,9 @@ fn cross_separators() -> Table {
 fn window_separators() -> Table {
     Table::default()
         .with_cols(vec![
-            Col::Separator(
+            Col::Body(
                 Styles::default()
+                    .with(StyleKind::Separator(Separator(true)))
                     .with(StyleKind::MinWidth(MinWidth(5)))
                     .with(StyleKind::HAlign(HAlign::Centred)),
             ),
@@ -470,8 +474,9 @@ fn window_separators() -> Table {
                     .with(StyleKind::MinWidth(MinWidth(5)))
                     .with(StyleKind::HAlign(HAlign::Centred)),
             ),
-            Col::Separator(
+            Col::Body(
                 Styles::default()
+                    .with(StyleKind::Separator(Separator(true)))
                     .with(StyleKind::MinWidth(MinWidth(5)))
                     .with(StyleKind::HAlign(HAlign::Centred)),
             ),
@@ -480,14 +485,16 @@ fn window_separators() -> Table {
                     .with(StyleKind::MinWidth(MinWidth(5)))
                     .with(StyleKind::HAlign(HAlign::Centred)),
             ),
-            Col::Separator(
+            Col::Body(
                 Styles::default()
+                    .with(StyleKind::Separator(Separator(true)))
                     .with(StyleKind::MinWidth(MinWidth(5)))
                     .with(StyleKind::HAlign(HAlign::Centred)),
             ),
         ])
-        .with_row(Row::Separator(
-            Styles::default(),
+        .with_row(Row::Body(
+            Styles::default().with(StyleKind::Separator(Separator(true))),
+            vec![]
         ))
         .with_row(Row::Body(
             Styles::default(),
@@ -499,8 +506,9 @@ fn window_separators() -> Table {
                 Cell::from(""),
             ],
         ))
-        .with_row(Row::Separator(
-            Styles::default(),
+        .with_row(Row::Body(
+            Styles::default().with(StyleKind::Separator(Separator(true))),
+            vec![],
         ))
         .with_row(Row::Body(
             Styles::default(),
@@ -512,8 +520,9 @@ fn window_separators() -> Table {
                 Cell::from(""),
             ],
         ))
-        .with_row(Row::Separator(
-            Styles::default(),
+        .with_row(Row::Body(
+            Styles::default().with(StyleKind::Separator(Separator(true))),
+            vec![]
         ))
 }
 
@@ -525,8 +534,9 @@ fn grid_separators() -> Table {
                     .with(StyleKind::MinWidth(MinWidth(5)))
                     .with(StyleKind::HAlign(HAlign::Centred)),
             ),
-            Col::Separator(
+            Col::Body(
                 Styles::default()
+                    .with(StyleKind::Separator(Separator(true)))
                     .with(StyleKind::MinWidth(MinWidth(5)))
                     .with(StyleKind::HAlign(HAlign::Centred)),
             ),
@@ -535,8 +545,9 @@ fn grid_separators() -> Table {
                     .with(StyleKind::MinWidth(MinWidth(5)))
                     .with(StyleKind::HAlign(HAlign::Centred)),
             ),
-            Col::Separator(
+            Col::Body(
                 Styles::default()
+                    .with(StyleKind::Separator(Separator(true)))
                     .with(StyleKind::MinWidth(MinWidth(5)))
                     .with(StyleKind::HAlign(HAlign::Centred)),
             ),
@@ -556,8 +567,9 @@ fn grid_separators() -> Table {
                 Cell::from("NE"),
             ],
         ))
-        .with_row(Row::Separator(
-            Styles::default(),
+        .with_row(Row::Body(
+            Styles::default().with(StyleKind::Separator(Separator(true))),
+            vec![]
         ))
         .with_row(Row::Body(
             Styles::default(),
@@ -569,8 +581,9 @@ fn grid_separators() -> Table {
                 Cell::from("E"),
             ],
         ))
-        .with_row(Row::Separator(
-            Styles::default(),
+        .with_row(Row::Body(
+            Styles::default().with(StyleKind::Separator(Separator(true))),
+            vec![]
         ))
         .with_row(Row::Body(
             Styles::default(),
@@ -593,8 +606,9 @@ fn grid_separators_outer_headers() -> Table {
                     .with(StyleKind::MinWidth(MinWidth(5)))
                     .with(StyleKind::HAlign(HAlign::Centred)),
             ),
-            Col::Separator(
+            Col::Body(
                 Styles::default()
+                    .with(StyleKind::Separator(Separator(true)))
                     .with(StyleKind::MinWidth(MinWidth(5)))
                     .with(StyleKind::HAlign(HAlign::Centred)),
             ),
@@ -603,8 +617,9 @@ fn grid_separators_outer_headers() -> Table {
                     .with(StyleKind::MinWidth(MinWidth(5)))
                     .with(StyleKind::HAlign(HAlign::Centred)),
             ),
-            Col::Separator(
+            Col::Body(
                 Styles::default()
+                    .with(StyleKind::Separator(Separator(true)))
                     .with(StyleKind::MinWidth(MinWidth(5)))
                     .with(StyleKind::HAlign(HAlign::Centred)),
             ),
@@ -625,8 +640,9 @@ fn grid_separators_outer_headers() -> Table {
                 Cell::from("NE"),
             ],
         ))
-        .with_row(Row::Separator(
-            Styles::default(),
+        .with_row(Row::Body(
+            Styles::default().with(StyleKind::Separator(Separator(true))),
+            vec![]
         ))
         .with_row(Row::Body(
             Styles::default(),
@@ -638,8 +654,9 @@ fn grid_separators_outer_headers() -> Table {
                 Cell::from("E"),
             ],
         ))
-        .with_row(Row::Separator(
-            Styles::default(),
+        .with_row(Row::Body(
+            Styles::default().with(StyleKind::Separator(Separator(true))),
+            vec![]
         ))
         .with_row(Row::Body(
             Styles::default().with(StyleKind::Header(Header(true))),
@@ -661,8 +678,9 @@ fn grid_seps_cross_headers() -> Table {
                     .with(StyleKind::MinWidth(MinWidth(5)))
                     .with(StyleKind::HAlign(HAlign::Centred)),
             ),
-            Col::Separator(
+            Col::Body(
                 Styles::default()
+                    .with(StyleKind::Separator(Separator(true)))
                     .with(StyleKind::MinWidth(MinWidth(5)))
                     .with(StyleKind::HAlign(HAlign::Centred)),
             ),
@@ -672,8 +690,9 @@ fn grid_seps_cross_headers() -> Table {
                     .with(StyleKind::MinWidth(MinWidth(5)))
                     .with(StyleKind::HAlign(HAlign::Centred)),
             ),
-            Col::Separator(
+            Col::Body(
                 Styles::default()
+                    .with(StyleKind::Separator(Separator(true)))
                     .with(StyleKind::MinWidth(MinWidth(5)))
                     .with(StyleKind::HAlign(HAlign::Centred)),
             ),
@@ -693,8 +712,9 @@ fn grid_seps_cross_headers() -> Table {
                 Cell::from("NE"),
             ],
         ))
-        .with_row(Row::Separator(
-            Styles::default(),
+        .with_row(Row::Body(
+            Styles::default().with(StyleKind::Separator(Separator(true))),
+            vec![]
         ))
         .with_row(Row::Body(
             Styles::default().with(StyleKind::Header(Header(true))),
@@ -706,8 +726,9 @@ fn grid_seps_cross_headers() -> Table {
                 Cell::from("E"),
             ],
         ))
-        .with_row(Row::Separator(
-            Styles::default(),
+        .with_row(Row::Body(
+            Styles::default().with(StyleKind::Separator(Separator(true))),
+            vec![]
         ))
         .with_row(Row::Body(
             Styles::default(),
@@ -750,7 +771,8 @@ fn outer_row_separators() -> Table {
                     .with(StyleKind::HAlign(HAlign::Centred)),
             ),
         ])
-        .with_row(Row::Separator(Styles::default()))
+        .with_row(Row::Body(Styles::default().with(StyleKind::Separator(Separator(true))),
+        vec![]))
         .with_row(Row::Body(
             Styles::default(),
             vec![
@@ -771,14 +793,15 @@ fn outer_row_separators() -> Table {
                 Cell::from("ESE"),
             ],
         ))
-        .with_row(Row::Separator(Styles::default()))
+        .with_row(Row::Body(Styles::default().with(StyleKind::Separator(Separator(true))), vec![]))
 }
 
 fn outer_col_separators() -> Table {
     Table::default()
         .with_cols(vec![
-            Col::Separator(
+            Col::Body(
                 Styles::default()
+                    .with(StyleKind::Separator(Separator(true)))
                     .with(StyleKind::MinWidth(MinWidth(5)))
                     .with(StyleKind::HAlign(HAlign::Centred)),
             ),
@@ -792,8 +815,9 @@ fn outer_col_separators() -> Table {
                     .with(StyleKind::MinWidth(MinWidth(5)))
                     .with(StyleKind::HAlign(HAlign::Centred)),
             ),
-            Col::Separator(
+            Col::Body(
                 Styles::default()
+                    .with(StyleKind::Separator(Separator(true)))
                     .with(StyleKind::MinWidth(MinWidth(5)))
                     .with(StyleKind::HAlign(HAlign::Centred)),
             ),
@@ -884,8 +908,8 @@ fn dual_row_separators() -> Table {
                 Cell::from("NE"),
             ],
         ))
-        .with_row(Row::Separator(Styles::default()))
-        .with_row(Row::Separator(Styles::default()))
+        .with_row(Row::Body(Styles::default().with(StyleKind::Separator(Separator(true))), vec![]))
+        .with_row(Row::Body(Styles::default().with(StyleKind::Separator(Separator(true))), vec![]))
         .with_row(Row::Body(
             Styles::default(),
             vec![
@@ -906,13 +930,15 @@ fn dual_col_separators() -> Table {
                     .with(StyleKind::MinWidth(MinWidth(5)))
                     .with(StyleKind::HAlign(HAlign::Centred)),
             ),
-            Col::Separator(
+            Col::Body(
                 Styles::default()
+                    .with(StyleKind::Separator(Separator(true)))
                     .with(StyleKind::MinWidth(MinWidth(5)))
                     .with(StyleKind::HAlign(HAlign::Centred)),
             ),
-            Col::Separator(
+            Col::Body(
                 Styles::default()
+                    .with(StyleKind::Separator(Separator(true)))
                     .with(StyleKind::MinWidth(MinWidth(5)))
                     .with(StyleKind::HAlign(HAlign::Centred)),
             ),
@@ -1046,16 +1072,17 @@ fn single_row_separator() -> Table {
                     .with(StyleKind::HAlign(HAlign::Centred)),
             ),
         ])
-        .with_row(Row::Separator(
-            Styles::default(),
+        .with_row(Row::Body(
+            Styles::default().with(StyleKind::Separator(Separator(true))), vec![]
         ))
 }
 
 fn single_col_separator() -> Table {
     Table::default()
         .with_cols(vec![
-            Col::Separator(
+            Col::Body(
                 Styles::default()
+                    .with(StyleKind::Separator(Separator(true)))
                     .with(StyleKind::MinWidth(MinWidth(5)))
                     .with(StyleKind::HAlign(HAlign::Centred)),
             ),
