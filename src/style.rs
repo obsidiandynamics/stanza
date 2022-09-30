@@ -2,24 +2,6 @@ use std::borrow::Cow;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, Default)]
-pub struct Bold(pub bool);
-
-impl Style for Bold {
-    fn key() -> Cow<'static, str> {
-        Cow::Borrowed("bold")
-    }
-}
-
-impl<'a> From<&'a StyleKind> for Option<&'a Bold> {
-    fn from(kind: &'a StyleKind) -> Self {
-        match kind {
-            StyleKind::Bold(style) => Some(style),
-            _ => None
-        }
-    }
-}
-
-#[derive(Debug, Clone, Default)]
 pub struct Header(pub bool);
 
 impl Style for Header {
@@ -32,8 +14,14 @@ impl<'a> From<&'a StyleKind> for Option<&'a Header> {
     fn from(kind: &'a StyleKind) -> Self {
         match kind {
             StyleKind::Header(style) => Some(style),
-            _ => None
+            _ => None,
         }
+    }
+}
+
+impl Into<StyleKind> for Header {
+    fn into(self) -> StyleKind {
+        StyleKind::Header(self)
     }
 }
 
@@ -42,7 +30,7 @@ pub struct Separator(pub bool);
 
 impl Style for Separator {
     fn key() -> Cow<'static, str> {
-        Cow::Borrowed("header")
+        Cow::Borrowed("separator")
     }
 }
 
@@ -50,8 +38,38 @@ impl<'a> From<&'a StyleKind> for Option<&'a Separator> {
     fn from(kind: &'a StyleKind) -> Self {
         match kind {
             StyleKind::Separator(style) => Some(style),
-            _ => None
+            _ => None,
         }
+    }
+}
+
+impl Into<StyleKind> for Separator {
+    fn into(self) -> StyleKind {
+        StyleKind::Separator(self)
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct Bold(pub bool);
+
+impl Style for Bold {
+    fn key() -> Cow<'static, str> {
+        Cow::Borrowed("bold")
+    }
+}
+
+impl<'a> From<&'a StyleKind> for Option<&'a Bold> {
+    fn from(kind: &'a StyleKind) -> Self {
+        match kind {
+            StyleKind::Bold(style) => Some(style),
+            _ => None,
+        }
+    }
+}
+
+impl Into<StyleKind> for Bold {
+    fn into(self) -> StyleKind {
+        StyleKind::Bold(self)
     }
 }
 
@@ -88,8 +106,14 @@ impl<'a> From<&'a StyleKind> for Option<&'a HAlign> {
     fn from(kind: &'a StyleKind) -> Self {
         match kind {
             StyleKind::HAlign(style) => Some(style),
-            _ => None
+            _ => None,
         }
+    }
+}
+
+impl Into<StyleKind> for HAlign {
+    fn into(self) -> StyleKind {
+        StyleKind::HAlign(self)
     }
 }
 
@@ -106,8 +130,14 @@ impl<'a> From<&'a StyleKind> for Option<&'a MinWidth> {
     fn from(kind: &'a StyleKind) -> Self {
         match kind {
             StyleKind::MinWidth(style) => Some(style),
-            _ => None
+            _ => None,
         }
+    }
+}
+
+impl Into<StyleKind> for MinWidth {
+    fn into(self) -> StyleKind {
+        StyleKind::MinWidth(self)
     }
 }
 
@@ -130,27 +160,41 @@ impl<'a> From<&'a StyleKind> for Option<&'a MaxWidth> {
     fn from(kind: &'a StyleKind) -> Self {
         match kind {
             StyleKind::MaxWidth(style) => Some(style),
-            _ => None
+            _ => None,
         }
     }
 }
 
-pub trait Style where Self: Clone, for <'a> Option<&'a Self>: From<&'a StyleKind> {
+impl Into<StyleKind> for MaxWidth {
+    fn into(self) -> StyleKind {
+        StyleKind::MaxWidth(self)
+    }
+}
+
+pub trait Style
+where
+    Self: Clone,
+    for<'a> Option<&'a Self>: From<&'a StyleKind>,
+    Self: Into<StyleKind>,
+{
     fn key() -> Cow<'static, str>;
 
     fn resolve(styles: &Styles) -> Option<&Self> {
         let kind = styles.get(&Self::key());
         match kind {
             None => None,
-            Some(kind) => kind.into()
+            Some(kind) => kind.into(),
         }
     }
 
-    fn resolve_or_default(styles: &Styles) -> Cow<Self> where Self: Default {
+    fn resolve_or_default(styles: &Styles) -> Cow<Self>
+    where
+        Self: Default,
+    {
         let style = Self::resolve(styles);
         match style {
             None => Cow::Owned(Self::default()),
-            Some(style) => Cow::Borrowed(style)
+            Some(style) => Cow::Borrowed(style),
         }
     }
 }
@@ -162,7 +206,7 @@ pub enum StyleKind {
     Bold(Bold),
     HAlign(HAlign),
     MinWidth(MinWidth),
-    MaxWidth(MaxWidth)
+    MaxWidth(MaxWidth),
 }
 
 impl StyleKind {
@@ -173,7 +217,7 @@ impl StyleKind {
             StyleKind::Bold(_) => Bold::key().into(),
             StyleKind::HAlign(_) => HAlign::key().into(),
             StyleKind::MinWidth(_) => MinWidth::key().into(),
-            StyleKind::MaxWidth(_) => MaxWidth::key().into()
+            StyleKind::MaxWidth(_) => MaxWidth::key().into(),
         }
     }
 }
@@ -192,8 +236,8 @@ impl From<Vec<StyleKind>> for Styles {
 }
 
 impl Styles {
-    pub fn with(mut self, style: StyleKind) -> Self {
-        self.insert(style);
+    pub fn with<S: Into<StyleKind>>(mut self, style: S) -> Self {
+        self.insert(style.into());
         self
     }
 

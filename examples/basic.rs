@@ -2,17 +2,17 @@ use stanza::model::{Cell, Col, Row, Table};
 use stanza::renderer::console::Console;
 use stanza::renderer::markdown::Markdown;
 use stanza::renderer::Renderer;
-use stanza::style::{HAlign, Header, MaxWidth, MinWidth, Separator, StyleKind, Styles};
+use stanza::style::{Bold, HAlign, Header, MaxWidth, MinWidth, Separator, Styles};
 
 fn main() {
     let table = Table::default()
         .with_cols(vec![
-            Col::new(Styles::default().with(StyleKind::HAlign(HAlign::Right))),
-            Col::new(Styles::default().with(StyleKind::MinWidth(MinWidth(20))).with(StyleKind::HAlign(HAlign::Centred))),
-            Col::new(Styles::default().with(StyleKind::MinWidth(MinWidth(10))).with(StyleKind::MaxWidth(MaxWidth(20)))),
+            Col::new(Styles::default().with(HAlign::Right)),
+            Col::new(Styles::default().with(MinWidth(20)).with(HAlign::Centred)),
+            Col::new(Styles::default().with(MinWidth(10)).with(MaxWidth(20))),
         ])
         .with_row(Row::new(
-            Styles::default().with(StyleKind::Header(Header(true))),
+            Styles::default().with(Header(true)).with(Bold(true)),
             vec![
                 Cell::from("Department"),
                 Cell::from("Personnel"),
@@ -31,7 +31,7 @@ fn main() {
                 Cell::from(1_150_000.0),
             ],
         ))
-        .with_row(Row::new(Styles::default().with(StyleKind::Separator(Separator(true))), vec![]))
+        .with_row(Row::new(Styles::default().with(Separator(true)), vec![]))
         .with_row(Row::new(
             Styles::default(),
             vec![

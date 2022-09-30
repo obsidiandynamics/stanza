@@ -1,6 +1,6 @@
 use crate::model::Table;
 use crate::renderer::{pad, wrap, Renderer, NEWLINE};
-use crate::style::{HAlign, Header, Separator, Style, Styles};
+use crate::style::{Bold, HAlign, Header, Separator, Style, Styles};
 
 pub struct Decor {
     blank: char,
@@ -181,7 +181,7 @@ impl Renderer for Console {
                         .unwrap_or("");
                     let alignment = HAlign::resolve_or_default(&grid_cell.styles);
                     let line = pad(line, ' ', col_widths[col], &alignment);
-                    buf.push_str(&line);
+                    append(&mut buf, &line, &grid_cell.styles);
 
                     // vertical cell separator
                     if col < col_widths.len() - 1 {
@@ -261,6 +261,44 @@ impl Renderer for Console {
         buf
     }
 }
+
+fn append(buf: &mut String, s: &str, styles: &Styles) {
+    const BLACK: &str = "\x1b[30m";
+    const RED: &str = "\x1b[31m";
+    const GREEN: &str = "\x1b[32m";
+    const YELLOW: &str = "\x1b[33m";
+    const BLUE: &str = "\x1b[34m";
+    const MAGENTA: &str = "\x1b[35m";
+    const CYAN: &str = "\x1b[36m";
+    const WHITE: &str = "\x1b[371m";
+
+    const BOLD: &str = "\x1b[1m";
+    const ITALIC: &str = "\x1b[3m";
+    const UNDERLINE: &str = "\x1b[4m";
+    const BLINK: &str = "\x1b[5m";
+    const STRIKETHROUGH: &str = "\x1b[9m";
+
+    const RESET: &str = "\x1b[0m";
+
+    let mut styled = false;
+    let mut apply_style = |code| {
+        styled = true;
+        buf.push_str(code);
+    };
+
+    if Bold::resolve_or_default(styles).0 {
+        apply_style(BOLD);
+    }
+
+    buf.push_str(s);
+    if styled {
+        buf.push_str(RESET);
+    }
+}
+
+// pub(super) mod ansi {
+// 
+// }
 
 fn pre_render(table: &Table, col_widths: &[usize]) -> Grid {
     let cells = (0..table.num_rows())
