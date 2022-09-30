@@ -1,8 +1,6 @@
 use crate::model::Table;
 use crate::renderer::{pad, wrap, Renderer, NEWLINE};
-use crate::style::{
-    Blink, Bold, Fg16, HAlign, Header, Italic, Separator, Strikethrough, Style, Styles, Underline,
-};
+use crate::style::{Bg16, Blink, Bold, Fg16, HAlign, Header, Italic, Separator, Strikethrough, Style, Styles, Underline};
 
 pub struct Decor {
     blank: char,
@@ -347,6 +345,29 @@ impl Fg16 {
     }
 }
 
+impl Bg16 {
+    fn escape_code(&self) -> &'static str {
+        match self {
+            Bg16::Black => "\x1b[40m",
+            Bg16::Red => "\x1b[41m",
+            Bg16::Green => "\x1b[42m",
+            Bg16::Yellow => "\x1b[43m",
+            Bg16::Blue => "\x1b[44m",
+            Bg16::Magenta => "\x1b[45m",
+            Bg16::Cyan => "\x1b[46m",
+            Bg16::White => "\x1b[471m",
+            Bg16::BrightBlack => "\x1b[40;1m",
+            Bg16::BrightRed => "\x1b[41;1m",
+            Bg16::BrightGreen => "\x1b[42;1m",
+            Bg16::BrightYellow => "\x1b[43;1m",
+            Bg16::BrightBlue => "\x1b[44;1m",
+            Bg16::BrightMagenta => "\x1b[45;1m",
+            Bg16::BrightCyan => "\x1b[46;1m",
+            Bg16::BrightWhite => "\x1b[471;1m",
+        }
+    }
+}
+
 fn append(buf: &mut String, s: &str, styles: &Styles) {
     const BOLD: &str = "\x1b[1m";
     const ITALIC: &str = "\x1b[3m";
@@ -386,6 +407,9 @@ fn append(buf: &mut String, s: &str, styles: &Styles) {
                 char_formatting.push_str(UNDERLINE);
             }
             if let Some(colour) = Fg16::resolve(styles) {
+                char_formatting.push_str(colour.escape_code());
+            }
+            if let Some(colour) = Bg16::resolve(styles) {
                 char_formatting.push_str(colour.escape_code());
             }
 

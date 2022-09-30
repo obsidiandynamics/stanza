@@ -2,7 +2,7 @@ use stanza::model::{Cell, Col, Row, Table};
 use stanza::renderer::console::Console;
 use stanza::renderer::markdown::Markdown;
 use stanza::renderer::Renderer;
-use stanza::style::{Blink, Bold, Fg16, HAlign, Header, Italic, MaxWidth, MinWidth, Separator, Strikethrough, Styles, Underline};
+use stanza::style::{Bg16, Blink, Bold, Fg16, HAlign, Header, Italic, MaxWidth, MinWidth, Separator, Strikethrough, Styles, Underline};
 
 fn main() {
     let table = Table::default()
@@ -18,9 +18,9 @@ fn main() {
             vec![
                 Cell::from("Department"),
                 Cell::from("Personnel"),
-                Cell::from("Budget"),
+                Cell::from("Training budget"),
                 Cell::from(""),
-                Cell::from("To-do"),
+                Cell::from("To-do list"),
             ],
         ))
         .with_row(Row::new(
@@ -40,7 +40,7 @@ fn main() {
                 Cell::from(117),
                 Cell::from(1_150_000.0),
                 Cell::from(""),
-                Cell::new(Styles::default().with(Strikethrough(true)).with(Fg16::BrightBlack), "Wash car"),
+                Cell::new(Styles::default().with(Strikethrough(true)).with(Fg16::BrightBlack), "Wash the car"),
             ],
         ))
         .with_row(Row::new(
@@ -58,13 +58,26 @@ fn main() {
             Styles::default(),
             vec![
                 Cell::new(
-                    Styles::default().with(Bold(true)).with(Fg16::BrightRed).with(Blink(true)),
-                    "WARNING:\nSelf destruct sequence initiated",
+                    Styles::default().with(Bold(true)).with(Bg16::BrightRed).with(Blink(true)),
+                    "WARNING",
                 ),
-                Cell::new(Styles::default().with(Underline(true)).with(Fg16::BrightYellow), "Check engine temp"),
+                Cell::new(Styles::default().with(Underline(true)).with(Fg16::BrightYellow), "Check oil temp"),
                 Cell::from(""),
                 Cell::from(""),
-                Cell::new(Styles::default().with(Italic(true)), "The quick brown fox jumped over the lazy dog.\nThe end!"),
+                Cell::from(""),
+            ],
+        ))
+        .with_row(Row::new(
+            Styles::default(),
+            vec![
+                Cell::new(
+                    Styles::default().with(Bold(true)).with(Fg16::BrightRed).with(Blink(true)),
+                    "Self destruct sequence initiated",
+                ),
+                Cell::from(""),
+                Cell::from(""),
+                Cell::from(""),
+                Cell::new(Styles::default().with(Italic(true)), "The quick brown fox jumped over the lazy dog.\nThat's all folks!"),
             ],
         ));
     println!("{}", Console::default().render(&table));

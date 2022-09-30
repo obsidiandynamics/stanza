@@ -1,8 +1,9 @@
+pub mod bg_16;
 pub mod blink;
 pub mod bold;
+pub mod fg_16;
 pub mod halign;
 pub mod header;
-pub mod fg_16;
 pub mod italic;
 pub mod max_width;
 pub mod min_width;
@@ -10,6 +11,7 @@ pub mod separator;
 pub mod strikethrough;
 pub mod underline;
 
+pub use bg_16::Bg16;
 pub use bold::Bold;
 pub use blink::Blink;
 pub use fg_16::Fg16;
@@ -55,6 +57,7 @@ where
 
 #[derive(Debug, Clone)]
 pub enum StyleKind {
+    Bg16(Bg16),
     Blink(Blink),
     Bold(Bold),
     Fg16(Fg16),
@@ -71,6 +74,7 @@ pub enum StyleKind {
 impl StyleKind {
     pub fn key(&self) -> String {
         match self {
+            StyleKind::Bg16(_) => Bg16::key().into(),
             StyleKind::Blink(_) => Blink::key().into(),
             StyleKind::Bold(_) => Bold::key().into(),
             StyleKind::Fg16(_) => Fg16::key().into(),
