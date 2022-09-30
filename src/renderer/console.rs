@@ -1,6 +1,8 @@
 use crate::model::Table;
 use crate::renderer::{pad, wrap, Renderer, NEWLINE};
-use crate::style::{Blink, Bold, Fg16, HAlign, Header, Italic, Separator, Strikethrough, Style, Styles, Underline};
+use crate::style::{
+    Blink, Bold, Fg16, HAlign, Header, Italic, Separator, Strikethrough, Style, Styles, Underline,
+};
 
 pub struct Decor {
     blank: char,
@@ -93,9 +95,15 @@ impl Decor {
             (Line::None, Line::Bold, Line::Bold, Line::Bold) => self.right_bold_down_bold_left_bold,
             (Line::Norm, Line::Bold, Line::None, Line::Bold) => self.up_norm_right_bold_left_bold,
             (Line::Bold, Line::Bold, Line::None, Line::Bold) => self.up_bold_right_bold_left_bold,
-            (Line::Norm, Line::Bold, Line::Norm, Line::Bold) => self.up_norm_right_bold_down_norm_left_bold,
-            (Line::Bold, Line::Norm, Line::Bold, Line::Norm) => self.up_bold_right_norm_down_bold_left_norm,
-            (Line::Bold, Line::Bold, Line::Bold, Line::Bold) => self.up_bold_right_bold_down_bold_left_bold,
+            (Line::Norm, Line::Bold, Line::Norm, Line::Bold) => {
+                self.up_norm_right_bold_down_norm_left_bold
+            }
+            (Line::Bold, Line::Norm, Line::Bold, Line::Norm) => {
+                self.up_bold_right_norm_down_bold_left_norm
+            }
+            (Line::Bold, Line::Bold, Line::Bold, Line::Bold) => {
+                self.up_bold_right_bold_down_bold_left_bold
+            }
             (Line::None, Line::Norm, Line::None, Line::Norm) => self.right_norm_left_norm,
             (Line::Norm, Line::None, Line::Norm, Line::None) => self.up_norm_down_norm,
             (Line::None, Line::Norm, Line::Norm, Line::None) => self.right_norm_down_norm,
@@ -106,7 +114,9 @@ impl Decor {
             (Line::Norm, Line::None, Line::Norm, Line::Norm) => self.up_norm_down_norm_left_norm,
             (Line::None, Line::Norm, Line::Norm, Line::Norm) => self.right_norm_down_norm_left_norm,
             (Line::Norm, Line::Norm, Line::None, Line::Norm) => self.up_norm_right_norm_left_norm,
-            (Line::Norm, Line::Norm, Line::Norm, Line::Norm) => self.up_norm_right_norm_down_norm_left_norm,
+            (Line::Norm, Line::Norm, Line::Norm, Line::Norm) => {
+                self.up_norm_right_norm_down_norm_left_norm
+            }
             _ => unreachable!(),
         }
     }
@@ -116,7 +126,7 @@ impl Decor {
 enum Line {
     None,
     Norm,
-    Bold
+    Bold,
 }
 
 #[derive(Default)]
@@ -132,10 +142,8 @@ impl Renderer for Console {
         let grid = pre_render(table, &col_widths);
         let mut buf = String::new();
 
-        let is_header_col_pair =
-            |col| grid.is_header_col(col) || grid.is_header_col(col + 1);
-        let is_header_row_pair =
-            |row| grid.is_header_row(row) || grid.is_header_row(row + 1);
+        let is_header_col_pair = |col| grid.is_header_col(col) || grid.is_header_col(col + 1);
+        let is_header_row_pair = |row| grid.is_header_row(row) || grid.is_header_row(row + 1);
 
         // upper outside border...
         // top-left corner
@@ -149,7 +157,13 @@ impl Renderer for Console {
             if col < col_widths.len() - 1 {
                 // junction between cells
                 let row_separator_below = grid.is_separator_row(0);
-                let down = if is_header_col_pair(col) { Line::Bold } else if row_separator_below { Line::None } else { Line::Norm };
+                let down = if is_header_col_pair(col) {
+                    Line::Bold
+                } else if row_separator_below {
+                    Line::None
+                } else {
+                    Line::Norm
+                };
                 buf.push(decor.lookup(Line::None, Line::Bold, down, Line::Bold));
             }
         }
@@ -208,13 +222,25 @@ impl Renderer for Console {
 
                 // vertical line with possible right junction
                 let col_separator_right = grid.is_separator_col(0);
-                let right = if header_row_pair { Line::Bold } else if col_separator_right { Line::None } else { Line::Norm };
+                let right = if header_row_pair {
+                    Line::Bold
+                } else if col_separator_right {
+                    Line::None
+                } else {
+                    Line::Norm
+                };
                 buf.push(decor.lookup(Line::Bold, right, Line::Bold, Line::None));
 
                 // horizontal line below the cell
                 for (col, &width) in col_widths.iter().enumerate() {
                     let col_separator = grid.is_separator_col(col);
-                    let (right, left) = if header_row_pair { (Line::Bold, Line::Bold) } else if col_separator { (Line::None, Line::None) } else { (Line::Norm, Line::Norm) };
+                    let (right, left) = if header_row_pair {
+                        (Line::Bold, Line::Bold)
+                    } else if col_separator {
+                        (Line::None, Line::None)
+                    } else {
+                        (Line::Norm, Line::Norm)
+                    };
                     let border = decor.lookup(Line::None, right, Line::None, left);
                     (0..width).for_each(|_| buf.push(border));
 
@@ -222,17 +248,47 @@ impl Renderer for Console {
                         // junction between cells
                         let header_col_pair = is_header_col_pair(col);
                         let col_separator_right = grid.is_separator_col(col + 1);
-                        let up = if header_col_pair { Line::Bold } else if row_separator { Line::None } else { Line::Norm };
-                        let down = if header_col_pair { Line::Bold } else if row_separator_below { Line::None } else { Line::Norm };
-                        let right = if header_row_pair { Line::Bold } else if col_separator_right { Line::None } else { Line::Norm };
-                        let left = if header_row_pair { Line::Bold } else if col_separator { Line::None } else { Line::Norm };
+                        let up = if header_col_pair {
+                            Line::Bold
+                        } else if row_separator {
+                            Line::None
+                        } else {
+                            Line::Norm
+                        };
+                        let down = if header_col_pair {
+                            Line::Bold
+                        } else if row_separator_below {
+                            Line::None
+                        } else {
+                            Line::Norm
+                        };
+                        let right = if header_row_pair {
+                            Line::Bold
+                        } else if col_separator_right {
+                            Line::None
+                        } else {
+                            Line::Norm
+                        };
+                        let left = if header_row_pair {
+                            Line::Bold
+                        } else if col_separator {
+                            Line::None
+                        } else {
+                            Line::Norm
+                        };
                         buf.push(decor.lookup(up, right, down, left));
                     }
                 }
 
                 // vertical line with possible left junction
                 let col_separator_left = grid.is_separator_col(col_widths.len() - 1);
-                let left = if header_row_pair { Line::Bold } else if col_separator_left { Line::None } else { Line::Norm };
+                let left = if header_row_pair {
+                    Line::Bold
+                } else if col_separator_left {
+                    Line::None
+                } else {
+                    Line::Norm
+                };
                 buf.push(decor.lookup(Line::Bold, Line::None, Line::Bold, left));
                 buf.push_str(NEWLINE);
             }
@@ -249,7 +305,13 @@ impl Renderer for Console {
             if col < col_widths.len() - 1 {
                 // junction between cells
                 let row_separator_above = grid.is_separator_row(table.num_rows() - 1);
-                let up = if is_header_col_pair(col) { Line::Bold } else if row_separator_above { Line::None } else { Line::Norm };
+                let up = if is_header_col_pair(col) {
+                    Line::Bold
+                } else if row_separator_above {
+                    Line::None
+                } else {
+                    Line::Norm
+                };
                 buf.push(decor.lookup(up, Line::Bold, Line::None, Line::Bold));
             }
         }
@@ -280,7 +342,7 @@ impl Fg16 {
             Fg16::BrightBlue => "\x1b[34;1m",
             Fg16::BrightMagenta => "\x1b[35;1m",
             Fg16::BrightCyan => "\x1b[36;1m",
-            Fg16::BrightWhite => "\x1b[371;1m"
+            Fg16::BrightWhite => "\x1b[371;1m",
         }
     }
 }
@@ -294,44 +356,57 @@ fn append(buf: &mut String, s: &str, styles: &Styles) {
 
     const RESET: &str = "\x1b[0m";
 
-    let mut styled = false;
-    let mut apply_style = |code| {
-        styled = true;
-        buf.push_str(code);
-    };
-
-    if Blink::resolve_or_default(styles).0 {
-        apply_style(BLINK);
+    fn find_first_printable(chars: impl Iterator<Item = char>) -> Option<usize> {
+        chars
+            .enumerate()
+            .find(|(_, ch)| !ch.is_whitespace())
+            .map(|(i, _)| i)
     }
 
-    if Bold::resolve_or_default(styles).0 {
-        apply_style(BOLD);
-    }
+    let first_char = find_first_printable(s.chars());
+    match first_char {
+        None => {
+            buf.push_str(s);
+        }
+        Some(first_char) => {
+            let mut char_formatting = String::new();
+            if Blink::resolve_or_default(styles).0 {
+                char_formatting.push_str(BLINK);
+            }
+            if Bold::resolve_or_default(styles).0 {
+                char_formatting.push_str(BOLD);
+            }
+            if Italic::resolve_or_default(styles).0 {
+                char_formatting.push_str(ITALIC);
+            }
+            if Strikethrough::resolve_or_default(styles).0 {
+                char_formatting.push_str(STRIKETHROUGH);
+            }
+            if Underline::resolve_or_default(styles).0 {
+                char_formatting.push_str(UNDERLINE);
+            }
+            if let Some(colour) = Fg16::resolve(styles) {
+                char_formatting.push_str(colour.escape_code());
+            }
 
-    if Italic::resolve_or_default(styles).0 {
-        apply_style(ITALIC);
-    }
+            let total_chars = s.chars().count();
+            let last_char = total_chars - find_first_printable(s.chars().rev()).unwrap() - 1;
 
-    if Strikethrough::resolve_or_default(styles).0 {
-        apply_style(STRIKETHROUGH);
-    }
-
-    if Underline::resolve_or_default(styles).0 {
-        apply_style(UNDERLINE);
-    }
-
-    if let Some(colour) = Fg16::resolve(styles) {
-        apply_style(colour.escape_code());
-    }
-
-    buf.push_str(s);
-    if styled {
-        buf.push_str(RESET);
+            for (i, ch) in s.chars().enumerate() {
+                if i == first_char {
+                    buf.push_str(&char_formatting);
+                }
+                buf.push(ch);
+                if i == last_char && !char_formatting.is_empty() {
+                    buf.push_str(RESET);
+                }
+            }
+        }
     }
 }
 
 // pub(super) mod ansi {
-// 
+//
 // }
 
 fn pre_render(table: &Table, col_widths: &[usize]) -> Grid {
@@ -364,7 +439,7 @@ fn pre_render(table: &Table, col_widths: &[usize]) -> Grid {
     Grid {
         cells,
         col_styles,
-        row_styles
+        row_styles,
     }
 }
 
@@ -395,4 +470,3 @@ struct GridCell {
     lines: Vec<String>,
     styles: Styles,
 }
-
