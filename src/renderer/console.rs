@@ -1,6 +1,6 @@
 use crate::model::Table;
 use crate::renderer::{pad, wrap, Renderer, NEWLINE};
-use crate::style::{Bold, HAlign, Header, Separator, Style, Styles};
+use crate::style::{Blink, Bold, Fg16, HAlign, Header, Italic, Separator, Strikethrough, Style, Styles, Underline};
 
 pub struct Decor {
     blank: char,
@@ -262,16 +262,30 @@ impl Renderer for Console {
     }
 }
 
-fn append(buf: &mut String, s: &str, styles: &Styles) {
-    const BLACK: &str = "\x1b[30m";
-    const RED: &str = "\x1b[31m";
-    const GREEN: &str = "\x1b[32m";
-    const YELLOW: &str = "\x1b[33m";
-    const BLUE: &str = "\x1b[34m";
-    const MAGENTA: &str = "\x1b[35m";
-    const CYAN: &str = "\x1b[36m";
-    const WHITE: &str = "\x1b[371m";
+impl Fg16 {
+    fn escape_code(&self) -> &'static str {
+        match self {
+            Fg16::Black => "\x1b[30m",
+            Fg16::Red => "\x1b[31m",
+            Fg16::Green => "\x1b[32m",
+            Fg16::Yellow => "\x1b[33m",
+            Fg16::Blue => "\x1b[34m",
+            Fg16::Magenta => "\x1b[35m",
+            Fg16::Cyan => "\x1b[36m",
+            Fg16::White => "\x1b[371m",
+            Fg16::BrightBlack => "\x1b[30;1m",
+            Fg16::BrightRed => "\x1b[31;1m",
+            Fg16::BrightGreen => "\x1b[32;1m",
+            Fg16::BrightYellow => "\x1b[33;1m",
+            Fg16::BrightBlue => "\x1b[34;1m",
+            Fg16::BrightMagenta => "\x1b[35;1m",
+            Fg16::BrightCyan => "\x1b[36;1m",
+            Fg16::BrightWhite => "\x1b[371;1m"
+        }
+    }
+}
 
+fn append(buf: &mut String, s: &str, styles: &Styles) {
     const BOLD: &str = "\x1b[1m";
     const ITALIC: &str = "\x1b[3m";
     const UNDERLINE: &str = "\x1b[4m";
@@ -286,8 +300,28 @@ fn append(buf: &mut String, s: &str, styles: &Styles) {
         buf.push_str(code);
     };
 
+    if Blink::resolve_or_default(styles).0 {
+        apply_style(BLINK);
+    }
+
     if Bold::resolve_or_default(styles).0 {
         apply_style(BOLD);
+    }
+
+    if Italic::resolve_or_default(styles).0 {
+        apply_style(ITALIC);
+    }
+
+    if Strikethrough::resolve_or_default(styles).0 {
+        apply_style(STRIKETHROUGH);
+    }
+
+    if Underline::resolve_or_default(styles).0 {
+        apply_style(UNDERLINE);
+    }
+
+    if let Some(colour) = Fg16::resolve(styles) {
+        apply_style(colour.escape_code());
     }
 
     buf.push_str(s);

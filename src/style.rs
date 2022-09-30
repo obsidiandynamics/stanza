@@ -1,175 +1,29 @@
+pub mod blink;
+pub mod bold;
+pub mod halign;
+pub mod header;
+pub mod fg_16;
+pub mod italic;
+pub mod max_width;
+pub mod min_width;
+pub mod separator;
+pub mod strikethrough;
+pub mod underline;
+
+pub use bold::Bold;
+pub use blink::Blink;
+pub use fg_16::Fg16;
+pub use halign::HAlign;
+pub use header::Header;
+pub use italic::Italic;
+pub use max_width::MaxWidth;
+pub use min_width::MinWidth;
+pub use separator::Separator;
+pub use strikethrough::Strikethrough;
+pub use underline::Underline;
+
 use std::borrow::Cow;
 use std::collections::HashMap;
-
-#[derive(Debug, Clone, Default)]
-pub struct Header(pub bool);
-
-impl Style for Header {
-    fn key() -> Cow<'static, str> {
-        Cow::Borrowed("header")
-    }
-}
-
-impl<'a> From<&'a StyleKind> for Option<&'a Header> {
-    fn from(kind: &'a StyleKind) -> Self {
-        match kind {
-            StyleKind::Header(style) => Some(style),
-            _ => None,
-        }
-    }
-}
-
-impl Into<StyleKind> for Header {
-    fn into(self) -> StyleKind {
-        StyleKind::Header(self)
-    }
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct Separator(pub bool);
-
-impl Style for Separator {
-    fn key() -> Cow<'static, str> {
-        Cow::Borrowed("separator")
-    }
-}
-
-impl<'a> From<&'a StyleKind> for Option<&'a Separator> {
-    fn from(kind: &'a StyleKind) -> Self {
-        match kind {
-            StyleKind::Separator(style) => Some(style),
-            _ => None,
-        }
-    }
-}
-
-impl Into<StyleKind> for Separator {
-    fn into(self) -> StyleKind {
-        StyleKind::Separator(self)
-    }
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct Bold(pub bool);
-
-impl Style for Bold {
-    fn key() -> Cow<'static, str> {
-        Cow::Borrowed("bold")
-    }
-}
-
-impl<'a> From<&'a StyleKind> for Option<&'a Bold> {
-    fn from(kind: &'a StyleKind) -> Self {
-        match kind {
-            StyleKind::Bold(style) => Some(style),
-            _ => None,
-        }
-    }
-}
-
-impl Into<StyleKind> for Bold {
-    fn into(self) -> StyleKind {
-        StyleKind::Bold(self)
-    }
-}
-
-#[derive(Debug, Clone)]
-pub enum HAlign {
-    Left,
-    Centred,
-    Right,
-}
-
-// impl HAlign {
-//     /// The `const` default value of [`HAlign`].
-//     ///
-//     /// Note, since `const fn` cannot be used in traits, an explicit `const` default value
-//     /// is provided here.
-//     pub const fn default() -> Self {
-//         HAlign::Left
-//     }
-// }
-
-impl Default for HAlign {
-    fn default() -> Self {
-        Self::Left
-    }
-}
-
-impl Style for HAlign {
-    fn key() -> Cow<'static, str> {
-        Cow::Borrowed("h_align")
-    }
-}
-
-impl<'a> From<&'a StyleKind> for Option<&'a HAlign> {
-    fn from(kind: &'a StyleKind) -> Self {
-        match kind {
-            StyleKind::HAlign(style) => Some(style),
-            _ => None,
-        }
-    }
-}
-
-impl Into<StyleKind> for HAlign {
-    fn into(self) -> StyleKind {
-        StyleKind::HAlign(self)
-    }
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct MinWidth(pub usize);
-
-impl Style for MinWidth {
-    fn key() -> Cow<'static, str> {
-        Cow::Borrowed("min_width")
-    }
-}
-
-impl<'a> From<&'a StyleKind> for Option<&'a MinWidth> {
-    fn from(kind: &'a StyleKind) -> Self {
-        match kind {
-            StyleKind::MinWidth(style) => Some(style),
-            _ => None,
-        }
-    }
-}
-
-impl Into<StyleKind> for MinWidth {
-    fn into(self) -> StyleKind {
-        StyleKind::MinWidth(self)
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct MaxWidth(pub usize);
-
-impl Default for MaxWidth {
-    fn default() -> Self {
-        Self(usize::MAX)
-    }
-}
-
-impl Style for MaxWidth {
-    fn key() -> Cow<'static, str> {
-        Cow::Borrowed("min_width")
-    }
-}
-
-impl<'a> From<&'a StyleKind> for Option<&'a MaxWidth> {
-    fn from(kind: &'a StyleKind) -> Self {
-        match kind {
-            StyleKind::MaxWidth(style) => Some(style),
-            _ => None,
-        }
-    }
-}
-
-impl Into<StyleKind> for MaxWidth {
-    fn into(self) -> StyleKind {
-        StyleKind::MaxWidth(self)
-    }
-}
 
 pub trait Style
 where
@@ -201,23 +55,33 @@ where
 
 #[derive(Debug, Clone)]
 pub enum StyleKind {
-    Header(Header),
-    Separator(Separator),
+    Blink(Blink),
     Bold(Bold),
+    Fg16(Fg16),
     HAlign(HAlign),
-    MinWidth(MinWidth),
+    Header(Header),
+    Italic(Italic),
     MaxWidth(MaxWidth),
+    MinWidth(MinWidth),
+    Separator(Separator),
+    Strikethrough(Strikethrough),
+    Underline(Underline),
 }
 
 impl StyleKind {
     pub fn key(&self) -> String {
         match self {
-            StyleKind::Header(_) => Header::key().into(),
-            StyleKind::Separator(_) => Separator::key().into(),
+            StyleKind::Blink(_) => Blink::key().into(),
             StyleKind::Bold(_) => Bold::key().into(),
+            StyleKind::Fg16(_) => Fg16::key().into(),
             StyleKind::HAlign(_) => HAlign::key().into(),
-            StyleKind::MinWidth(_) => MinWidth::key().into(),
+            StyleKind::Header(_) => Header::key().into(),
+            StyleKind::Italic(_) => Italic::key().into(),
             StyleKind::MaxWidth(_) => MaxWidth::key().into(),
+            StyleKind::MinWidth(_) => MinWidth::key().into(),
+            StyleKind::Separator(_) => Separator::key().into(),
+            StyleKind::Strikethrough(_) => Strikethrough::key().into(),
+            StyleKind::Underline(_) => Underline::key().into(),
         }
     }
 }

@@ -162,8 +162,8 @@ impl Styled for Cell {
 }
 
 impl Cell {
-    pub fn new(styles: Styles, data: String) -> Self {
-        Self { styles, data }
+    pub fn new<S: ToString>(styles: Styles, data: S) -> Self {
+        Self { styles, data: data.to_string() }
     }
 
     pub fn data(&self) -> &str {
