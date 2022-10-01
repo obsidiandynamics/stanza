@@ -503,13 +503,13 @@ fn find_first_printable(chars: impl Iterator<Item = char>) -> Option<usize> {
 
 fn append_content(buf: &mut String, s: &str, styles: &Styles, print_escape_codes: bool) {
     if print_escape_codes {
-        // formatting that applies to the entire line (both printable and whitespace characters)
+        // formatting that applies to the entire line (both whitespace and printable characters)
         let mut line_format = String::new();
         if let Some(bg) = FillBg::resolve(styles) {
             line_format.push_str(bg.0.escape_codes().1);
         }
 
-        // formatting only or the printable characters
+        // formatting only of the printable characters
         let mut char_format = line_format.clone();
         if Blink::resolve_or_default(styles).0 {
             char_format.push_str(ansi::BLINK);
