@@ -65,51 +65,44 @@ impl Table {
             .unwrap_or(0)
     }
 
-    pub fn col(&self, col: usize) -> Option<Element<Col>> {
+    pub fn col(&self, col: usize) -> Element<Col> {
+        let parent_styles = vec![&self.styles];
         let col = self.cols.get(col);
-        match col {
-            None => None,
-            Some(col) => {
-                let parent_styles = vec![&self.styles, col.styles()];
-                Some(Element {
-                    parent_styles,
-                    element: col,
-                })
-            }
+        Element {
+            parent_styles,
+            element: col,
         }
     }
 
-    pub fn row(&self, row: usize) -> Option<Element<Row>> {
-        let row = self.rows.get(row);
-        match row {
+    pub fn row(&self, row_idx: usize) -> Element<Row> {
+        let parent_styles = vec![&self.styles];
+        let row = self.rows.get(row_idx);
+        Element {
+            parent_styles,
+            element: row,
+        }
+    }
+
+    pub fn cell(&self, col_idx: usize, row_idx: usize) -> Element<Cell> {
+        let col = self.cols.get(col_idx);
+        let row = self.rows.get(row_idx);
+        let mut parent_styles = vec![&self.styles];
+
+        if let Some(col) = col {
+            parent_styles.push(col.styles());
+        }
+
+        let cell = match row {
             None => None,
             Some(row) => {
-                let parent_styles = vec![&self.styles, row.styles()];
-                Some(Element {
-                    parent_styles,
-                    element: row,
-                })
+                parent_styles.push(row.styles());
+                row.1.get(col_idx)
             }
-        }
-    }
+        };
 
-    pub fn cell(&self, col: usize, row: usize) -> Option<Element<Cell>> {
-        if row >= self.rows.len() {
-            return None;
-        }
-        let row = &self.rows[row];
-        let cell = row.1.get(col);
-        match cell {
-            None => None,
-            Some(cell) => {
-                let parent_styles = vec![
-                    &self.styles,
-                    self.cols[col].styles(),
-                    row.styles(),
-                    &cell.styles,
-                ];
-                Some(Element { parent_styles, element: cell })
-            }
+        Element {
+            parent_styles,
+            element: cell
         }
     }
 
@@ -182,7 +175,7 @@ impl<S: ToString> From<S> for Cell {
 
 pub struct Element<'a, T: Styled> {
     parent_styles: Vec<&'a Styles>,
-    element: &'a T,
+    element: Option<&'a T>,
 }
 
 impl<'a, T: Styled> Element<'a, T> {
@@ -195,13 +188,15 @@ impl<'a, T: Styled> Element<'a, T> {
         for &s in &self.parent_styles {
             styles.insert_all(s);
         }
-        styles.insert_all(self.element.styles());
+        if let Some(element) = self.element {
+            styles.insert_all(element.styles());
+        }
         styles
     }
 }
 
 impl<'a, T: Styled> Deref for Element<'a, T> {
-    type Target = T;
+    type Target = Option<&'a T>;
 
     fn deref(&self) -> &Self::Target {
         &self.element

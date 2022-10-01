@@ -1,9 +1,8 @@
-use crate::table::Table;
 use crate::style::{HAlign, MaxWidth, MinWidth, Style};
+use crate::table::Table;
 use std::borrow::Cow;
 use std::fmt::Display;
 use std::mem;
-use crate::lazy::Lazy;
 
 pub mod console;
 pub mod markdown;
@@ -25,37 +24,25 @@ impl Table {
     }
 
     pub fn col_width(&self, col: usize) -> usize {
-        let mut min_col_width = Lazy::new(|| {
-            let col = self.col(col).unwrap();
-            MinWidth::resolve_or_default(&col.blended_styles()).0
-        });
-
         (0..self.num_rows())
             .into_iter()
             .map(|row| self.cell(col, row))
             .map(|cell| {
-                cell.map_or_else(
-                    || {
-                        // if there is no cell at the given col/row coordinate, fall back to the
-                        // column MinWidth constraint
-                        *min_col_width.get()
-                    },
-                    |cell| {
-                        // if a cell exists at the given col/row coordinate, calculate the width from the combination
-                        // of its data and the MinWidth/MaxWidth constraints
-                        let styles = cell.blended_styles();
-                        let min_width =
-                            MinWidth::resolve_or_default(&styles).0;
-                        let max_width =
-                            MaxWidth::resolve_or_default(&styles).0;
-                        let widest_line =
-                            cell.data().lines()
+                // if a cell exists at the given col/row coordinate, calculate the width from the combination
+                // of its data and the MinWidth/MaxWidth constraints
+                let styles = cell.blended_styles();
+                let min_width = MinWidth::resolve_or_default(&styles).0;
+                let max_width = MaxWidth::resolve_or_default(&styles).0;
+                let widest_line = cell
+                    .map(|cell| {
+                        cell.data()
+                            .lines()
                             .map(|line| line.chars().count())
                             .max()
-                            .unwrap_or(0);
-                        usize::min(usize::max(min_width, widest_line), max_width)
-                    },
-                )
+                            .unwrap_or(0)
+                    })
+                    .unwrap_or(0);
+                usize::min(usize::max(min_width, widest_line), max_width)
             })
             .max()
             .unwrap_or(0)

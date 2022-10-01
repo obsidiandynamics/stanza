@@ -458,12 +458,12 @@ fn switch_format(buf: &mut String, new_format: &str, old_format: &str) {
 fn pre_render(table: &Table, col_widths: &[usize]) -> Grid {
     let col_styles = (0..table.num_cols())
         .into_iter()
-        .map(|col| table.col(col).unwrap().blended_styles())
+        .map(|col| table.col(col).blended_styles())
         .collect::<Vec<_>>();
 
     let row_styles = (0..table.num_rows())
         .into_iter()
-        .map(|row| table.row(row).unwrap().blended_styles())
+        .map(|row| table.row(row).blended_styles())
         .collect::<Vec<_>>();
 
     let cells = (0..table.num_rows())
@@ -475,17 +475,7 @@ fn pre_render(table: &Table, col_widths: &[usize]) -> Grid {
                     let cell = table.cell(col, row);
                     let data = cell.as_ref().map(|cell| cell.data()).unwrap_or("");
                     let lines = wrap(data, col_widths[col]);
-                    let styles = cell.map(|cell| cell.blended_styles());
-                    let styles = match styles {
-                        None => {
-                            let mut blended = Styles::default();
-                            blended.insert_all(table.styles());
-                            blended.insert_all(&col_styles[col]);
-                            blended.insert_all(&row_styles[row]);
-                            blended
-                        }
-                        Some(styles) => styles
-                    };
+                    let styles = cell.blended_styles();
                     GridCell { lines, styles }
                 })
                 .collect()
