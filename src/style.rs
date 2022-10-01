@@ -16,6 +16,7 @@ pub mod text_fg;
 pub mod underline;
 
 use alloc::borrow::Cow;
+use alloc::collections::btree_map::Iter;
 use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;
@@ -169,14 +170,19 @@ impl Styles {
         self.0.remove(key)
     }
     
-    pub fn entries(&self) -> &BTreeMap<String, StyleKind> {
-        &self.0
-    }
-
     pub fn assert_assignability<S>(&self, mut check: impl FnMut(Assignability) -> bool) {
-        for entry in &self.0 {
+        for entry in self {
             assert!(check(entry.1.assignability()), "cannot assign style {} to a {}", entry.1.id(), any::type_name::<S>())
         }
+    }
+}
+
+impl<'a> IntoIterator for &'a Styles {
+    type Item = (&'a String, &'a StyleKind);
+    type IntoIter = Iter<'a, String, StyleKind>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.0.iter()
     }
 }
 
