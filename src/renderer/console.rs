@@ -1,6 +1,6 @@
 use crate::table::Table;
 use crate::renderer::{pad, wrap, Renderer, NEWLINE};
-use crate::style::{Bg16, Blink, Bold, BorderBg, BorderFg, Fg16, HAlign, Header, Italic, Palette16, Separator, Strikethrough, Style, Styled, Styles, Underline};
+use crate::style::{TextBg, Blink, Bold, BorderBg, BorderFg, TextFg, HAlign, Header, Italic, Palette16, Separator, Strikethrough, Style, Styled, Styles, Underline, FillBg};
 
 pub struct Decor {
     pub blank: char,
@@ -332,52 +332,6 @@ impl Renderer for Console {
     }
 }
 
-impl Fg16 {
-    fn escape_code(&self) -> &'static str {
-        match self {
-            Fg16::Black => "\x1b[30m",
-            Fg16::Red => "\x1b[31m",
-            Fg16::Green => "\x1b[32m",
-            Fg16::Yellow => "\x1b[33m",
-            Fg16::Blue => "\x1b[34m",
-            Fg16::Magenta => "\x1b[35m",
-            Fg16::Cyan => "\x1b[36m",
-            Fg16::White => "\x1b[371m",
-            Fg16::BrightBlack => "\x1b[30;1m",
-            Fg16::BrightRed => "\x1b[31;1m",
-            Fg16::BrightGreen => "\x1b[32;1m",
-            Fg16::BrightYellow => "\x1b[33;1m",
-            Fg16::BrightBlue => "\x1b[34;1m",
-            Fg16::BrightMagenta => "\x1b[35;1m",
-            Fg16::BrightCyan => "\x1b[36;1m",
-            Fg16::BrightWhite => "\x1b[371;1m",
-        }
-    }
-}
-
-impl Bg16 {
-    fn escape_code(&self) -> &'static str {
-        match self {
-            Bg16::Black => "\x1b[40m",
-            Bg16::Red => "\x1b[41m",
-            Bg16::Green => "\x1b[42m",
-            Bg16::Yellow => "\x1b[43m",
-            Bg16::Blue => "\x1b[44m",
-            Bg16::Magenta => "\x1b[45m",
-            Bg16::Cyan => "\x1b[46m",
-            Bg16::White => "\x1b[471m",
-            Bg16::BrightBlack => "\x1b[40;1m",
-            Bg16::BrightRed => "\x1b[41;1m",
-            Bg16::BrightGreen => "\x1b[42;1m",
-            Bg16::BrightYellow => "\x1b[43;1m",
-            Bg16::BrightBlue => "\x1b[44;1m",
-            Bg16::BrightMagenta => "\x1b[45;1m",
-            Bg16::BrightCyan => "\x1b[46;1m",
-            Bg16::BrightWhite => "\x1b[471;1m",
-        }
-    }
-}
-
 impl Palette16 {
     /// Obtains a pair of ANSI escape codes in the form `(foreground, background)`.
     fn escape_codes(&self) -> (&'static str, &'static str) {
@@ -417,11 +371,11 @@ fn append_border(buf: &mut String, b: char, fg: Option<&BorderFg>, bg: Option<&B
         match (fg, bg) {
             (None, None) => buf.push(b),
             _ => {
-                if let Some(border) = fg {
-                    buf.push_str(border.0.escape_codes().0);
+                if let Some(fg) = fg {
+                    buf.push_str(fg.0.escape_codes().0);
                 }
-                if let Some(border) = bg {
-                    buf.push_str(border.0.escape_codes().1);
+                if let Some(bg) = bg {
+                    buf.push_str(bg.0.escape_codes().1);
                 }
                 buf.push(b);
                 buf.push_str(ansi::RESET);
@@ -447,45 +401,61 @@ fn append_content(buf: &mut String, s: &str, styles: &Styles, print_escape_codes
                 buf.push_str(s);
             }
             Some(first_char) => {
-                let mut char_formatting = String::new();
+                // formatting that applies to the entire line (both printable and whitespace characters)
+                let mut line_format = String::new();
+                if let Some(bg) = FillBg::resolve(styles) {
+                    line_format.push_str(bg.0.escape_codes().1);
+                }
+
+                // formatting only or the printable characters
+                let mut char_format = line_format.clone();
                 if Blink::resolve_or_default(styles).0 {
-                    char_formatting.push_str(ansi::BLINK);
+                    char_format.push_str(ansi::BLINK);
                 }
                 if Bold::resolve_or_default(styles).0 {
-                    char_formatting.push_str(ansi::BOLD);
+                    char_format.push_str(ansi::BOLD);
                 }
                 if Italic::resolve_or_default(styles).0 {
-                    char_formatting.push_str(ansi::ITALIC);
+                    char_format.push_str(ansi::ITALIC);
                 }
                 if Strikethrough::resolve_or_default(styles).0 {
-                    char_formatting.push_str(ansi::STRIKETHROUGH);
+                    char_format.push_str(ansi::STRIKETHROUGH);
+                }
+                if let Some(bg) = TextBg::resolve(styles) {
+                    char_format.push_str(bg.0.escape_codes().1);
+                }
+                if let Some(fg) = TextFg::resolve(styles) {
+                    char_format.push_str(fg.0.escape_codes().0);
                 }
                 if Underline::resolve_or_default(styles).0 {
-                    char_formatting.push_str(ansi::UNDERLINE);
-                }
-                if let Some(colour) = Fg16::resolve(styles) {
-                    char_formatting.push_str(colour.escape_code());
-                }
-                if let Some(colour) = Bg16::resolve(styles) {
-                    char_formatting.push_str(colour.escape_code());
+                    char_format.push_str(ansi::UNDERLINE);
                 }
 
                 let total_chars = s.chars().count();
                 let last_char = total_chars - find_first_printable(s.chars().rev()).unwrap() - 1;
 
+                buf.push_str(&line_format);
                 for (i, ch) in s.chars().enumerate() {
                     if i == first_char {
-                        buf.push_str(&char_formatting);
+                        switch_format(buf, &char_format, &line_format);
                     }
                     buf.push(ch);
-                    if i == last_char && !char_formatting.is_empty() {
-                        buf.push_str(ansi::RESET);
+                    if i == last_char {
+                        switch_format(buf, &line_format, &char_format);
                     }
                 }
+                switch_format(buf, "", &line_format);
             }
         }
     } else {
         buf.push_str(s);
+    }
+}
+
+fn switch_format(buf: &mut String, new_format: &str, old_format: &str) {
+    if new_format != old_format {
+        buf.push_str(ansi::RESET);
+        buf.push_str(new_format);
     }
 }
 

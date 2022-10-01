@@ -1,9 +1,8 @@
-pub mod bg_16;
 pub mod blink;
 pub mod bold;
 pub mod border_bg;
 pub mod border_fg;
-pub mod fg_16;
+pub mod fill_bg;
 pub mod halign;
 pub mod header;
 pub mod italic;
@@ -12,15 +11,16 @@ pub mod min_width;
 pub mod palette_16;
 pub mod separator;
 pub mod strikethrough;
+pub mod text_bg;
+pub mod text_fg;
 pub mod underline;
 
 use std::any;
-pub use bg_16::Bg16;
 pub use bold::Bold;
 pub use border_bg::BorderBg;
 pub use border_fg::BorderFg;
 pub use blink::Blink;
-pub use fg_16::Fg16;
+pub use fill_bg::FillBg;
 pub use halign::HAlign;
 pub use header::Header;
 pub use italic::Italic;
@@ -29,6 +29,8 @@ pub use min_width::MinWidth;
 pub use palette_16::Palette16;
 pub use separator::Separator;
 pub use strikethrough::Strikethrough;
+pub use text_bg::TextBg;
+pub use text_fg::TextFg;
 pub use underline::Underline;
 
 use std::borrow::Cow;
@@ -68,12 +70,11 @@ where
 
 #[derive(Debug, Clone)]
 pub enum StyleKind {
-    Bg16(Bg16),
     Blink(Blink),
     Bold(Bold),
     BorderBg(BorderBg),
     BorderFg(BorderFg),
-    Fg16(Fg16),
+    FillBg(FillBg),
     HAlign(HAlign),
     Header(Header),
     Italic(Italic),
@@ -81,6 +82,8 @@ pub enum StyleKind {
     MinWidth(MinWidth),
     Separator(Separator),
     Strikethrough(Strikethrough),
+    TextFg(TextFg),
+    TextBg(TextBg),
     Underline(Underline),
 }
 
@@ -95,12 +98,11 @@ impl StyleKind {
     
     fn statics(&self) -> Statics {
         match self {
-            StyleKind::Bg16(_) => Statics::capture::<Bg16>(),
             StyleKind::Blink(_) => Statics::capture::<Blink>(),
             StyleKind::Bold(_) => Statics::capture::<Bold>(),
             StyleKind::BorderBg(_) => Statics::capture::<BorderBg>(),
             StyleKind::BorderFg(_) => Statics::capture::<BorderFg>(),
-            StyleKind::Fg16(_) => Statics::capture::<Fg16>(),
+            StyleKind::FillBg(_) => Statics::capture::<FillBg>(),
             StyleKind::HAlign(_) => Statics::capture::<HAlign>(),
             StyleKind::Header(_) => Statics::capture::<Header>(),
             StyleKind::Italic(_) => Statics::capture::<Italic>(),
@@ -108,8 +110,10 @@ impl StyleKind {
             StyleKind::MinWidth(_) => Statics::capture::<MinWidth>(),
             StyleKind::Separator(_) => Statics::capture::<Separator>(),
             StyleKind::Strikethrough(_) => Statics::capture::<Strikethrough>(),
+            StyleKind::TextBg(_) => Statics::capture::<TextBg>(),
+            StyleKind::TextFg(_) => Statics::capture::<TextFg>(),
             StyleKind::Underline(_) => Statics::capture::<Underline>(),
-        }  
+        }
     }
 }
 

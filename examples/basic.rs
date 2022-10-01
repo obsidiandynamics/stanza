@@ -2,8 +2,8 @@ use stanza::renderer::console::{Console, Decor};
 use stanza::renderer::markdown::Markdown;
 use stanza::renderer::Renderer;
 use stanza::style::{
-    Bg16, Blink, Bold, Fg16, HAlign, Header, Italic, MaxWidth, MinWidth, Separator, Strikethrough,
-    Styles, Underline,
+    Blink, Bold, FillBg, HAlign, Header, Italic, MaxWidth, MinWidth, Palette16, Separator,
+    Strikethrough, Styles, TextBg, TextFg, Underline,
 };
 use stanza::table::{Cell, Col, Row, Table};
 
@@ -34,14 +34,17 @@ fn main() {
         .with_row(Row::new(
             Styles::default(),
             vec![
-                Cell::new(Styles::default().with(Fg16::BrightGreen), "Sales"),
+                Cell::new(
+                    Styles::default().with(TextFg(Palette16::BrightGreen)),
+                    "Sales",
+                ),
                 Cell::from(39),
                 Cell::from(300_000.0),
                 Cell::from(""),
                 Cell::new(
                     Styles::default()
                         .with(Strikethrough(true))
-                        .with(Fg16::BrightBlack),
+                        .with(TextFg(Palette16::BrightBlack)),
                     "Walk the dog",
                 ),
             ],
@@ -49,14 +52,17 @@ fn main() {
         .with_row(Row::new(
             Styles::default(),
             vec![
-                Cell::new(Styles::default().with(Fg16::BrightBlue), "Engineering"),
+                Cell::new(
+                    Styles::default().with(TextFg(Palette16::BrightBlue)),
+                    "Engineering",
+                ),
                 Cell::from(117),
                 Cell::from(1_150_000.0),
                 Cell::from(""),
                 Cell::new(
                     Styles::default()
                         .with(Strikethrough(true))
-                        .with(Fg16::BrightBlack),
+                        .with(TextFg(Palette16::BrightBlack)),
                     "Wash the car",
                 ),
             ],
@@ -64,7 +70,10 @@ fn main() {
         .with_row(Row::new(
             Styles::default(),
             vec![
-                Cell::new(Styles::default().with(Fg16::BrightCyan), "Manufacturing"),
+                Cell::new(
+                    Styles::default().with(TextFg(Palette16::BrightCyan)),
+                    "Manufacturing",
+                ),
                 Cell::from(20),
                 Cell::from(250_000),
                 Cell::from(""),
@@ -78,17 +87,20 @@ fn main() {
                 Cell::new(
                     Styles::default()
                         .with(Bold(true))
-                        .with(Bg16::BrightRed)
+                        .with(TextBg(Palette16::BrightRed))
                         .with(Blink(true)),
                     "WARNING",
                 ),
                 Cell::new(
                     Styles::default()
                         .with(Underline(true))
-                        .with(Fg16::BrightYellow),
+                        .with(TextFg(Palette16::BrightYellow)),
                     "Check oil temp",
                 ),
-                Cell::from(""),
+                Cell::new(
+                    Styles::default().with(FillBg(Palette16::BrightMagenta)).with(Italic(true)),
+                    "fill",
+                ),
                 Cell::from(""),
                 Cell::from(""),
             ],
@@ -99,11 +111,13 @@ fn main() {
                 Cell::new(
                     Styles::default()
                         .with(Bold(true))
-                        .with(Fg16::BrightRed)
+                        .with(TextFg(Palette16::BrightRed))
                         .with(Blink(true)),
                     "Self destruct sequence initiated",
                 ),
-                Cell::from(Console(Decor::default().suppress_escape_codes()).render(&nested_table())),
+                Cell::from(
+                    Console(Decor::default().suppress_escape_codes()).render(&nested_table()),
+                ),
                 Cell::from(""),
                 Cell::from(""),
                 Cell::new(
@@ -122,7 +136,16 @@ fn nested_table() -> Table {
             Col::new(Styles::default()),
             Col::new(Styles::default()),
         ])
-        .with_row(Row::new(Styles::default().with(Header(true)).with(Bold(true)), vec![Cell::from("Sensor"), Cell::from("Temperature")]))
-        .with_row(Row::new(Styles::default(), vec![Cell::from("Oil"), Cell::from(95.4)]))
-        .with_row(Row::new(Styles::default(), vec![Cell::from("Water"), Cell::from(57.1)]))
+        .with_row(Row::new(
+            Styles::default().with(Header(true)).with(Bold(true)),
+            vec![Cell::from("Sensor"), Cell::from("Temperature")],
+        ))
+        .with_row(Row::new(
+            Styles::default(),
+            vec![Cell::from("Oil"), Cell::from(95.4)],
+        ))
+        .with_row(Row::new(
+            Styles::default(),
+            vec![Cell::from("Water"), Cell::from(57.1)],
+        ))
 }
