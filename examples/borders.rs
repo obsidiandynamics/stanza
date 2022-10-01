@@ -1,7 +1,7 @@
 use stanza::table::{Cell, Col, Row, Table};
-use stanza::renderer::console::Console;
+use stanza::renderer::console::{Console, Decor};
 use stanza::renderer::Renderer;
-use stanza::style::{BorderColour, HAlign, Header, MinWidth, Palette16, Separator, Styles};
+use stanza::style::{BorderFg, HAlign, Header, MinWidth, Palette16, Separator, Styles};
 use std::mem;
 
 fn main() {
@@ -29,14 +29,14 @@ fn main() {
     ];
     const NUM_COLS: usize = div_ceil(EXAMPLES.len(), NUM_ROWS);
 
-    let mut outer_table = Table::with_styles(Styles::default().with(BorderColour(Palette16::BrightBlack)));
+    let mut outer_table = Table::with_styles(Styles::default().with(BorderFg(Palette16::BrightBlack)));
     let cols = (0..NUM_COLS)
         .into_iter()
         .map(|_| Col::new(Styles::default().with(HAlign::Centred)))
         .collect();
     outer_table.set_cols(cols);
 
-    let renderer = Console::default();
+    let renderer = Console(nested_decor());
     let mut row = Vec::new();
     for (i, example) in EXAMPLES.iter().enumerate() {
         let inner_table = example.1();
@@ -55,6 +55,12 @@ fn main() {
     }
 
     print!("{}", Console::default().render(&outer_table));
+}
+
+fn nested_decor() -> Decor {
+    let mut decor = Decor::default();
+    decor.print_escape_codes = false;
+    decor
 }
 
 const fn div_ceil(a: usize, b: usize) -> usize {

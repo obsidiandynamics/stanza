@@ -1,25 +1,25 @@
 use crate::style::{Assignability, Palette16, Style, StyleKind};
 
 #[derive(Debug, Clone)]
-pub struct BorderColour(pub Palette16);
+pub struct BorderFg(pub Palette16);
 
-impl Style for BorderColour {
+impl Style for BorderFg {
     fn assignability() -> Assignability {
         Assignability::Table
     }
 }
 
-impl<'a> From<&'a StyleKind> for Option<&'a BorderColour> {
+impl<'a> From<&'a StyleKind> for Option<&'a BorderFg> {
     fn from(kind: &'a StyleKind) -> Self {
         match kind {
-            StyleKind::BorderColour(style) => Some(style),
+            StyleKind::BorderFg(style) => Some(style),
             _ => None,
         }
     }
 }
 
-impl Into<StyleKind> for BorderColour {
+impl Into<StyleKind> for BorderFg {
     fn into(self) -> StyleKind {
-        StyleKind::BorderColour(self)
+        StyleKind::BorderFg(self)
     }
 }

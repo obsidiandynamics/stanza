@@ -1,7 +1,8 @@
 pub mod bg_16;
 pub mod blink;
 pub mod bold;
-pub mod border_colour;
+pub mod border_bg;
+pub mod border_fg;
 pub mod fg_16;
 pub mod halign;
 pub mod header;
@@ -16,7 +17,8 @@ pub mod underline;
 use std::any;
 pub use bg_16::Bg16;
 pub use bold::Bold;
-pub use border_colour::BorderColour;
+pub use border_bg::BorderBg;
+pub use border_fg::BorderFg;
 pub use blink::Blink;
 pub use fg_16::Fg16;
 pub use halign::HAlign;
@@ -69,7 +71,8 @@ pub enum StyleKind {
     Bg16(Bg16),
     Blink(Blink),
     Bold(Bold),
-    BorderColour(BorderColour),
+    BorderBg(BorderBg),
+    BorderFg(BorderFg),
     Fg16(Fg16),
     HAlign(HAlign),
     Header(Header),
@@ -84,38 +87,10 @@ pub enum StyleKind {
 impl StyleKind {
     pub fn id(&self) -> String {
         self.statics().id.into()
-        // match self {
-        //     StyleKind::Bg16(_) => Bg16::key().into(),
-        //     StyleKind::Blink(_) => Blink::key().into(),
-        //     StyleKind::Bold(_) => Bold::key().into(),
-        //     StyleKind::Fg16(_) => Fg16::key().into(),
-        //     StyleKind::HAlign(_) => HAlign::key().into(),
-        //     StyleKind::Header(_) => Header::key().into(),
-        //     StyleKind::Italic(_) => Italic::key().into(),
-        //     StyleKind::MaxWidth(_) => MaxWidth::key().into(),
-        //     StyleKind::MinWidth(_) => MinWidth::key().into(),
-        //     StyleKind::Separator(_) => Separator::key().into(),
-        //     StyleKind::Strikethrough(_) => Strikethrough::key().into(),
-        //     StyleKind::Underline(_) => Underline::key().into(),
-        // }
     }
     
     pub fn assignability(&self) -> Assignability {
         self.statics().assignability
-        // match self {
-        //     StyleKind::Bg16(_) => Bg16::assignability(),
-        //     StyleKind::Blink(_) => Blink::assignability(),
-        //     StyleKind::Bold(_) => Bold::assignability(),
-        //     StyleKind::Fg16(_) => Fg16::assignability(),
-        //     StyleKind::HAlign(_) => HAlign::assignability(),
-        //     StyleKind::Header(_) => Header::assignability(),
-        //     StyleKind::Italic(_) => Italic::assignability(),
-        //     StyleKind::MaxWidth(_) => MaxWidth::assignability(),
-        //     StyleKind::MinWidth(_) => MinWidth::assignability(),
-        //     StyleKind::Separator(_) => Separator::assignability(),
-        //     StyleKind::Strikethrough(_) => Strikethrough::assignability(),
-        //     StyleKind::Underline(_) => Underline::assignability(),
-        // }
     }
     
     fn statics(&self) -> Statics {
@@ -123,7 +98,8 @@ impl StyleKind {
             StyleKind::Bg16(_) => Statics::capture::<Bg16>(),
             StyleKind::Blink(_) => Statics::capture::<Blink>(),
             StyleKind::Bold(_) => Statics::capture::<Bold>(),
-            StyleKind::BorderColour(_) => Statics::capture::<BorderColour>(),
+            StyleKind::BorderBg(_) => Statics::capture::<BorderBg>(),
+            StyleKind::BorderFg(_) => Statics::capture::<BorderFg>(),
             StyleKind::Fg16(_) => Statics::capture::<Fg16>(),
             StyleKind::HAlign(_) => Statics::capture::<HAlign>(),
             StyleKind::Header(_) => Statics::capture::<Header>(),
@@ -149,13 +125,6 @@ impl Statics {
             assignability: S::assignability()
         }
     }
-    
-    // fn lazy_extract<S: Style>() -> impl Fn() -> Self where for<'a> Option<&'a S>: From<&'a StyleKind> {
-    //     || Self {
-    //         key: S::key(),
-    //         assignability: S::assignability()
-    //     }
-    // }
 }
 
 #[derive(Default)]

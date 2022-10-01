@@ -1,37 +1,38 @@
 use crate::table::Table;
 use crate::renderer::{pad, wrap, Renderer, NEWLINE};
-use crate::style::{Bg16, Blink, Bold, BorderColour, Fg16, HAlign, Header, Italic, Palette16, Separator, Strikethrough, Style, Styled, Styles, Underline};
+use crate::style::{Bg16, Blink, Bold, BorderBg, BorderFg, Fg16, HAlign, Header, Italic, Palette16, Separator, Strikethrough, Style, Styled, Styles, Underline};
 
 pub struct Decor {
-    blank: char,
-    up_bold_down_bold: char,
-    right_bold_left_bold: char,
-    right_bold_down_bold: char,
-    down_bold_left_bold: char,
-    up_bold_right_bold: char,
-    up_bold_left_bold: char,
-    up_bold_right_norm_down_bold: char,
-    up_bold_right_bold_down_bold: char,
-    up_bold_down_bold_left_norm: char,
-    up_bold_down_bold_left_bold: char,
-    right_bold_down_norm_left_bold: char,
-    right_bold_down_bold_left_bold: char,
-    up_norm_right_bold_left_bold: char,
-    up_bold_right_bold_left_bold: char,
-    up_norm_right_bold_down_norm_left_bold: char,
-    up_bold_right_norm_down_bold_left_norm: char,
-    up_bold_right_bold_down_bold_left_bold: char,
-    right_norm_left_norm: char,
-    up_norm_down_norm: char,
-    right_norm_down_norm: char,
-    down_norm_left_norm: char,
-    up_norm_right_norm: char,
-    up_norm_left_norm: char,
-    up_norm_right_norm_down_norm: char,
-    up_norm_down_norm_left_norm: char,
-    right_norm_down_norm_left_norm: char,
-    up_norm_right_norm_left_norm: char,
-    up_norm_right_norm_down_norm_left_norm: char,
+    pub blank: char,
+    pub up_bold_down_bold: char,
+    pub right_bold_left_bold: char,
+    pub right_bold_down_bold: char,
+    pub down_bold_left_bold: char,
+    pub up_bold_right_bold: char,
+    pub up_bold_left_bold: char,
+    pub up_bold_right_norm_down_bold: char,
+    pub up_bold_right_bold_down_bold: char,
+    pub up_bold_down_bold_left_norm: char,
+    pub up_bold_down_bold_left_bold: char,
+    pub right_bold_down_norm_left_bold: char,
+    pub right_bold_down_bold_left_bold: char,
+    pub up_norm_right_bold_left_bold: char,
+    pub up_bold_right_bold_left_bold: char,
+    pub up_norm_right_bold_down_norm_left_bold: char,
+    pub up_bold_right_norm_down_bold_left_norm: char,
+    pub up_bold_right_bold_down_bold_left_bold: char,
+    pub right_norm_left_norm: char,
+    pub up_norm_down_norm: char,
+    pub right_norm_down_norm: char,
+    pub down_norm_left_norm: char,
+    pub up_norm_right_norm: char,
+    pub up_norm_left_norm: char,
+    pub up_norm_right_norm_down_norm: char,
+    pub up_norm_down_norm_left_norm: char,
+    pub right_norm_down_norm_left_norm: char,
+    pub up_norm_right_norm_left_norm: char,
+    pub up_norm_right_norm_down_norm_left_norm: char,
+    pub print_escape_codes: bool,
 }
 
 impl Default for Decor {
@@ -72,7 +73,13 @@ impl Decor {
             right_norm_down_norm_left_norm: '┬',
             up_norm_right_norm_left_norm: '┴',
             up_norm_right_norm_down_norm_left_norm: '┼',
+            print_escape_codes: true
         }
+    }
+
+    pub fn suppress_escape_codes(mut self) -> Self {
+        self.print_escape_codes = false;
+        self
     }
 
     fn lookup(&self, up: Line, right: Line, down: Line, left: Line) -> char {
@@ -138,7 +145,9 @@ impl Renderer for Console {
         let col_widths = table.col_widths();
         let decor = &self.0;
         let grid = pre_render(table, &col_widths);
-        let border_colour = BorderColour::resolve(&table.styles());
+        let print_escape_codes = self.0.print_escape_codes;
+        let border_fg = BorderFg::resolve(&table.styles());
+        let border_bg = BorderBg::resolve(&table.styles());
         let mut buf = String::new();
 
         let is_header_col_pair = |col| grid.is_header_col(col) || grid.is_header_col(col + 1);
@@ -147,11 +156,11 @@ impl Renderer for Console {
         // upper outside border...
         // top-left corner
         let top_left = decor.lookup(Line::None, Line::Bold, Line::Bold, Line::None);
-        append_border(&mut buf, top_left, border_colour);
+        append_border(&mut buf, top_left, border_fg, border_bg, print_escape_codes);
         let horizontal_line = decor.lookup(Line::None, Line::Bold, Line::None, Line::Bold);
         for (col, &width) in col_widths.iter().enumerate() {
             // horizontal line
-            (0..width).for_each(|_| append_border(&mut buf, horizontal_line, border_colour));
+            (0..width).for_each(|_| append_border(&mut buf, horizontal_line, border_fg, border_bg, print_escape_codes));
 
             if col < col_widths.len() - 1 {
                 // junction between cells
@@ -163,12 +172,12 @@ impl Renderer for Console {
                 } else {
                     Line::Norm
                 };
-                append_border(&mut buf, decor.lookup(Line::None, Line::Bold, down, Line::Bold), border_colour);
+                append_border(&mut buf, decor.lookup(Line::None, Line::Bold, down, Line::Bold), border_fg, border_bg, print_escape_codes);
             }
         }
         // bottom-right corner
         let top_right = decor.lookup(Line::None, Line::None, Line::Bold, Line::Bold);
-        append_border(&mut buf, top_right, border_colour);
+        append_border(&mut buf, top_right, border_fg, border_bg, print_escape_codes);
         buf.push_str(NEWLINE);
 
         // table (incl. headers and body)...
@@ -181,7 +190,7 @@ impl Renderer for Console {
             // lines comprising the row
             for line in 0..max_lines {
                 // right outer vertical separator
-                append_border(&mut buf, vertical_line, border_colour);
+                append_border(&mut buf, vertical_line, border_fg, border_bg, print_escape_codes);
 
                 for col in 0..col_widths.len() {
                     let grid_cell = &grid_row[col];
@@ -194,7 +203,7 @@ impl Renderer for Console {
                         .unwrap_or("");
                     let alignment = HAlign::resolve_or_default(&grid_cell.styles);
                     let line = pad(line, ' ', col_widths[col], &alignment);
-                    append_content(&mut buf, &line, &grid_cell.styles);
+                    append_content(&mut buf, &line, &grid_cell.styles, print_escape_codes);
 
                     // vertical cell separator
                     if col < col_widths.len() - 1 {
@@ -205,12 +214,12 @@ impl Renderer for Console {
                         } else {
                             (Line::Norm, Line::Norm)
                         };
-                        append_border(&mut buf, decor.lookup(up, Line::None, down, Line::None), border_colour);
+                        append_border(&mut buf, decor.lookup(up, Line::None, down, Line::None), border_fg, border_bg, print_escape_codes);
                     }
                 }
 
                 // right outer vertical separator
-                append_border(&mut buf, vertical_line, border_colour);
+                append_border(&mut buf, vertical_line, border_fg, border_bg, print_escape_codes);
                 buf.push_str(NEWLINE);
             }
 
@@ -228,7 +237,7 @@ impl Renderer for Console {
                 } else {
                     Line::Norm
                 };
-                append_border(&mut buf, decor.lookup(Line::Bold, right, Line::Bold, Line::None), border_colour);
+                append_border(&mut buf, decor.lookup(Line::Bold, right, Line::Bold, Line::None), border_fg, border_bg, print_escape_codes);
 
                 // horizontal line below the cell
                 for (col, &width) in col_widths.iter().enumerate() {
@@ -241,7 +250,7 @@ impl Renderer for Console {
                         (Line::Norm, Line::Norm)
                     };
                     let border = decor.lookup(Line::None, right, Line::None, left);
-                    (0..width).for_each(|_| append_border(&mut buf, border, border_colour));
+                    (0..width).for_each(|_| append_border(&mut buf, border, border_fg, border_bg, print_escape_codes));
 
                     if col < col_widths.len() - 1 {
                         // junction between cells
@@ -275,7 +284,7 @@ impl Renderer for Console {
                         } else {
                             Line::Norm
                         };
-                        append_border(&mut buf, decor.lookup(up, right, down, left), border_colour);
+                        append_border(&mut buf, decor.lookup(up, right, down, left), border_fg, border_bg, print_escape_codes);
                     }
                 }
 
@@ -288,7 +297,7 @@ impl Renderer for Console {
                 } else {
                     Line::Norm
                 };
-                append_border(&mut buf, decor.lookup(Line::Bold, Line::None, Line::Bold, left), border_colour);
+                append_border(&mut buf, decor.lookup(Line::Bold, Line::None, Line::Bold, left), border_fg, border_bg, print_escape_codes);
                 buf.push_str(NEWLINE);
             }
         }
@@ -296,10 +305,10 @@ impl Renderer for Console {
         // lower outside border...
         // bottom-left corner
         let bottom_left = decor.lookup(Line::Bold, Line::Bold, Line::None, Line::None);
-        append_border(&mut buf, bottom_left, border_colour);
+        append_border(&mut buf, bottom_left, border_fg, border_bg, print_escape_codes);
         for (col, &width) in col_widths.iter().enumerate() {
             // horizontal line
-            (0..width).for_each(|_| append_border(&mut buf, horizontal_line, border_colour));
+            (0..width).for_each(|_| append_border(&mut buf, horizontal_line, border_fg, border_bg, print_escape_codes));
 
             if col < col_widths.len() - 1 {
                 // junction between cells
@@ -311,12 +320,12 @@ impl Renderer for Console {
                 } else {
                     Line::Norm
                 };
-                append_border(&mut buf, decor.lookup(up, Line::Bold, Line::None, Line::Bold), border_colour);
+                append_border(&mut buf, decor.lookup(up, Line::Bold, Line::None, Line::Bold), border_fg, border_bg, print_escape_codes);
             }
         }
         // bottom-right corner
         let bottom_right = decor.lookup(Line::Bold, Line::None, Line::None, Line::Bold);
-        append_border(&mut buf, bottom_right, border_colour);
+        append_border(&mut buf, bottom_right, border_fg, border_bg, print_escape_codes);
         buf.push_str(NEWLINE);
 
         buf
@@ -403,67 +412,80 @@ mod ansi {
     pub const RESET: &str = "\x1b[0m";
 }
 
-fn append_border(buf: &mut String, b: char, colour: Option<&BorderColour>) {
-    match colour {
-        None => buf.push(b),
-        Some(colour) => {
-            buf.push_str(colour.0.escape_codes().0);
-            buf.push(b);
-            buf.push_str(ansi::RESET);
+fn append_border(buf: &mut String, b: char, fg: Option<&BorderFg>, bg: Option<&BorderBg>, print_escape_codes: bool) {
+    if print_escape_codes {
+        match (fg, bg) {
+            (None, None) => buf.push(b),
+            _ => {
+                if let Some(border) = fg {
+                    buf.push_str(border.0.escape_codes().0);
+                }
+                if let Some(border) = bg {
+                    buf.push_str(border.0.escape_codes().1);
+                }
+                buf.push(b);
+                buf.push_str(ansi::RESET);
+            }
         }
+    } else {
+        buf.push(b)
     }
 }
 
-fn append_content(buf: &mut String, s: &str, styles: &Styles) {
-    fn find_first_printable(chars: impl Iterator<Item = char>) -> Option<usize> {
-        chars
-            .enumerate()
-            .find(|(_, ch)| !ch.is_whitespace())
-            .map(|(i, _)| i)
-    }
+fn find_first_printable(chars: impl Iterator<Item = char>) -> Option<usize> {
+    chars
+        .enumerate()
+        .find(|(_, ch)| !ch.is_whitespace())
+        .map(|(i, _)| i)
+}
 
-    let first_char = find_first_printable(s.chars());
-    match first_char {
-        None => {
-            buf.push_str(s);
-        }
-        Some(first_char) => {
-            let mut char_formatting = String::new();
-            if Blink::resolve_or_default(styles).0 {
-                char_formatting.push_str(ansi::BLINK);
+fn append_content(buf: &mut String, s: &str, styles: &Styles, print_escape_codes: bool) {
+    if print_escape_codes {
+        let first_char = find_first_printable(s.chars());
+        match first_char {
+            None => {
+                buf.push_str(s);
             }
-            if Bold::resolve_or_default(styles).0 {
-                char_formatting.push_str(ansi::BOLD);
-            }
-            if Italic::resolve_or_default(styles).0 {
-                char_formatting.push_str(ansi::ITALIC);
-            }
-            if Strikethrough::resolve_or_default(styles).0 {
-                char_formatting.push_str(ansi::STRIKETHROUGH);
-            }
-            if Underline::resolve_or_default(styles).0 {
-                char_formatting.push_str(ansi::UNDERLINE);
-            }
-            if let Some(colour) = Fg16::resolve(styles) {
-                char_formatting.push_str(colour.escape_code());
-            }
-            if let Some(colour) = Bg16::resolve(styles) {
-                char_formatting.push_str(colour.escape_code());
-            }
-
-            let total_chars = s.chars().count();
-            let last_char = total_chars - find_first_printable(s.chars().rev()).unwrap() - 1;
-
-            for (i, ch) in s.chars().enumerate() {
-                if i == first_char {
-                    buf.push_str(&char_formatting);
+            Some(first_char) => {
+                let mut char_formatting = String::new();
+                if Blink::resolve_or_default(styles).0 {
+                    char_formatting.push_str(ansi::BLINK);
                 }
-                buf.push(ch);
-                if i == last_char && !char_formatting.is_empty() {
-                    buf.push_str(ansi::RESET);
+                if Bold::resolve_or_default(styles).0 {
+                    char_formatting.push_str(ansi::BOLD);
+                }
+                if Italic::resolve_or_default(styles).0 {
+                    char_formatting.push_str(ansi::ITALIC);
+                }
+                if Strikethrough::resolve_or_default(styles).0 {
+                    char_formatting.push_str(ansi::STRIKETHROUGH);
+                }
+                if Underline::resolve_or_default(styles).0 {
+                    char_formatting.push_str(ansi::UNDERLINE);
+                }
+                if let Some(colour) = Fg16::resolve(styles) {
+                    char_formatting.push_str(colour.escape_code());
+                }
+                if let Some(colour) = Bg16::resolve(styles) {
+                    char_formatting.push_str(colour.escape_code());
+                }
+
+                let total_chars = s.chars().count();
+                let last_char = total_chars - find_first_printable(s.chars().rev()).unwrap() - 1;
+
+                for (i, ch) in s.chars().enumerate() {
+                    if i == first_char {
+                        buf.push_str(&char_formatting);
+                    }
+                    buf.push(ch);
+                    if i == last_char && !char_formatting.is_empty() {
+                        buf.push_str(ansi::RESET);
+                    }
                 }
             }
         }
+    } else {
+        buf.push_str(s);
     }
 }
 
