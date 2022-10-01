@@ -1,7 +1,7 @@
 use stanza::renderer::console::{Console};
 use stanza::renderer::markdown::Markdown;
 use stanza::renderer::Renderer;
-use stanza::style::{Blink, Bold, BorderBg, FillBg, HAlign, Header, Italic, MaxWidth, MinWidth, Palette16, Separator, Strikethrough, Styles, TextBg, TextFg, Underline};
+use stanza::style::{Blink, Bold, BorderBg, FillBg, HAlign, Header, Italic, MaxWidth, MinWidth, Palette16, Strikethrough, Styles, TextBg, TextFg, Underline};
 use stanza::table::{Cell, Content, Col, Row, Table};
 
 fn main() {
@@ -15,7 +15,7 @@ fn main() {
                     .with(MinWidth(10))
                     .with(MaxWidth(20)),
             ),
-            Col::new(Styles::default().with(Separator(true)).with(MinWidth(5))),
+            Col::separator(5),
             Col::new(Styles::default().with(MinWidth(10)).with(MaxWidth(20))),
         ])
         .with_row(Row::new(
@@ -76,7 +76,7 @@ fn main() {
                 Cell::from("Buy groceries"),
             ],
         ))
-        .with_row(Row::new(Styles::default().with(Separator(true)), vec![]))
+        .with_row(Row::separator())
         .with_row(Row::new(
             Styles::default(),
             vec![
@@ -116,12 +116,12 @@ fn main() {
                 Cell::from(""),
                 Cell::new(
                     Styles::default().with(Italic(true)),
-                    Content::from("The quick brown fox jumped over the lazy dog.\nThat's all folks!"),
+                    Content::from("The quick brown fox jumped over the lazy dog.\nThat's all folks!\n👍"),
                 ),
             ],
         ));
-    println!("{}", Console::default().render(&table, Default::default()));
-    println!("{}", Markdown::default().render(&table, Default::default()));
+    println!("{}", Console::default().render(&table, &[]));
+    println!("{}", Markdown::default().render(&table, &[]));
 }
 
 fn nested_table() -> Table {

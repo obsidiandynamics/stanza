@@ -38,6 +38,10 @@ pub struct Decor {
     pub right_norm_down_norm_left_norm: char,
     pub up_norm_right_norm_left_norm: char,
     pub up_norm_right_norm_down_norm_left_norm: char,
+    pub up_norm: char,
+    pub right_norm: char,
+    pub down_norm: char,
+    pub left_norm: char,
     pub print_escape_codes: bool,
 }
 
@@ -79,6 +83,10 @@ impl Decor {
             right_norm_down_norm_left_norm: '┬',
             up_norm_right_norm_left_norm: '┴',
             up_norm_right_norm_down_norm_left_norm: '┼',
+            up_norm: '╵',
+            right_norm: '╶',
+            down_norm: '╷',
+            left_norm: '╴',
             print_escape_codes: true,
         }
     }
@@ -128,6 +136,10 @@ impl Decor {
             (Line::Norm, Line::Norm, Line::Norm, Line::Norm) => {
                 self.up_norm_right_norm_down_norm_left_norm
             }
+            (Line::Norm, Line::None, Line::None, Line::None) => self.up_norm,
+            (Line::None, Line::Norm, Line::None, Line::None) => self.right_norm,
+            (Line::None, Line::None, Line::Norm, Line::None) => self.down_norm,
+            (Line::None, Line::None, Line::None, Line::Norm) => self.left_norm,
             _ => unreachable!(),
         }
     }

@@ -10,3 +10,6 @@ repository = "https://github.com/obsidiandynamics/stanza"
 keywords = ["cli", "terminal", "table", "format", "no_std"]
 
 [dependencies]
+
+[dev-dependencies]
+term_size = "0.3.2"

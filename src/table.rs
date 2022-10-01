@@ -3,7 +3,7 @@ use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
 use core::ops::Deref;
-use crate::style::{Styled, Styles};
+use crate::style::{MinWidth, Separator, Styled, Styles};
 
 #[derive(Default)]
 pub struct Table {
@@ -115,12 +115,17 @@ impl Table {
     }
 }
 
+#[derive(Default)]
 pub struct Col(Styles);
 
 impl Col {
     pub fn new(styles: Styles) -> Self {
         styles.assert_assignability::<Self>(|assignability| assignability.at_col());
         Self(styles)
+    }
+
+    pub fn separator(min_width: usize) -> Self {
+        Self(Styles::default().with(Separator(true)).with(MinWidth(min_width)))
     }
 }
 
@@ -130,12 +135,17 @@ impl Styled for Col {
     }
 }
 
+#[derive(Default)]
 pub struct Row(Styles, Vec<Cell>);
 
 impl Row {
     pub fn new(styles: Styles, cells: Vec<Cell>) -> Self {
         styles.assert_assignability::<Self>(|assignability| assignability.at_row());
         Self(styles, cells)
+    }
+
+    pub fn separator() -> Self {
+        Self(Styles::default().with(Separator(true)), vec![])
     }
 
     pub fn cells(&self) -> &[Cell] {
