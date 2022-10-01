@@ -1,5 +1,5 @@
-use stanza::table::{Cell, Col, Row, Table};
-use stanza::renderer::console::{Console, Decor};
+use stanza::table::{Cell, Col, Content, Row, Table};
+use stanza::renderer::console::{Console};
 use stanza::renderer::Renderer;
 use stanza::style::{BorderFg, HAlign, Header, MinWidth, Palette16, Separator, Styles};
 use std::mem;
@@ -36,13 +36,12 @@ fn main() {
         .collect();
     outer_table.set_cols(cols);
 
-    let renderer = Console(nested_decor());
     let mut row = Vec::new();
     for (i, example) in EXAMPLES.iter().enumerate() {
         let inner_table = example.1();
         let name = example.0;
-        let rendered = renderer.render(&inner_table).to_string();
-        let cell_data = Cell::from(format!("{}) {name}\n{rendered}", i + 1));
+        let title = format!("{}) {name}\n", i + 1);
+        let cell_data = Cell::from(Content::Composite(vec![Content::Label(title), Content::Nested(inner_table)]));
         row.push(cell_data);
         if i % NUM_COLS == NUM_COLS - 1 {
             let current_row = mem::replace(&mut row, Vec::new());
@@ -54,13 +53,7 @@ fn main() {
         outer_table.push_row(Row::new(Styles::default(), row));
     }
 
-    print!("{}", Console::default().render(&outer_table));
-}
-
-fn nested_decor() -> Decor {
-    let mut decor = Decor::default();
-    decor.print_escape_codes = false;
-    decor
+    print!("{}", Console::default().render(&outer_table, Default::default()));
 }
 
 const fn div_ceil(a: usize, b: usize) -> usize {

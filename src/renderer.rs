@@ -1,10 +1,11 @@
+use crate::style::{HAlign, MaxWidth, MinWidth, Style};
+use crate::table::{Content, Table};
 use alloc::borrow::Cow;
+use alloc::format;
 use alloc::string::String;
 use alloc::vec::Vec;
 use core::fmt::Display;
 use core::mem;
-use crate::style::{HAlign, MaxWidth, MinWidth, Style};
-use crate::table::Table;
 
 pub mod console;
 pub mod markdown;
@@ -14,18 +15,42 @@ pub const NEWLINE: &'static str = "\n";
 pub trait Renderer {
     type Output: Display;
 
-    fn render(&self, table: &Table) -> Self::Output;
+    fn render(&self, table: &Table, hints: &[RenderHint]) -> Self::Output;
+}
+
+#[derive(PartialEq)]
+pub enum RenderHint {
+    Nested,
+}
+
+impl Content {
+    pub fn render<R: Renderer>(&self, renderer: &R) -> Cow<str> {
+        match self {
+            Content::Label(s) => Cow::Borrowed(s),
+            Content::Computed(f) => Cow::Owned(f()),
+            Content::Nested(table) => {
+                Cow::Owned(format!("{}", renderer.render(table, &[RenderHint::Nested])))
+            }
+            Content::Composite(contents) => {
+                let mut buf = String::new();
+                for content in contents {
+                    buf.push_str(&content.render(renderer));
+                }
+                Cow::Owned(buf)
+            }
+        }
+    }
 }
 
 impl Table {
-    pub fn col_widths(&self) -> Vec<usize> {
+    pub fn col_widths(&self, renderer: &impl Renderer) -> Vec<usize> {
         (0..self.num_cols())
             .into_iter()
-            .map(|col| self.col_width(col))
+            .map(|col| self.col_width(col, renderer))
             .collect()
     }
 
-    pub fn col_width(&self, col: usize) -> usize {
+    pub fn col_width(&self, col: usize, renderer: &impl Renderer) -> usize {
         (0..self.num_rows())
             .into_iter()
             .map(|row| self.cell(col, row))
@@ -38,6 +63,7 @@ impl Table {
                 let widest_line = cell
                     .map(|cell| {
                         cell.data()
+                            .render(renderer)
                             .lines()
                             .map(|line| line.chars().count())
                             .max()

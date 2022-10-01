@@ -1,8 +1,9 @@
+use alloc::borrow::Cow;
 use alloc::string::String;
 use alloc::vec::Vec;
 use core::borrow::Borrow;
 use crate::table::Table;
-use crate::renderer::{pad, wrap, Renderer, NEWLINE};
+use crate::renderer::{pad, wrap, Renderer, NEWLINE, RenderHint};
 use crate::style::{HAlign, Style};
 
 #[derive(Default)]
@@ -11,20 +12,20 @@ pub struct Markdown();
 impl Renderer for Markdown {
     type Output = String;
 
-    fn render(&self, table: &Table) -> Self::Output {
+    fn render(&self, table: &Table, _: &[RenderHint]) -> Self::Output {
         assert!(!table.is_empty(), "Table cannot be empty");
-        let col_widths = table.col_widths();
+        let col_widths = table.col_widths(self);
         let mut buf = String::new();
 
         // print the header
-        print_row(table, &col_widths, 0, &mut buf);
+        print_row(self, table, &col_widths, 0, &mut buf);
 
         // print the line between the header and the body
         print_header_format(table, &col_widths, &mut buf);
 
         // print the body
         for row in 1..table.num_rows() {
-            print_row(table, &col_widths, row, &mut buf);
+            print_row(self, table, &col_widths, row, &mut buf);
         }
 
         buf
@@ -57,14 +58,14 @@ fn print_header_format(table: &Table, col_widths: &[usize], buf: &mut String) {
     buf.push_str(NEWLINE);
 }
 
-fn print_row(table: &Table, col_widths: &[usize], row: usize, buf: &mut String) {
+fn print_row(renderer: &Markdown, table: &Table, col_widths: &[usize], row: usize, buf: &mut String) {
     // first pass: wrap individual cell data over multiple rows
     let cell_lines = (0..col_widths.len())
         .into_iter()
         .map(|col| {
             let cell = table.cell(col, row);
-            let data = cell.as_ref().map(|cell| cell.data()).unwrap_or("");
-            wrap(data, col_widths[col])
+            let data = cell.as_ref().map(|cell| cell.data().render(renderer)).unwrap_or(Cow::Borrowed(""));
+            wrap(&data, col_widths[col])
         })
         .collect::<Vec<_>>();
 

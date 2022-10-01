@@ -1,8 +1,12 @@
+use alloc::borrow::Cow;
+use crate::renderer::{pad, wrap, Renderer, NEWLINE, RenderHint};
+use crate::style::{
+    Blink, Bold, BorderBg, BorderFg, FillBg, HAlign, Header, Italic, Palette16, Separator,
+    Strikethrough, Style, Styled, Styles, TextBg, TextFg, Underline,
+};
+use crate::table::Table;
 use alloc::string::String;
 use alloc::vec::Vec;
-use crate::table::Table;
-use crate::renderer::{pad, wrap, Renderer, NEWLINE};
-use crate::style::{TextBg, Blink, Bold, BorderBg, BorderFg, TextFg, HAlign, Header, Italic, Palette16, Separator, Strikethrough, Style, Styled, Styles, Underline, FillBg};
 
 pub struct Decor {
     pub blank: char,
@@ -75,7 +79,7 @@ impl Decor {
             right_norm_down_norm_left_norm: '┬',
             up_norm_right_norm_left_norm: '┴',
             up_norm_right_norm_down_norm_left_norm: '┼',
-            print_escape_codes: true
+            print_escape_codes: true,
         }
     }
 
@@ -142,12 +146,12 @@ pub struct Console(pub Decor);
 impl Renderer for Console {
     type Output = String;
 
-    fn render(&self, table: &Table) -> Self::Output {
+    fn render(&self, table: &Table, hints: &[RenderHint]) -> Self::Output {
         assert!(!table.is_empty(), "Table cannot be empty");
-        let col_widths = table.col_widths();
+        let col_widths = table.col_widths(self);
         let decor = &self.0;
-        let grid = pre_render(table, &col_widths);
-        let print_escape_codes = self.0.print_escape_codes;
+        let grid = pre_render(self,table, &col_widths);
+        let print_escape_codes = self.0.print_escape_codes && !hints.contains(&RenderHint::Nested);
         let border_fg = BorderFg::resolve(&table.styles());
         let border_bg = BorderBg::resolve(&table.styles());
         let mut buf = String::new();
@@ -162,7 +166,15 @@ impl Renderer for Console {
         let horizontal_line = decor.lookup(Line::None, Line::Bold, Line::None, Line::Bold);
         for (col, &width) in col_widths.iter().enumerate() {
             // horizontal line
-            (0..width).for_each(|_| append_border(&mut buf, horizontal_line, border_fg, border_bg, print_escape_codes));
+            (0..width).for_each(|_| {
+                append_border(
+                    &mut buf,
+                    horizontal_line,
+                    border_fg,
+                    border_bg,
+                    print_escape_codes,
+                )
+            });
 
             if col < col_widths.len() - 1 {
                 // junction between cells
@@ -174,12 +186,24 @@ impl Renderer for Console {
                 } else {
                     Line::Norm
                 };
-                append_border(&mut buf, decor.lookup(Line::None, Line::Bold, down, Line::Bold), border_fg, border_bg, print_escape_codes);
+                append_border(
+                    &mut buf,
+                    decor.lookup(Line::None, Line::Bold, down, Line::Bold),
+                    border_fg,
+                    border_bg,
+                    print_escape_codes,
+                );
             }
         }
         // bottom-right corner
         let top_right = decor.lookup(Line::None, Line::None, Line::Bold, Line::Bold);
-        append_border(&mut buf, top_right, border_fg, border_bg, print_escape_codes);
+        append_border(
+            &mut buf,
+            top_right,
+            border_fg,
+            border_bg,
+            print_escape_codes,
+        );
         buf.push_str(NEWLINE);
 
         // table (incl. headers and body)...
@@ -192,7 +216,13 @@ impl Renderer for Console {
             // lines comprising the row
             for line in 0..max_lines {
                 // right outer vertical separator
-                append_border(&mut buf, vertical_line, border_fg, border_bg, print_escape_codes);
+                append_border(
+                    &mut buf,
+                    vertical_line,
+                    border_fg,
+                    border_bg,
+                    print_escape_codes,
+                );
 
                 for col in 0..col_widths.len() {
                     let grid_cell = &grid_row[col];
@@ -216,12 +246,24 @@ impl Renderer for Console {
                         } else {
                             (Line::Norm, Line::Norm)
                         };
-                        append_border(&mut buf, decor.lookup(up, Line::None, down, Line::None), border_fg, border_bg, print_escape_codes);
+                        append_border(
+                            &mut buf,
+                            decor.lookup(up, Line::None, down, Line::None),
+                            border_fg,
+                            border_bg,
+                            print_escape_codes,
+                        );
                     }
                 }
 
                 // right outer vertical separator
-                append_border(&mut buf, vertical_line, border_fg, border_bg, print_escape_codes);
+                append_border(
+                    &mut buf,
+                    vertical_line,
+                    border_fg,
+                    border_bg,
+                    print_escape_codes,
+                );
                 buf.push_str(NEWLINE);
             }
 
@@ -239,7 +281,13 @@ impl Renderer for Console {
                 } else {
                     Line::Norm
                 };
-                append_border(&mut buf, decor.lookup(Line::Bold, right, Line::Bold, Line::None), border_fg, border_bg, print_escape_codes);
+                append_border(
+                    &mut buf,
+                    decor.lookup(Line::Bold, right, Line::Bold, Line::None),
+                    border_fg,
+                    border_bg,
+                    print_escape_codes,
+                );
 
                 // horizontal line below the cell
                 for (col, &width) in col_widths.iter().enumerate() {
@@ -252,7 +300,9 @@ impl Renderer for Console {
                         (Line::Norm, Line::Norm)
                     };
                     let border = decor.lookup(Line::None, right, Line::None, left);
-                    (0..width).for_each(|_| append_border(&mut buf, border, border_fg, border_bg, print_escape_codes));
+                    (0..width).for_each(|_| {
+                        append_border(&mut buf, border, border_fg, border_bg, print_escape_codes)
+                    });
 
                     if col < col_widths.len() - 1 {
                         // junction between cells
@@ -286,7 +336,13 @@ impl Renderer for Console {
                         } else {
                             Line::Norm
                         };
-                        append_border(&mut buf, decor.lookup(up, right, down, left), border_fg, border_bg, print_escape_codes);
+                        append_border(
+                            &mut buf,
+                            decor.lookup(up, right, down, left),
+                            border_fg,
+                            border_bg,
+                            print_escape_codes,
+                        );
                     }
                 }
 
@@ -299,7 +355,13 @@ impl Renderer for Console {
                 } else {
                     Line::Norm
                 };
-                append_border(&mut buf, decor.lookup(Line::Bold, Line::None, Line::Bold, left), border_fg, border_bg, print_escape_codes);
+                append_border(
+                    &mut buf,
+                    decor.lookup(Line::Bold, Line::None, Line::Bold, left),
+                    border_fg,
+                    border_bg,
+                    print_escape_codes,
+                );
                 buf.push_str(NEWLINE);
             }
         }
@@ -307,10 +369,24 @@ impl Renderer for Console {
         // lower outside border...
         // bottom-left corner
         let bottom_left = decor.lookup(Line::Bold, Line::Bold, Line::None, Line::None);
-        append_border(&mut buf, bottom_left, border_fg, border_bg, print_escape_codes);
+        append_border(
+            &mut buf,
+            bottom_left,
+            border_fg,
+            border_bg,
+            print_escape_codes,
+        );
         for (col, &width) in col_widths.iter().enumerate() {
             // horizontal line
-            (0..width).for_each(|_| append_border(&mut buf, horizontal_line, border_fg, border_bg, print_escape_codes));
+            (0..width).for_each(|_| {
+                append_border(
+                    &mut buf,
+                    horizontal_line,
+                    border_fg,
+                    border_bg,
+                    print_escape_codes,
+                )
+            });
 
             if col < col_widths.len() - 1 {
                 // junction between cells
@@ -322,12 +398,24 @@ impl Renderer for Console {
                 } else {
                     Line::Norm
                 };
-                append_border(&mut buf, decor.lookup(up, Line::Bold, Line::None, Line::Bold), border_fg, border_bg, print_escape_codes);
+                append_border(
+                    &mut buf,
+                    decor.lookup(up, Line::Bold, Line::None, Line::Bold),
+                    border_fg,
+                    border_bg,
+                    print_escape_codes,
+                );
             }
         }
         // bottom-right corner
         let bottom_right = decor.lookup(Line::Bold, Line::None, Line::None, Line::Bold);
-        append_border(&mut buf, bottom_right, border_fg, border_bg, print_escape_codes);
+        append_border(
+            &mut buf,
+            bottom_right,
+            border_fg,
+            border_bg,
+            print_escape_codes,
+        );
         buf.push_str(NEWLINE);
 
         buf
@@ -368,7 +456,13 @@ mod ansi {
     pub const RESET: &str = "\x1b[0m";
 }
 
-fn append_border(buf: &mut String, b: char, fg: Option<&BorderFg>, bg: Option<&BorderBg>, print_escape_codes: bool) {
+fn append_border(
+    buf: &mut String,
+    b: char,
+    fg: Option<&BorderFg>,
+    bg: Option<&BorderBg>,
+    print_escape_codes: bool,
+) {
     if print_escape_codes {
         match (fg, bg) {
             (None, None) => buf.push(b),
@@ -457,7 +551,7 @@ fn switch_format(buf: &mut String, new_format: &str, old_format: &str) {
     }
 }
 
-fn pre_render(table: &Table, col_widths: &[usize]) -> Grid {
+fn pre_render(renderer: &Console, table: &Table, col_widths: &[usize]) -> Grid {
     let col_styles = (0..table.num_cols())
         .into_iter()
         .map(|col| table.col(col).blended_styles())
@@ -475,8 +569,11 @@ fn pre_render(table: &Table, col_widths: &[usize]) -> Grid {
                 .into_iter()
                 .map(|col| {
                     let cell = table.cell(col, row);
-                    let data = cell.as_ref().map(|cell| cell.data()).unwrap_or("");
-                    let lines = wrap(data, col_widths[col]);
+                    let data = cell
+                        .as_ref()
+                        .map(|cell| cell.data().render(renderer))
+                        .unwrap_or(Cow::Borrowed(""));
+                    let lines = wrap(&data, col_widths[col]);
                     let styles = cell.blended_styles();
                     GridCell { lines, styles }
                 })

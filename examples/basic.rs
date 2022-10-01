@@ -1,8 +1,8 @@
-use stanza::renderer::console::{Console, Decor};
+use stanza::renderer::console::{Console};
 use stanza::renderer::markdown::Markdown;
 use stanza::renderer::Renderer;
 use stanza::style::{Blink, Bold, BorderBg, FillBg, HAlign, Header, Italic, MaxWidth, MinWidth, Palette16, Separator, Strikethrough, Styles, TextBg, TextFg, Underline};
-use stanza::table::{Cell, Col, Row, Table};
+use stanza::table::{Cell, Content, Col, Row, Table};
 
 fn main() {
     let table = Table::with_styles(Styles::default().with(BorderBg(Palette16::Black)).with(FillBg(Palette16::Black)))
@@ -33,7 +33,7 @@ fn main() {
             vec![
                 Cell::new(
                     Styles::default().with(TextFg(Palette16::BrightGreen)),
-                    "Sales",
+                    Content::from("Sales"),
                 ),
                 Cell::from(39),
                 Cell::from(300_000.0),
@@ -41,7 +41,7 @@ fn main() {
                 Cell::new(
                     Styles::default()
                         .with(Strikethrough(true)),
-                    "Walk the dog",
+                    Content::from("Walk the dog"),
                 ),
             ],
         ))
@@ -50,7 +50,7 @@ fn main() {
             vec![
                 Cell::new(
                     Styles::default().with(TextFg(Palette16::BrightBlue)),
-                    "Engineering",
+                    Content::from("Engineering"),
                 ),
                 Cell::from(117),
                 Cell::from(1_150_000.0),
@@ -59,7 +59,7 @@ fn main() {
                     Styles::default()
                         .with(Strikethrough(true))
                         .with(TextFg(Palette16::BrightBlack)),
-                    "Wash the car",
+                    Content::from("Wash the car"),
                 ),
             ],
         ))
@@ -68,7 +68,7 @@ fn main() {
             vec![
                 Cell::new(
                     Styles::default().with(TextFg(Palette16::BrightCyan)),
-                    "Manufacturing",
+                    Content::from("Manufacturing"),
                 ),
                 Cell::from(20),
                 Cell::from(250_000),
@@ -85,17 +85,17 @@ fn main() {
                         .with(Bold(true))
                         .with(TextBg(Palette16::BrightRed))
                         .with(Blink(true)),
-                    "WARNING",
+                    Content::from("WARNING"),
                 ),
                 Cell::new(
                     Styles::default()
                         .with(Underline(true))
                         .with(TextFg(Palette16::BrightYellow)),
-                    "Check oil temp",
+                    Content::from("Check oil temp"),
                 ),
                 Cell::new(
                     Styles::default().with(FillBg(Palette16::BrightMagenta)).with(Italic(true)),
-                    "fill",
+                    Content::Computed(Box::new(|| "fill".into())) // deferred computation
                 ),
                 Cell::from(""),
                 Cell::from(""),
@@ -109,21 +109,19 @@ fn main() {
                         .with(Bold(true))
                         .with(TextFg(Palette16::BrightRed))
                         .with(Blink(true)),
-                    "Self destruct sequence initiated",
+                    Content::from("Self destruct sequence initiated"),
                 ),
-                Cell::from(
-                    Console(Decor::default().suppress_escape_codes()).render(&nested_table()),
-                ),
+                Cell::from(nested_table()),
                 Cell::from(""),
                 Cell::from(""),
                 Cell::new(
                     Styles::default().with(Italic(true)),
-                    "The quick brown fox jumped over the lazy dog.\nThat's all folks!",
+                    Content::from("The quick brown fox jumped over the lazy dog.\nThat's all folks!"),
                 ),
             ],
         ));
-    println!("{}", Console::default().render(&table));
-    println!("{}", Markdown::default().render(&table));
+    println!("{}", Console::default().render(&table, Default::default()));
+    println!("{}", Markdown::default().render(&table, Default::default()));
 }
 
 fn nested_table() -> Table {

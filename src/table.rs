@@ -1,3 +1,4 @@
+use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
@@ -150,7 +151,7 @@ impl Styled for Row {
 
 pub struct Cell {
     styles: Styles,
-    data: String,
+    data: Content,
 }
 
 impl Styled for Cell {
@@ -160,19 +161,50 @@ impl Styled for Cell {
 }
 
 impl Cell {
-    pub fn new<S: ToString>(styles: Styles, data: S) -> Self {
+    pub fn new(styles: Styles, data: Content) -> Self {
         styles.assert_assignability::<Self>(|assignability| assignability.at_cell());
-        Self { styles, data: data.to_string() }
+        Self { styles, data }
     }
 
-    pub fn data(&self) -> &str {
+    pub fn data(&self) -> &Content {
         &self.data
+    }
+}
+
+impl From<Content> for Cell {
+    fn from(data: Content) -> Self {
+        Self::new(Styles::default(), data)
+    }
+}
+
+impl From<Table> for Cell {
+    fn from(table: Table) -> Self {
+        Self::new(Styles::default(), table.into())
     }
 }
 
 impl<S: ToString> From<S> for Cell {
     fn from(data: S) -> Self {
-        Self::new(Styles::default(), data.to_string())
+       Content::from(data).into()
+    }
+}
+
+pub enum Content {
+    Label(String),
+    Computed(Box<dyn Fn() -> String>),
+    Nested(Table),
+    Composite(Vec<Content>)
+}
+
+impl<S: ToString> From<S> for Content {
+    fn from(data: S) -> Self {
+        Self::Label(data.to_string())
+    }
+}
+
+impl From<Table> for Content {
+    fn from(table: Table) -> Self {
+        Self::Nested(table)
     }
 }
 

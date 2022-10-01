@@ -1,16 +1,16 @@
 use alloc::vec;
 use crate::style::{Bold, BorderFg, Header, Palette16, Styles};
-use crate::table::{Cell, Col, Row};
+use crate::table::{Cell, Content, Col, Row};
 
 #[test]
 fn cell_style_assignability_allows() {
-    Cell::new(Styles::default().with(Bold(true)), "");
+    Cell::new(Styles::default().with(Bold(true)), Content::from(""));
 }
 
 #[test]
 #[should_panic(expected="cannot assign style stanza::style::header::Header to a stanza::table::Cell")]
 fn cell_style_assignability_panics() {
-    Cell::new(Styles::default().with(Header(true)), "");
+    Cell::new(Styles::default().with(Header(true)), Content::from(""));
 }
 
 #[test]
