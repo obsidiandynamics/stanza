@@ -1,7 +1,7 @@
 use stanza::table::{Cell, Col, Row, Table};
 use stanza::renderer::console::Console;
 use stanza::renderer::Renderer;
-use stanza::style::{HAlign, Header, MinWidth, Separator, Styles};
+use stanza::style::{BorderColour, HAlign, Header, MinWidth, Palette16, Separator, Styles};
 use std::mem;
 
 fn main() {
@@ -29,7 +29,7 @@ fn main() {
     ];
     const NUM_COLS: usize = div_ceil(EXAMPLES.len(), NUM_ROWS);
 
-    let mut outer_table = Table::default();
+    let mut outer_table = Table::with_styles(Styles::default().with(BorderColour(Palette16::BrightBlack)));
     let cols = (0..NUM_COLS)
         .into_iter()
         .map(|_| Col::new(Styles::default().with(HAlign::Centred)))

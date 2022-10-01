@@ -1,6 +1,6 @@
 use crate::table::Table;
 use crate::renderer::{pad, wrap, Renderer, NEWLINE};
-use crate::style::{Bg16, Blink, Bold, Fg16, HAlign, Header, Italic, Separator, Strikethrough, Style, Styles, Underline};
+use crate::style::{Bg16, Blink, Bold, BorderColour, Fg16, HAlign, Header, Italic, Palette16, Separator, Strikethrough, Style, Styled, Styles, Underline};
 
 pub struct Decor {
     blank: char,
@@ -138,6 +138,7 @@ impl Renderer for Console {
         let col_widths = table.col_widths();
         let decor = &self.0;
         let grid = pre_render(table, &col_widths);
+        let border_colour = BorderColour::resolve(&table.styles());
         let mut buf = String::new();
 
         let is_header_col_pair = |col| grid.is_header_col(col) || grid.is_header_col(col + 1);
@@ -146,11 +147,11 @@ impl Renderer for Console {
         // upper outside border...
         // top-left corner
         let top_left = decor.lookup(Line::None, Line::Bold, Line::Bold, Line::None);
-        buf.push(top_left);
+        append_border(&mut buf, top_left, border_colour);
         let horizontal_line = decor.lookup(Line::None, Line::Bold, Line::None, Line::Bold);
         for (col, &width) in col_widths.iter().enumerate() {
             // horizontal line
-            (0..width).for_each(|_| buf.push(horizontal_line));
+            (0..width).for_each(|_| append_border(&mut buf, horizontal_line, border_colour));
 
             if col < col_widths.len() - 1 {
                 // junction between cells
@@ -162,12 +163,12 @@ impl Renderer for Console {
                 } else {
                     Line::Norm
                 };
-                buf.push(decor.lookup(Line::None, Line::Bold, down, Line::Bold));
+                append_border(&mut buf, decor.lookup(Line::None, Line::Bold, down, Line::Bold), border_colour);
             }
         }
         // bottom-right corner
         let top_right = decor.lookup(Line::None, Line::None, Line::Bold, Line::Bold);
-        buf.push(top_right);
+        append_border(&mut buf, top_right, border_colour);
         buf.push_str(NEWLINE);
 
         // table (incl. headers and body)...
@@ -180,7 +181,7 @@ impl Renderer for Console {
             // lines comprising the row
             for line in 0..max_lines {
                 // right outer vertical separator
-                buf.push(vertical_line);
+                append_border(&mut buf, vertical_line, border_colour);
 
                 for col in 0..col_widths.len() {
                     let grid_cell = &grid_row[col];
@@ -193,7 +194,7 @@ impl Renderer for Console {
                         .unwrap_or("");
                     let alignment = HAlign::resolve_or_default(&grid_cell.styles);
                     let line = pad(line, ' ', col_widths[col], &alignment);
-                    append(&mut buf, &line, &grid_cell.styles);
+                    append_content(&mut buf, &line, &grid_cell.styles);
 
                     // vertical cell separator
                     if col < col_widths.len() - 1 {
@@ -204,12 +205,12 @@ impl Renderer for Console {
                         } else {
                             (Line::Norm, Line::Norm)
                         };
-                        buf.push(decor.lookup(up, Line::None, down, Line::None));
+                        append_border(&mut buf, decor.lookup(up, Line::None, down, Line::None), border_colour);
                     }
                 }
 
                 // right outer vertical separator
-                buf.push(vertical_line);
+                append_border(&mut buf, vertical_line, border_colour);
                 buf.push_str(NEWLINE);
             }
 
@@ -227,7 +228,7 @@ impl Renderer for Console {
                 } else {
                     Line::Norm
                 };
-                buf.push(decor.lookup(Line::Bold, right, Line::Bold, Line::None));
+                append_border(&mut buf, decor.lookup(Line::Bold, right, Line::Bold, Line::None), border_colour);
 
                 // horizontal line below the cell
                 for (col, &width) in col_widths.iter().enumerate() {
@@ -240,7 +241,7 @@ impl Renderer for Console {
                         (Line::Norm, Line::Norm)
                     };
                     let border = decor.lookup(Line::None, right, Line::None, left);
-                    (0..width).for_each(|_| buf.push(border));
+                    (0..width).for_each(|_| append_border(&mut buf, border, border_colour));
 
                     if col < col_widths.len() - 1 {
                         // junction between cells
@@ -274,7 +275,7 @@ impl Renderer for Console {
                         } else {
                             Line::Norm
                         };
-                        buf.push(decor.lookup(up, right, down, left));
+                        append_border(&mut buf, decor.lookup(up, right, down, left), border_colour);
                     }
                 }
 
@@ -287,7 +288,7 @@ impl Renderer for Console {
                 } else {
                     Line::Norm
                 };
-                buf.push(decor.lookup(Line::Bold, Line::None, Line::Bold, left));
+                append_border(&mut buf, decor.lookup(Line::Bold, Line::None, Line::Bold, left), border_colour);
                 buf.push_str(NEWLINE);
             }
         }
@@ -295,10 +296,10 @@ impl Renderer for Console {
         // lower outside border...
         // bottom-left corner
         let bottom_left = decor.lookup(Line::Bold, Line::Bold, Line::None, Line::None);
-        buf.push(bottom_left);
+        append_border(&mut buf, bottom_left, border_colour);
         for (col, &width) in col_widths.iter().enumerate() {
             // horizontal line
-            (0..width).for_each(|_| buf.push(horizontal_line));
+            (0..width).for_each(|_| append_border(&mut buf, horizontal_line, border_colour));
 
             if col < col_widths.len() - 1 {
                 // junction between cells
@@ -310,12 +311,12 @@ impl Renderer for Console {
                 } else {
                     Line::Norm
                 };
-                buf.push(decor.lookup(up, Line::Bold, Line::None, Line::Bold));
+                append_border(&mut buf, decor.lookup(up, Line::Bold, Line::None, Line::Bold), border_colour);
             }
         }
         // bottom-right corner
         let bottom_right = decor.lookup(Line::Bold, Line::None, Line::None, Line::Bold);
-        buf.push(bottom_right);
+        append_border(&mut buf, bottom_right, border_colour);
         buf.push_str(NEWLINE);
 
         buf
@@ -368,15 +369,52 @@ impl Bg16 {
     }
 }
 
-fn append(buf: &mut String, s: &str, styles: &Styles) {
-    const BOLD: &str = "\x1b[1m";
-    const ITALIC: &str = "\x1b[3m";
-    const UNDERLINE: &str = "\x1b[4m";
-    const BLINK: &str = "\x1b[5m";
-    const STRIKETHROUGH: &str = "\x1b[9m";
+impl Palette16 {
+    /// Obtains a pair of ANSI escape codes in the form `(foreground, background)`.
+    fn escape_codes(&self) -> (&'static str, &'static str) {
+        match self {
+            Palette16::Black => ("\x1b[30m", "\x1b[40m"),
+            Palette16::Red => ("\x1b[31m", "\x1b[41m"),
+            Palette16::Green => ("\x1b[32m", "\x1b[42m"),
+            Palette16::Yellow => ("\x1b[33m", "\x1b[43m"),
+            Palette16::Blue => ("\x1b[34m", "\x1b[44m"),
+            Palette16::Magenta => ("\x1b[35m", "\x1b[45m"),
+            Palette16::Cyan => ("\x1b[36m", "\x1b[46m"),
+            Palette16::White => ("\x1b[371m", "\x1b[471m"),
+            Palette16::BrightBlack => ("\x1b[30;1m", "\x1b[40;1m"),
+            Palette16::BrightRed => ("\x1b[31;1m", "\x1b[41;1m"),
+            Palette16::BrightGreen => ("\x1b[32;1m", "\x1b[42;1m"),
+            Palette16::BrightYellow => ("\x1b[33;1m", "\x1b[43;1m"),
+            Palette16::BrightBlue => ("\x1b[34;1m", "\x1b[44;1m"),
+            Palette16::BrightMagenta => ("\x1b[35;1m", "\x1b[45;1m"),
+            Palette16::BrightCyan => ("\x1b[36;1m", "\x1b[46;1m"),
+            Palette16::BrightWhite => ("\x1b[371;1m", "\x1b[471;1m"),
+        }
+    }
+}
 
-    const RESET: &str = "\x1b[0m";
+mod ansi {
+    pub const BOLD: &str = "\x1b[1m";
+    pub const ITALIC: &str = "\x1b[3m";
+    pub const UNDERLINE: &str = "\x1b[4m";
+    pub const BLINK: &str = "\x1b[5m";
+    pub const STRIKETHROUGH: &str = "\x1b[9m";
 
+    pub const RESET: &str = "\x1b[0m";
+}
+
+fn append_border(buf: &mut String, b: char, colour: Option<&BorderColour>) {
+    match colour {
+        None => buf.push(b),
+        Some(colour) => {
+            buf.push_str(colour.0.escape_codes().0);
+            buf.push(b);
+            buf.push_str(ansi::RESET);
+        }
+    }
+}
+
+fn append_content(buf: &mut String, s: &str, styles: &Styles) {
     fn find_first_printable(chars: impl Iterator<Item = char>) -> Option<usize> {
         chars
             .enumerate()
@@ -392,19 +430,19 @@ fn append(buf: &mut String, s: &str, styles: &Styles) {
         Some(first_char) => {
             let mut char_formatting = String::new();
             if Blink::resolve_or_default(styles).0 {
-                char_formatting.push_str(BLINK);
+                char_formatting.push_str(ansi::BLINK);
             }
             if Bold::resolve_or_default(styles).0 {
-                char_formatting.push_str(BOLD);
+                char_formatting.push_str(ansi::BOLD);
             }
             if Italic::resolve_or_default(styles).0 {
-                char_formatting.push_str(ITALIC);
+                char_formatting.push_str(ansi::ITALIC);
             }
             if Strikethrough::resolve_or_default(styles).0 {
-                char_formatting.push_str(STRIKETHROUGH);
+                char_formatting.push_str(ansi::STRIKETHROUGH);
             }
             if Underline::resolve_or_default(styles).0 {
-                char_formatting.push_str(UNDERLINE);
+                char_formatting.push_str(ansi::UNDERLINE);
             }
             if let Some(colour) = Fg16::resolve(styles) {
                 char_formatting.push_str(colour.escape_code());
@@ -422,16 +460,12 @@ fn append(buf: &mut String, s: &str, styles: &Styles) {
                 }
                 buf.push(ch);
                 if i == last_char && !char_formatting.is_empty() {
-                    buf.push_str(RESET);
+                    buf.push_str(ansi::RESET);
                 }
             }
         }
     }
 }
-
-// pub(super) mod ansi {
-//
-// }
 
 fn pre_render(table: &Table, col_widths: &[usize]) -> Grid {
     let cells = (0..table.num_rows())

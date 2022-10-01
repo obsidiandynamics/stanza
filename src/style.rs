@@ -1,13 +1,14 @@
 pub mod bg_16;
 pub mod blink;
 pub mod bold;
-pub mod border_16;
+pub mod border_colour;
 pub mod fg_16;
 pub mod halign;
 pub mod header;
 pub mod italic;
 pub mod max_width;
 pub mod min_width;
+pub mod palette_16;
 pub mod separator;
 pub mod strikethrough;
 pub mod underline;
@@ -15,7 +16,7 @@ pub mod underline;
 use std::any;
 pub use bg_16::Bg16;
 pub use bold::Bold;
-pub use border_16::Border16;
+pub use border_colour::BorderColour;
 pub use blink::Blink;
 pub use fg_16::Fg16;
 pub use halign::HAlign;
@@ -23,6 +24,7 @@ pub use header::Header;
 pub use italic::Italic;
 pub use max_width::MaxWidth;
 pub use min_width::MinWidth;
+pub use palette_16::Palette16;
 pub use separator::Separator;
 pub use strikethrough::Strikethrough;
 pub use underline::Underline;
@@ -67,7 +69,7 @@ pub enum StyleKind {
     Bg16(Bg16),
     Blink(Blink),
     Bold(Bold),
-    Border16(Border16),
+    BorderColour(BorderColour),
     Fg16(Fg16),
     HAlign(HAlign),
     Header(Header),
@@ -121,7 +123,7 @@ impl StyleKind {
             StyleKind::Bg16(_) => Statics::capture::<Bg16>(),
             StyleKind::Blink(_) => Statics::capture::<Blink>(),
             StyleKind::Bold(_) => Statics::capture::<Bold>(),
-            StyleKind::Border16(_) => Statics::capture::<Border16>(),
+            StyleKind::BorderColour(_) => Statics::capture::<BorderColour>(),
             StyleKind::Fg16(_) => Statics::capture::<Fg16>(),
             StyleKind::HAlign(_) => Statics::capture::<HAlign>(),
             StyleKind::Header(_) => Statics::capture::<Header>(),

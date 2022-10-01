@@ -1,4 +1,4 @@
-use crate::style::{Bold, Border16, Header, Styles};
+use crate::style::{Bold, BorderColour, Header, Palette16, Styles};
 use crate::table::{Cell, Col, Row};
 
 #[test]
@@ -18,9 +18,9 @@ fn row_style_assignability_allows() {
 }
 
 #[test]
-#[should_panic(expected="cannot assign style stanza::style::border_16::Border16 to a stanza::table::Row")]
+#[should_panic(expected="cannot assign style stanza::style::border_colour::BorderColour to a stanza::table::Row")]
 fn row_style_assignability_panics() {
-    Row::new(Styles::default().with(Border16::BrightMagenta), vec![]);
+    Row::new(Styles::default().with(BorderColour(Palette16::Blue)), vec![]);
 }
 
 #[test]
@@ -29,7 +29,7 @@ fn col_style_assignability_allows() {
 }
 
 #[test]
-#[should_panic(expected="cannot assign style stanza::style::border_16::Border16 to a stanza::table::Col")]
+#[should_panic(expected="cannot assign style stanza::style::border_colour::BorderColour to a stanza::table::Col")]
 fn col_style_assignability_panics() {
-    Col::new(Styles::default().with(Border16::BrightMagenta));
+    Col::new(Styles::default().with(BorderColour(Palette16::Blue)));
 }
