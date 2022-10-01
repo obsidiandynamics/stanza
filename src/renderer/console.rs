@@ -343,7 +343,7 @@ impl Palette16 {
             Palette16::Blue => ("\x1b[34m", "\x1b[44m"),
             Palette16::Magenta => ("\x1b[35m", "\x1b[45m"),
             Palette16::Cyan => ("\x1b[36m", "\x1b[46m"),
-            Palette16::White => ("\x1b[371m", "\x1b[471m"),
+            Palette16::White => ("\x1b[37m", "\x1b[47m"),
             Palette16::BrightBlack => ("\x1b[30;1m", "\x1b[40;1m"),
             Palette16::BrightRed => ("\x1b[31;1m", "\x1b[41;1m"),
             Palette16::BrightGreen => ("\x1b[32;1m", "\x1b[42;1m"),
@@ -351,7 +351,7 @@ impl Palette16 {
             Palette16::BrightBlue => ("\x1b[34;1m", "\x1b[44;1m"),
             Palette16::BrightMagenta => ("\x1b[35;1m", "\x1b[45;1m"),
             Palette16::BrightCyan => ("\x1b[36;1m", "\x1b[46;1m"),
-            Palette16::BrightWhite => ("\x1b[371;1m", "\x1b[471;1m"),
+            Palette16::BrightWhite => ("\x1b[37;1m", "\x1b[47;1m"),
         }
     }
 }
@@ -395,58 +395,54 @@ fn find_first_printable(chars: impl Iterator<Item = char>) -> Option<usize> {
 
 fn append_content(buf: &mut String, s: &str, styles: &Styles, print_escape_codes: bool) {
     if print_escape_codes {
-        let first_char = find_first_printable(s.chars());
-        match first_char {
-            None => {
-                buf.push_str(s);
-            }
-            Some(first_char) => {
-                // formatting that applies to the entire line (both printable and whitespace characters)
-                let mut line_format = String::new();
-                if let Some(bg) = FillBg::resolve(styles) {
-                    line_format.push_str(bg.0.escape_codes().1);
-                }
-
-                // formatting only or the printable characters
-                let mut char_format = line_format.clone();
-                if Blink::resolve_or_default(styles).0 {
-                    char_format.push_str(ansi::BLINK);
-                }
-                if Bold::resolve_or_default(styles).0 {
-                    char_format.push_str(ansi::BOLD);
-                }
-                if Italic::resolve_or_default(styles).0 {
-                    char_format.push_str(ansi::ITALIC);
-                }
-                if Strikethrough::resolve_or_default(styles).0 {
-                    char_format.push_str(ansi::STRIKETHROUGH);
-                }
-                if let Some(bg) = TextBg::resolve(styles) {
-                    char_format.push_str(bg.0.escape_codes().1);
-                }
-                if let Some(fg) = TextFg::resolve(styles) {
-                    char_format.push_str(fg.0.escape_codes().0);
-                }
-                if Underline::resolve_or_default(styles).0 {
-                    char_format.push_str(ansi::UNDERLINE);
-                }
-
-                let total_chars = s.chars().count();
-                let last_char = total_chars - find_first_printable(s.chars().rev()).unwrap() - 1;
-
-                buf.push_str(&line_format);
-                for (i, ch) in s.chars().enumerate() {
-                    if i == first_char {
-                        switch_format(buf, &char_format, &line_format);
-                    }
-                    buf.push(ch);
-                    if i == last_char {
-                        switch_format(buf, &line_format, &char_format);
-                    }
-                }
-                switch_format(buf, "", &line_format);
-            }
+        // formatting that applies to the entire line (both printable and whitespace characters)
+        let mut line_format = String::new();
+        if let Some(bg) = FillBg::resolve(styles) {
+            line_format.push_str(bg.0.escape_codes().1);
         }
+
+        // formatting only or the printable characters
+        let mut char_format = line_format.clone();
+        if Blink::resolve_or_default(styles).0 {
+            char_format.push_str(ansi::BLINK);
+        }
+        if Bold::resolve_or_default(styles).0 {
+            char_format.push_str(ansi::BOLD);
+        }
+        if Italic::resolve_or_default(styles).0 {
+            char_format.push_str(ansi::ITALIC);
+        }
+        if Strikethrough::resolve_or_default(styles).0 {
+            char_format.push_str(ansi::STRIKETHROUGH);
+        }
+        if let Some(bg) = TextBg::resolve(styles) {
+            char_format.push_str(bg.0.escape_codes().1);
+        }
+        if let Some(fg) = TextFg::resolve(styles) {
+            char_format.push_str(fg.0.escape_codes().0);
+        }
+        if Underline::resolve_or_default(styles).0 {
+            char_format.push_str(ansi::UNDERLINE);
+        }
+
+        buf.push_str(&line_format);
+        let first_char = find_first_printable(s.chars());
+        if let Some(first_char) = first_char {
+            let total_chars = s.chars().count();
+            let last_char = total_chars - find_first_printable(s.chars().rev()).unwrap() - 1;
+            for (i, ch) in s.chars().enumerate() {
+                if i == first_char {
+                    switch_format(buf, &char_format, &line_format);
+                }
+                buf.push(ch);
+                if i == last_char {
+                    switch_format(buf, &line_format, &char_format);
+                }
+            }
+        } else {
+            buf.push_str(s);
+        }
+        switch_format(buf, "", &line_format);
     } else {
         buf.push_str(s);
     }
@@ -460,6 +456,16 @@ fn switch_format(buf: &mut String, new_format: &str, old_format: &str) {
 }
 
 fn pre_render(table: &Table, col_widths: &[usize]) -> Grid {
+    let col_styles = (0..table.num_cols())
+        .into_iter()
+        .map(|col| table.col(col).unwrap().combined_styles())
+        .collect::<Vec<_>>();
+
+    let row_styles = (0..table.num_rows())
+        .into_iter()
+        .map(|row| table.row(row).unwrap().combined_styles())
+        .collect::<Vec<_>>();
+
     let cells = (0..table.num_rows())
         .into_iter()
         .map(|row| {
@@ -469,21 +475,21 @@ fn pre_render(table: &Table, col_widths: &[usize]) -> Grid {
                     let cell = table.cell(col, row);
                     let data = cell.as_ref().map(|cell| cell.data()).unwrap_or("");
                     let lines = wrap(data, col_widths[col]);
-                    let styles = cell.map(|cell| cell.combined_styles()).unwrap_or_default();
+                    let styles = cell.map(|cell| cell.combined_styles());
+                    let styles = match styles {
+                        None => {
+                            let mut blended = Styles::default();
+                            blended.insert_all(table.styles());
+                            blended.insert_all(&col_styles[col]);
+                            blended.insert_all(&row_styles[row]);
+                            blended
+                        }
+                        Some(styles) => styles
+                    };
                     GridCell { lines, styles }
                 })
                 .collect()
         })
-        .collect();
-
-    let col_styles = (0..table.num_cols())
-        .into_iter()
-        .map(|col| table.col(col).unwrap().combined_styles())
-        .collect();
-
-    let row_styles = (0..table.num_rows())
-        .into_iter()
-        .map(|row| table.row(row).unwrap().combined_styles())
         .collect();
 
     Grid {

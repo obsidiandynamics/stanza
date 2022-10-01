@@ -1,14 +1,11 @@
 use stanza::renderer::console::{Console, Decor};
 use stanza::renderer::markdown::Markdown;
 use stanza::renderer::Renderer;
-use stanza::style::{
-    Blink, Bold, FillBg, HAlign, Header, Italic, MaxWidth, MinWidth, Palette16, Separator,
-    Strikethrough, Styles, TextBg, TextFg, Underline,
-};
+use stanza::style::{Blink, Bold, BorderBg, FillBg, HAlign, Header, Italic, MaxWidth, MinWidth, Palette16, Separator, Strikethrough, Styles, TextBg, TextFg, Underline};
 use stanza::table::{Cell, Col, Row, Table};
 
 fn main() {
-    let table = Table::default()
+    let table = Table::with_styles(Styles::default().with(BorderBg(Palette16::Black)).with(FillBg(Palette16::Black)))
         .with_cols(vec![
             Col::new(Styles::default().with(HAlign::Left).with(MaxWidth(40))),
             Col::new(Styles::default().with(MinWidth(20)).with(HAlign::Centred)),
@@ -43,8 +40,7 @@ fn main() {
                 Cell::from(""),
                 Cell::new(
                     Styles::default()
-                        .with(Strikethrough(true))
-                        .with(TextFg(Palette16::BrightBlack)),
+                        .with(Strikethrough(true)),
                     "Walk the dog",
                 ),
             ],
