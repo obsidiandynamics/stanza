@@ -27,7 +27,7 @@ impl Table {
     pub fn col_width(&self, col: usize) -> usize {
         let mut min_col_width = Lazy::new(|| {
             let col = self.col(col).unwrap();
-            MinWidth::resolve_or_default(&col.combined_styles()).0
+            MinWidth::resolve_or_default(&col.blended_styles()).0
         });
 
         (0..self.num_rows())
@@ -43,7 +43,7 @@ impl Table {
                     |cell| {
                         // if a cell exists at the given col/row coordinate, calculate the width from the combination
                         // of its data and the MinWidth/MaxWidth constraints
-                        let styles = cell.combined_styles();
+                        let styles = cell.blended_styles();
                         let min_width =
                             MinWidth::resolve_or_default(&styles).0;
                         let max_width =

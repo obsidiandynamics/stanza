@@ -33,7 +33,7 @@ fn print_header_format(table: &Table, col_widths: &[usize], buf: &mut String) {
     buf.push('|');
     for (col, &width) in col_widths.iter().enumerate() {
         let col = table.col(col).unwrap();
-        let styles = col.combined_styles();
+        let styles = col.blended_styles();
         let alignment = HAlign::resolve_or_default(&styles);
         let alignment = alignment.borrow();
         match alignment {
@@ -72,7 +72,7 @@ fn print_row(table: &Table, col_widths: &[usize], row: usize, buf: &mut String) 
         .map(|col| {
             let cell = table.cell(col, row);
             cell
-                .map(|cell| cell.combined_styles())
+                .map(|cell| cell.blended_styles())
                 .unwrap_or_default()
         })
         .collect::<Vec<_>>();

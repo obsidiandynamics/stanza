@@ -190,7 +190,7 @@ impl<'a, T: Styled> Element<'a, T> {
         &self.parent_styles
     }
 
-    pub fn combined_styles(&self) -> Styles {
+    pub fn blended_styles(&self) -> Styles {
         let mut styles = Styles::default();
         for &s in &self.parent_styles {
             styles.insert_all(s);
