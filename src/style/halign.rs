@@ -1,5 +1,4 @@
-use std::borrow::Cow;
-use crate::style::{Style, StyleKind};
+use crate::style::{Assignability, Style, StyleKind};
 
 #[derive(Debug, Clone)]
 pub enum HAlign {
@@ -15,8 +14,8 @@ impl Default for HAlign {
 }
 
 impl Style for HAlign {
-    fn key() -> Cow<'static, str> {
-        Cow::Borrowed("h_align")
+    fn assignability() -> Assignability {
+        Assignability::CellRowColTable
     }
 }
 

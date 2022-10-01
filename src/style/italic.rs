@@ -1,12 +1,11 @@
-use std::borrow::Cow;
-use crate::style::{Style, StyleKind};
+use crate::style::{Assignability, Style, StyleKind};
 
 #[derive(Debug, Clone, Default)]
 pub struct Italic(pub bool);
 
 impl Style for Italic {
-    fn key() -> Cow<'static, str> {
-        Cow::Borrowed("italic")
+    fn assignability() -> Assignability {
+        Assignability::CellRowColTable
     }
 }
 

@@ -1,4 +1,4 @@
-use stanza::model::{Cell, Col, Row, Table};
+use stanza::table::{Cell, Col, Row, Table};
 use stanza::renderer::console::Console;
 use stanza::renderer::Renderer;
 use stanza::style::{HAlign, Header, MinWidth, Separator, Styles};

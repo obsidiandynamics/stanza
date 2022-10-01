@@ -1,12 +1,11 @@
-use std::borrow::Cow;
-use crate::style::{Style, StyleKind};
+use crate::style::{Assignability, Style, StyleKind};
 
 #[derive(Debug, Clone, Default)]
 pub struct Bold(pub bool);
 
 impl Style for Bold {
-    fn key() -> Cow<'static, str> {
-        Cow::Borrowed("bold")
+    fn assignability() -> Assignability {
+        Assignability::CellRowColTable
     }
 }
 

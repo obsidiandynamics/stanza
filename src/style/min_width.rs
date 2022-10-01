@@ -1,12 +1,11 @@
-use std::borrow::Cow;
-use crate::style::{Style, StyleKind};
+use crate::style::{Assignability, Style, StyleKind};
 
 #[derive(Debug, Clone, Default)]
 pub struct MinWidth(pub usize);
 
 impl Style for MinWidth {
-    fn key() -> Cow<'static, str> {
-        Cow::Borrowed("min_width")
+    fn assignability() -> Assignability {
+        Assignability::ColTable
     }
 }
 

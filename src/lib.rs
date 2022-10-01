@@ -1,4 +1,4 @@
 pub mod lazy;
-pub mod model;
+pub mod table;
 pub mod renderer;
 pub mod style;

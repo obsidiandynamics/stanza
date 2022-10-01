@@ -1,12 +1,11 @@
-use std::borrow::Cow;
-use crate::style::{Style, StyleKind};
+use crate::style::{Assignability, Style, StyleKind};
 
 #[derive(Debug, Clone, Default)]
 pub struct Separator(pub bool);
 
 impl Style for Separator {
-    fn key() -> Cow<'static, str> {
-        Cow::Borrowed("separator")
+    fn assignability() -> Assignability {
+        Assignability::RowColTable
     }
 }
 

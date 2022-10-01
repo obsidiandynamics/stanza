@@ -1,6 +1,7 @@
 pub mod bg_16;
 pub mod blink;
 pub mod bold;
+pub mod border_16;
 pub mod fg_16;
 pub mod halign;
 pub mod header;
@@ -11,8 +12,10 @@ pub mod separator;
 pub mod strikethrough;
 pub mod underline;
 
+use std::any;
 pub use bg_16::Bg16;
 pub use bold::Bold;
+pub use border_16::Border16;
 pub use blink::Blink;
 pub use fg_16::Fg16;
 pub use halign::HAlign;
@@ -33,10 +36,14 @@ where
     for<'a> Option<&'a Self>: From<&'a StyleKind>,
     Self: Into<StyleKind>,
 {
-    fn key() -> Cow<'static, str>;
+    fn id() -> Cow<'static, str> {
+        Cow::Borrowed(any::type_name::<Self>())
+    }
+
+    fn assignability() -> Assignability;
 
     fn resolve(styles: &Styles) -> Option<&Self> {
-        let kind = styles.get(&Self::key());
+        let kind = styles.get(&Self::id());
         match kind {
             None => None,
             Some(kind) => kind.into(),
@@ -60,6 +67,7 @@ pub enum StyleKind {
     Bg16(Bg16),
     Blink(Blink),
     Bold(Bold),
+    Border16(Border16),
     Fg16(Fg16),
     HAlign(HAlign),
     Header(Header),
@@ -72,22 +80,80 @@ pub enum StyleKind {
 }
 
 impl StyleKind {
-    pub fn key(&self) -> String {
+    pub fn id(&self) -> String {
+        self.statics().id.into()
+        // match self {
+        //     StyleKind::Bg16(_) => Bg16::key().into(),
+        //     StyleKind::Blink(_) => Blink::key().into(),
+        //     StyleKind::Bold(_) => Bold::key().into(),
+        //     StyleKind::Fg16(_) => Fg16::key().into(),
+        //     StyleKind::HAlign(_) => HAlign::key().into(),
+        //     StyleKind::Header(_) => Header::key().into(),
+        //     StyleKind::Italic(_) => Italic::key().into(),
+        //     StyleKind::MaxWidth(_) => MaxWidth::key().into(),
+        //     StyleKind::MinWidth(_) => MinWidth::key().into(),
+        //     StyleKind::Separator(_) => Separator::key().into(),
+        //     StyleKind::Strikethrough(_) => Strikethrough::key().into(),
+        //     StyleKind::Underline(_) => Underline::key().into(),
+        // }
+    }
+    
+    pub fn assignability(&self) -> Assignability {
+        self.statics().assignability
+        // match self {
+        //     StyleKind::Bg16(_) => Bg16::assignability(),
+        //     StyleKind::Blink(_) => Blink::assignability(),
+        //     StyleKind::Bold(_) => Bold::assignability(),
+        //     StyleKind::Fg16(_) => Fg16::assignability(),
+        //     StyleKind::HAlign(_) => HAlign::assignability(),
+        //     StyleKind::Header(_) => Header::assignability(),
+        //     StyleKind::Italic(_) => Italic::assignability(),
+        //     StyleKind::MaxWidth(_) => MaxWidth::assignability(),
+        //     StyleKind::MinWidth(_) => MinWidth::assignability(),
+        //     StyleKind::Separator(_) => Separator::assignability(),
+        //     StyleKind::Strikethrough(_) => Strikethrough::assignability(),
+        //     StyleKind::Underline(_) => Underline::assignability(),
+        // }
+    }
+    
+    fn statics(&self) -> Statics {
         match self {
-            StyleKind::Bg16(_) => Bg16::key().into(),
-            StyleKind::Blink(_) => Blink::key().into(),
-            StyleKind::Bold(_) => Bold::key().into(),
-            StyleKind::Fg16(_) => Fg16::key().into(),
-            StyleKind::HAlign(_) => HAlign::key().into(),
-            StyleKind::Header(_) => Header::key().into(),
-            StyleKind::Italic(_) => Italic::key().into(),
-            StyleKind::MaxWidth(_) => MaxWidth::key().into(),
-            StyleKind::MinWidth(_) => MinWidth::key().into(),
-            StyleKind::Separator(_) => Separator::key().into(),
-            StyleKind::Strikethrough(_) => Strikethrough::key().into(),
-            StyleKind::Underline(_) => Underline::key().into(),
+            StyleKind::Bg16(_) => Statics::capture::<Bg16>(),
+            StyleKind::Blink(_) => Statics::capture::<Blink>(),
+            StyleKind::Bold(_) => Statics::capture::<Bold>(),
+            StyleKind::Border16(_) => Statics::capture::<Border16>(),
+            StyleKind::Fg16(_) => Statics::capture::<Fg16>(),
+            StyleKind::HAlign(_) => Statics::capture::<HAlign>(),
+            StyleKind::Header(_) => Statics::capture::<Header>(),
+            StyleKind::Italic(_) => Statics::capture::<Italic>(),
+            StyleKind::MaxWidth(_) => Statics::capture::<MaxWidth>(),
+            StyleKind::MinWidth(_) => Statics::capture::<MinWidth>(),
+            StyleKind::Separator(_) => Statics::capture::<Separator>(),
+            StyleKind::Strikethrough(_) => Statics::capture::<Strikethrough>(),
+            StyleKind::Underline(_) => Statics::capture::<Underline>(),
+        }  
+    }
+}
+
+struct Statics {
+    id: Cow<'static, str>,
+    assignability: Assignability
+}
+
+impl Statics {
+    fn capture<S: Style>() -> Self where for<'a> Option<&'a S>: From<&'a StyleKind> {
+        Self {
+            id: S::id(),
+            assignability: S::assignability()
         }
     }
+    
+    // fn lazy_extract<S: Style>() -> impl Fn() -> Self where for<'a> Option<&'a S>: From<&'a StyleKind> {
+    //     || Self {
+    //         key: S::key(),
+    //         assignability: S::assignability()
+    //     }
+    // }
 }
 
 #[derive(Default)]
@@ -110,7 +176,7 @@ impl Styles {
     }
 
     pub fn insert(&mut self, style: StyleKind) -> Option<StyleKind> {
-        self.0.insert(style.key(), style)
+        self.0.insert(style.id(), style)
     }
 
     pub fn insert_all(&mut self, styles: &Styles) {
@@ -126,8 +192,53 @@ impl Styles {
     pub fn take(&mut self, key: &str) -> Option<StyleKind> {
         self.0.remove(key)
     }
+    
+    pub fn entries(&self) -> &HashMap<String, StyleKind> {
+        &self.0
+    }
+
+    pub fn assert_assignability<S>(&self, mut check: impl FnMut(Assignability) -> bool) {
+        for entry in &self.0 {
+            assert!(check(entry.1.assignability()), "cannot assign style {} to a {}", entry.1.id(), any::type_name::<S>())
+        }
+    }
 }
 
 pub trait Styled {
     fn styles(&self) -> &Styles;
 }
+
+/// Indicates the element types to which a particular [`Style`] may be assigned.
+pub enum Assignability {
+    /// At the table level only.
+    Table,
+
+    /// At the column level and at the table level.
+    ColTable,
+
+    /// At the row level and at the table level.
+    RowTable,
+
+    /// At the row, column and table level.
+    RowColTable,
+
+    /// At the cell, row, column and table level.
+    CellRowColTable
+}
+
+impl Assignability {
+    pub fn at_col(&self) -> bool {
+        matches!(self, Assignability::ColTable | Assignability::RowColTable | Assignability::CellRowColTable)
+    }
+
+    pub fn at_row(&self) -> bool {
+        matches!(self, Assignability::RowTable | Assignability::RowColTable | Assignability::CellRowColTable)
+    }
+
+    pub fn at_cell(&self) -> bool {
+        matches!(self, Assignability::CellRowColTable)
+    }
+}
+
+#[cfg(test)]
+mod tests;

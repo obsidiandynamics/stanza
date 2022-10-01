@@ -122,6 +122,7 @@ pub struct Col(Styles);
 
 impl Col {
     pub fn new(styles: Styles) -> Self {
+        styles.assert_assignability::<Self>(|assignability| assignability.at_col());
         Self(styles)
     }
 }
@@ -136,6 +137,7 @@ pub struct Row(Styles, Vec<Cell>);
 
 impl Row {
     pub fn new(styles: Styles, cells: Vec<Cell>) -> Self {
+        styles.assert_assignability::<Self>(|assignability| assignability.at_row());
         Self(styles, cells)
     }
 
@@ -163,6 +165,7 @@ impl Styled for Cell {
 
 impl Cell {
     pub fn new<S: ToString>(styles: Styles, data: S) -> Self {
+        styles.assert_assignability::<Self>(|assignability| assignability.at_cell());
         Self { styles, data: data.to_string() }
     }
 
@@ -204,3 +207,6 @@ impl<'a, T: Styled> Deref for Element<'a, T> {
         &self.element
     }
 }
+
+#[cfg(test)]
+mod tests;

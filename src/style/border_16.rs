@@ -1,7 +1,7 @@
 use crate::style::{Assignability, Style, StyleKind};
 
 #[derive(Debug, Clone)]
-pub enum Fg16 {
+pub enum Border16 {
     Black,
     Red,
     Green,
@@ -20,23 +20,23 @@ pub enum Fg16 {
     BrightWhite
 }
 
-impl Style for Fg16 {
+impl Style for Border16 {
     fn assignability() -> Assignability {
-        Assignability::CellRowColTable
+        Assignability::Table
     }
 }
 
-impl<'a> From<&'a StyleKind> for Option<&'a Fg16> {
+impl<'a> From<&'a StyleKind> for Option<&'a Border16> {
     fn from(kind: &'a StyleKind) -> Self {
         match kind {
-            StyleKind::Fg16(style) => Some(style),
+            StyleKind::Border16(style) => Some(style),
             _ => None,
         }
     }
 }
 
-impl Into<StyleKind> for Fg16 {
+impl Into<StyleKind> for Border16 {
     fn into(self) -> StyleKind {
-        StyleKind::Fg16(self)
+        StyleKind::Border16(self)
     }
 }

@@ -1,4 +1,4 @@
-use crate::model::Table;
+use crate::table::Table;
 use crate::renderer::{pad, wrap, Renderer, NEWLINE};
 use crate::style::{Bg16, Blink, Bold, Fg16, HAlign, Header, Italic, Separator, Strikethrough, Style, Styles, Underline};
 

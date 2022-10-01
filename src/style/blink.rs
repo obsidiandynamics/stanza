@@ -1,12 +1,11 @@
-use std::borrow::Cow;
-use crate::style::{Style, StyleKind};
+use crate::style::{Assignability, Style, StyleKind};
 
 #[derive(Debug, Clone, Default)]
 pub struct Blink(pub bool);
 
 impl Style for Blink {
-    fn key() -> Cow<'static, str> {
-        Cow::Borrowed("blink")
+    fn assignability() -> Assignability {
+        Assignability::CellRowColTable
     }
 }
 

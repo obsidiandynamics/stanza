@@ -1,5 +1,4 @@
-use std::borrow::Cow;
-use crate::style::{Style, StyleKind};
+use crate::style::{Assignability, Style, StyleKind};
 
 #[derive(Debug, Clone)]
 pub struct MaxWidth(pub usize);
@@ -11,8 +10,8 @@ impl Default for MaxWidth {
 }
 
 impl Style for MaxWidth {
-    fn key() -> Cow<'static, str> {
-        Cow::Borrowed("min_width")
+    fn assignability() -> Assignability {
+        Assignability::ColTable
     }
 }
 

@@ -1,5 +1,4 @@
-use std::borrow::Cow;
-use crate::style::{Style, StyleKind};
+use crate::style::{Assignability, Style, StyleKind};
 
 #[derive(Debug, Clone)]
 pub enum Bg16 {
@@ -22,8 +21,8 @@ pub enum Bg16 {
 }
 
 impl Style for Bg16 {
-    fn key() -> Cow<'static, str> {
-        Cow::Borrowed("bg_16")
+    fn assignability() -> Assignability {
+        Assignability::CellRowColTable
     }
 }
 

@@ -1,4 +1,4 @@
-use crate::model::Table;
+use crate::table::Table;
 use crate::style::{HAlign, MaxWidth, MinWidth, Style};
 use std::borrow::Cow;
 use std::fmt::Display;

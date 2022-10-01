@@ -1,12 +1,11 @@
-use std::borrow::Cow;
-use crate::style::{Style, StyleKind};
+use crate::style::{Assignability, Style, StyleKind};
 
 #[derive(Debug, Clone, Default)]
 pub struct Underline(pub bool);
 
 impl Style for Underline {
-    fn key() -> Cow<'static, str> {
-        Cow::Borrowed("underline")
+    fn assignability() -> Assignability {
+        Assignability::CellRowColTable
     }
 }
 

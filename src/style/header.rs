@@ -1,12 +1,11 @@
-use std::borrow::Cow;
-use crate::style::{Style, StyleKind};
+use crate::style::{Assignability, Style, StyleKind};
 
 #[derive(Debug, Clone, Default)]
 pub struct Header(pub bool);
 
 impl Style for Header {
-    fn key() -> Cow<'static, str> {
-        Cow::Borrowed("header")
+    fn assignability() -> Assignability {
+        Assignability::RowColTable
     }
 }
 
