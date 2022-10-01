@@ -2,7 +2,11 @@
 name = "stanza"
 version = "0.1.0"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+readme = "../README.md"
+authors = ["Emil Koutanov"]
+license = "MIT"
+description = "An abstract table model with customisable text formatting and renderers."
+repository = "https://github.com/obsidiandynamics/stanza"
+keywords = ["cli", "terminal", "table", "format", "no_std"]
 
 [dependencies]

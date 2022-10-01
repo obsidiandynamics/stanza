@@ -1,3 +1,5 @@
+use alloc::string::String;
+use alloc::vec::Vec;
 use crate::table::Table;
 use crate::renderer::{pad, wrap, Renderer, NEWLINE};
 use crate::style::{TextBg, Blink, Bold, BorderBg, BorderFg, TextFg, HAlign, Header, Italic, Palette16, Separator, Strikethrough, Style, Styled, Styles, Underline, FillBg};

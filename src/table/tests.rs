@@ -1,3 +1,4 @@
+use alloc::vec;
 use crate::style::{Bold, BorderFg, Header, Palette16, Styles};
 use crate::table::{Cell, Col, Row};
 

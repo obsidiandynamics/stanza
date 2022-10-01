@@ -15,7 +15,11 @@ pub mod text_bg;
 pub mod text_fg;
 pub mod underline;
 
-use std::any;
+use alloc::borrow::Cow;
+use alloc::collections::BTreeMap;
+use alloc::string::String;
+use alloc::vec::Vec;
+use core::any;
 pub use bold::Bold;
 pub use border_bg::BorderBg;
 pub use border_fg::BorderFg;
@@ -32,9 +36,6 @@ pub use strikethrough::Strikethrough;
 pub use text_bg::TextBg;
 pub use text_fg::TextFg;
 pub use underline::Underline;
-
-use std::borrow::Cow;
-use std::collections::HashMap;
 
 pub trait Style
 where
@@ -132,7 +133,7 @@ impl Statics {
 }
 
 #[derive(Default)]
-pub struct Styles(HashMap<String, StyleKind>);
+pub struct Styles(BTreeMap<String, StyleKind>);
 
 impl From<Vec<StyleKind>> for Styles {
     fn from(vec: Vec<StyleKind>) -> Self {
@@ -168,7 +169,7 @@ impl Styles {
         self.0.remove(key)
     }
     
-    pub fn entries(&self) -> &HashMap<String, StyleKind> {
+    pub fn entries(&self) -> &BTreeMap<String, StyleKind> {
         &self.0
     }
 

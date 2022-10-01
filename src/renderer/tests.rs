@@ -1,3 +1,6 @@
+use alloc::vec;
+use alloc::vec::Vec;
+
 #[test]
 fn wrap() {
     #[derive(Debug)]

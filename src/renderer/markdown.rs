@@ -1,4 +1,6 @@
-use std::borrow::Borrow;
+use alloc::string::String;
+use alloc::vec::Vec;
+use core::borrow::Borrow;
 use crate::table::Table;
 use crate::renderer::{pad, wrap, Renderer, NEWLINE};
 use crate::style::{HAlign, Style};

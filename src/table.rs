@@ -1,4 +1,7 @@
-use std::ops::Deref;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
+use core::ops::Deref;
 use crate::style::{Styled, Styles};
 
 #[derive(Default)]

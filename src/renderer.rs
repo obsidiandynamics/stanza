@@ -1,8 +1,10 @@
+use alloc::borrow::Cow;
+use alloc::string::String;
+use alloc::vec::Vec;
+use core::fmt::Display;
+use core::mem;
 use crate::style::{HAlign, MaxWidth, MinWidth, Style};
 use crate::table::Table;
-use std::borrow::Cow;
-use std::fmt::Display;
-use std::mem;
 
 pub mod console;
 pub mod markdown;
