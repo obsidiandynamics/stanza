@@ -260,7 +260,7 @@ As we expected, the "Extract" column is too wide. A simple way of dealing with t
 
 That's better! But since we're dealing with a poem, we should probably respect the author's choice of lines. Stanza supports newline characters, leading to line breaks exactly where you need them. Best of all, you can combine newline characters with `MaxWidth`, resulting in something like this:
 
-```c
+```html
 ╔═══════════════╤════════════════════════════════════════╗
 ║Poem           │Extract                                 ║
 ╠═══════════════╪════════════════════════════════════════╣
