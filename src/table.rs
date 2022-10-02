@@ -27,11 +27,13 @@ impl Table {
         Self::new(styles, Vec::default(), Vec::default())
     }
 
+    #[must_use]
     pub fn with_cols(mut self, cols: Vec<Col>) -> Self {
         self.set_cols(cols);
         self
     }
 
+    #[must_use]
     pub fn with_row<R: Into<Row>>(mut self, row: R) -> Self {
         self.push_row(row);
         self

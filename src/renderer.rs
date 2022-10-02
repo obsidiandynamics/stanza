@@ -10,7 +10,7 @@ use core::mem;
 pub mod console;
 pub mod markdown;
 
-pub const NEWLINE: &'static str = "\n";
+pub const NEWLINE: &str = "\n";
 
 pub trait Renderer {
     type Output: Display;

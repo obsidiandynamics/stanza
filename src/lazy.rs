@@ -13,7 +13,7 @@ impl<F, T> Lazy<F, T> where F: FnOnce() -> T {
     /// Obtains the memoized value, evaluating the closure if unset.
     pub fn get(&mut self) -> &T {
         if let State::Uninit(f) = &mut self.0 {
-            let val = f.take().unwrap()();
+            let val = f.take().expect("cannot be uninitialised")();
             self.0 = State::Init(val);
         }
 

@@ -5,7 +5,8 @@ use stanza::style::{Blink, Bold, BorderBg, FillBg, HAlign, Header, Italic, MaxWi
 use stanza::table::{Cell, Content, Col, Row, Table};
 
 fn main() {
-    let table = Table::with_styles(Styles::default().with(BorderBg(Palette16::Black)).with(FillBg(Palette16::Black)))
+    let table =
+        Table::with_styles(Styles::default().with(BorderBg(Palette16::Black)).with(FillBg(Palette16::Black)))
         .with_cols(vec![
             Col::new(Styles::default().with(HAlign::Left).with(MaxWidth(40))),
             Col::new(Styles::default().with(MinWidth(20)).with(HAlign::Centred)),

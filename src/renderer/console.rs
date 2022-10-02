@@ -159,7 +159,7 @@ pub struct Console(pub Decor);
 impl Renderer for Console {
     type Output = String;
 
-    #[allow(clippy::too_many_lines)]
+    #[allow(clippy::too_many_lines, clippy::similar_names)]
     fn render(&self, table: &Table, hints: &[RenderHint]) -> Self::Output {
         assert!(!table.is_empty(), "table cannot be empty");
         let col_widths = table.col_widths(self);
