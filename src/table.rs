@@ -61,6 +61,12 @@ impl Table {
         self.rows.push(row);
     }
 
+    pub fn push_rows<I: IntoIterator<Item = Row>>(&mut self, it: I) {
+        for row in it {
+            self.push_row(row);
+        }
+    }
+
     pub fn num_rows(&self) -> usize {
         self.rows.len()
     }
