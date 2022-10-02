@@ -1,9 +1,9 @@
+use crate::style::{MinWidth, Separator, Styled, Styles};
 use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
 use core::ops::Deref;
-use crate::style::{MinWidth, Separator, Styled, Styles};
 
 #[derive(Default)]
 pub struct Table {
@@ -32,7 +32,8 @@ impl Table {
         self
     }
 
-    pub fn with_row(mut self, row: Row) -> Self {
+    pub fn with_row<R: Into<Row>>(mut self, row: R) -> Self {
+        let row = row.into();
         while self.cols.len() < row.1.len() {
             self.cols.push(Col::new(Styles::default()))
         }
@@ -62,11 +63,7 @@ impl Table {
     }
 
     fn compute_widest_row(&self) -> usize {
-        self.rows
-            .iter()
-            .map(|row| row.1.len())
-            .max()
-            .unwrap_or(0)
+        self.rows.iter().map(|row| row.1.len()).max().unwrap_or(0)
     }
 
     pub fn col(&self, col: usize) -> Element<Col> {
@@ -106,7 +103,7 @@ impl Table {
 
         Element {
             parent_styles,
-            element: cell
+            element: cell,
         }
     }
 
@@ -125,7 +122,11 @@ impl Col {
     }
 
     pub fn separator(min_width: usize) -> Self {
-        Self(Styles::default().with(Separator(true)).with(MinWidth(min_width)))
+        Self(
+            Styles::default()
+                .with(Separator(true))
+                .with(MinWidth(min_width)),
+        )
     }
 }
 
@@ -156,6 +157,15 @@ impl Row {
 impl Styled for Row {
     fn styles(&self) -> &Styles {
         &self.0
+    }
+}
+
+impl<I> From<I> for Row where I: IntoIterator, I::Item: ToString {
+    fn from(it: I) -> Self {
+        Self(
+            Styles::default(),
+            it.into_iter().map(|s| Cell::from(s)).collect(),
+        )
     }
 }
 
@@ -195,7 +205,7 @@ impl From<Table> for Cell {
 
 impl<S: ToString> From<S> for Cell {
     fn from(data: S) -> Self {
-       Content::from(data).into()
+        Content::from(data).into()
     }
 }
 
@@ -203,7 +213,7 @@ pub enum Content {
     Label(String),
     Computed(Box<dyn Fn() -> String>),
     Nested(Table),
-    Composite(Vec<Content>)
+    Composite(Vec<Content>),
 }
 
 impl<S: ToString> From<S> for Content {
