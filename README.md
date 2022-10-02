@@ -264,7 +264,7 @@ As we expected, the "Extract" column is too wide. A simple way of dealing with t
 ╚═══════════════╧════════════════════════════════════════╝
 ```
 
-That's better! But since we're dealing with a poem, we should probably respect the author's choice of lines. Stanza supports newline characters, leading to line breaks exactly where you need them. Best of all, you can combine newline characters with `MaxWidth`, resulting in something like this:
+That's better! But since we're dealing with a poem, we should probably respect the author's choice of line breaks. Stanza supports newline characters, leading to line breaks exactly where you need them. Best of all, you can combine newline characters with `MaxWidth`, resulting in something like this:
 
 ```html
 ╔═══════════════╤════════════════════════════════════════╗
@@ -281,15 +281,3 @@ That's better! But since we're dealing with a poem, we should probably respect t
 ║               │its ghost upon the floor.               ║
 ╚═══════════════╧════════════════════════════════════════╝
 ```
-
-
-
-`Table`
-
-* Column
-* Row
-* Cell
-
-In principle, styles may be applied to any table element. In practice, some styles are
-
-Styles that apply to the table will also apply to all elements contained within it
