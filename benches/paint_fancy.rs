@@ -17,7 +17,7 @@ fn criterion_benchmark(c: &mut Criterion) {
     });
 
     let renderer = Markdown::default();
-    c.bench_function("markdown/console", |b| {
+    c.bench_function("render/markdown", |b| {
         b.iter(|| renderer.render(&table, &[]));
     });
 }
