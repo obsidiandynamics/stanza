@@ -1,6 +1,13 @@
 # Stanza
 An abstract table model written in Rust, with customisable text formatting and renderers.
 
+[![Crates.io](https://img.shields.io/crates/v/stanza?style=flat-square&logo=rust)](https://crates.io/crates/stanza)
+[![docs.rs](https://img.shields.io/badge/docs.rs-stanza-blue?style=flat-square&logo=docs.rs)](https://docs.rs/stanza)
+[![Build Status](https://img.shields.io/github/workflow/status/obsidiandynamics/stanza/Cargo%20build?style=flat-square&logo=github)](https://github.com/obsidiandynamics/stanza/actions/workflows/master.yml)
+[![codecov](https://img.shields.io/codecov/c/github/obsidiandynamics/stanza/master?style=flat-square&logo=codecov)](https://codecov.io/gh/obsidiandynamics/stanza)
+![no_std](https://img.shields.io/badge/linking-no__std-9cf?style=flat-square)
+
+
 # Why Stanza
 * **Feature-complete**: Stanza supports a broad range of styling features — various text formatting controls, foreground/background/fill colours, border styles, multiple horizontal and vertical headers and separators, and even nested tables, to name a few.
 * **Pluggable renderers**: The clean separation of the table model from the render implementation lets you switch between output formats. For example, the table that you might output to the terminal can be switched to produce a Markdown document instead. You can also add your own render; e.g., to output HTML or paint a TUI/Curses screen.
