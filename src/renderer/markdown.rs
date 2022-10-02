@@ -13,7 +13,7 @@ impl Renderer for Markdown {
     type Output = String;
 
     fn render(&self, table: &Table, _: &[RenderHint]) -> Self::Output {
-        assert!(!table.is_empty(), "Table cannot be empty");
+        assert!(!table.is_empty(), "table cannot be empty");
         let col_widths = table.col_widths(self);
         let mut buf = String::new();
 

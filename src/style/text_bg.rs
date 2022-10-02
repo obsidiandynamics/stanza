@@ -18,8 +18,8 @@ impl<'a> From<&'a StyleKind> for Option<&'a TextBg> {
     }
 }
 
-impl Into<StyleKind> for TextBg {
-    fn into(self) -> StyleKind {
-        StyleKind::TextBg(self)
+impl From<TextBg> for StyleKind {
+    fn from(style: TextBg) -> Self {
+        StyleKind::TextBg(style)
     }
 }

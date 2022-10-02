@@ -18,8 +18,8 @@ impl<'a> From<&'a StyleKind> for Option<&'a Header> {
     }
 }
 
-impl Into<StyleKind> for Header {
-    fn into(self) -> StyleKind {
-        StyleKind::Header(self)
+impl From<Header> for StyleKind {
+    fn from(style: Header) -> Self {
+        StyleKind::Header(style)
     }
 }

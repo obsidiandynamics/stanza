@@ -24,8 +24,8 @@ impl<'a> From<&'a StyleKind> for Option<&'a MaxWidth> {
     }
 }
 
-impl Into<StyleKind> for MaxWidth {
-    fn into(self) -> StyleKind {
-        StyleKind::MaxWidth(self)
+impl From<MaxWidth> for StyleKind {
+    fn from(style: MaxWidth) -> Self {
+        StyleKind::MaxWidth(style)
     }
 }

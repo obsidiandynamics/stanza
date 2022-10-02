@@ -18,8 +18,8 @@ impl<'a> From<&'a StyleKind> for Option<&'a Italic> {
     }
 }
 
-impl Into<StyleKind> for Italic {
-    fn into(self) -> StyleKind {
-        StyleKind::Italic(self)
+impl From<Italic> for StyleKind {
+    fn from(style: Italic) -> Self {
+        StyleKind::Italic(style)
     }
 }

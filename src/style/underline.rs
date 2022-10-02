@@ -18,8 +18,8 @@ impl<'a> From<&'a StyleKind> for Option<&'a Underline> {
     }
 }
 
-impl Into<StyleKind> for Underline {
-    fn into(self) -> StyleKind {
-        StyleKind::Underline(self)
+impl From<Underline> for StyleKind {
+    fn from(style: Underline) -> Self {
+        StyleKind::Underline(style)
     }
 }

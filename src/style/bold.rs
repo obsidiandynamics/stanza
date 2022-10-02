@@ -18,8 +18,8 @@ impl<'a> From<&'a StyleKind> for Option<&'a Bold> {
     }
 }
 
-impl Into<StyleKind> for Bold {
-    fn into(self) -> StyleKind {
-        StyleKind::Bold(self)
+impl From<Bold> for StyleKind {
+    fn from(style: Bold) -> Self {
+        StyleKind::Bold(style)
     }
 }

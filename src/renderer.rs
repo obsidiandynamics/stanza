@@ -144,7 +144,7 @@ pub fn wrap(s: &str, width: usize) -> Vec<String> {
                 let chars = word.chars();
                 for ch in chars {
                     if buf_chars == width {
-                        let current_buf = mem::replace(&mut buf, String::new());
+                        let current_buf = mem::take(&mut buf);
                         wrapped_lines.push(current_buf);
                         buf_chars = 0;
                     }
@@ -154,10 +154,10 @@ pub fn wrap(s: &str, width: usize) -> Vec<String> {
                 }
             } else if buf_chars + needed_width > width {
                 // can fit on one line but too big to fit on this line
-                let current_buf = mem::replace(&mut buf, String::new());
+                let current_buf = mem::take(&mut buf);
                 wrapped_lines.push(current_buf);
                 buf_chars = word_chars;
-                buf.push_str(&word)
+                buf.push_str(&word);
             } else {
                 // can fit on this line
                 if buf_chars > 0 {
@@ -180,7 +180,7 @@ pub fn wrap(s: &str, width: usize) -> Vec<String> {
 
     if wrapped_lines.is_empty() {
         // the output should contain at least one, albeit empty, line
-        wrapped_lines.push(String::new())
+        wrapped_lines.push(String::new());
     }
 
     wrapped_lines
@@ -220,7 +220,7 @@ pub fn split_preserving_whitespace(s: &str) -> Vec<String> {
             buf.push(ch);
             prev_whitespace = whitespace;
         } else {
-            frags.push(mem::replace(&mut buf, String::new()));
+            frags.push(mem::take(&mut buf));
             prev_whitespace = true;
         }
     }

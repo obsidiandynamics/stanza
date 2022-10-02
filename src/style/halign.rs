@@ -28,8 +28,8 @@ impl<'a> From<&'a StyleKind> for Option<&'a HAlign> {
     }
 }
 
-impl Into<StyleKind> for HAlign {
-    fn into(self) -> StyleKind {
-        StyleKind::HAlign(self)
+impl From<HAlign> for StyleKind {
+    fn from(style: HAlign) -> Self {
+        StyleKind::HAlign(style)
     }
 }

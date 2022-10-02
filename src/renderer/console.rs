@@ -159,7 +159,7 @@ impl Renderer for Console {
     type Output = String;
 
     fn render(&self, table: &Table, hints: &[RenderHint]) -> Self::Output {
-        assert!(!table.is_empty(), "Table cannot be empty");
+        assert!(!table.is_empty(), "table cannot be empty");
         let col_widths = table.col_widths(self);
         let decor = &self.0;
         let grid = pre_render(self,table, &col_widths);

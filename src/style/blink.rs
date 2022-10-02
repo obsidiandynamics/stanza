@@ -18,8 +18,8 @@ impl<'a> From<&'a StyleKind> for Option<&'a Blink> {
     }
 }
 
-impl Into<StyleKind> for Blink {
-    fn into(self) -> StyleKind {
-        StyleKind::Blink(self)
+impl From<Blink> for StyleKind {
+    fn from(style: Blink) -> Self {
+        StyleKind::Blink(style)
     }
 }

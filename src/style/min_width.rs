@@ -18,8 +18,8 @@ impl<'a> From<&'a StyleKind> for Option<&'a MinWidth> {
     }
 }
 
-impl Into<StyleKind> for MinWidth {
-    fn into(self) -> StyleKind {
-        StyleKind::MinWidth(self)
+impl From<MinWidth> for StyleKind {
+    fn from(style: MinWidth) -> Self {
+        StyleKind::MinWidth(style)
     }
 }

@@ -17,7 +17,7 @@ impl<F, T> Lazy<F, T> where F: FnOnce() -> T {
             self.0 = State::Init(val);
         }
 
-        self.try_get().expect("Cannot be uninitialised")
+        self.try_get().expect("cannot be uninitialised")
     }
 
     /// Tries to obtain the memoized value if it is set. The closure is not evaluated

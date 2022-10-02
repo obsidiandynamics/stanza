@@ -18,8 +18,8 @@ impl<'a> From<&'a StyleKind> for Option<&'a Separator> {
     }
 }
 
-impl Into<StyleKind> for Separator {
-    fn into(self) -> StyleKind {
-        StyleKind::Separator(self)
+impl From<Separator> for StyleKind {
+    fn from(style: Separator) -> Self {
+        StyleKind::Separator(style)
     }
 }

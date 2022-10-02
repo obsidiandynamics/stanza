@@ -3,7 +3,7 @@ An abstract table model written in Rust, with customisable text formatting and r
 
 # Why Stanza
 * **Feature-complete**: Stanza supports a broad range of styling features — various text formatting controls, foreground/background/fill colours, border styles, multiple horizontal and vertical headers and separators, and even nested tables, to name a few.
-* **Pluggable renderers**: The clean separation of the table model from the render implementation lets you switch between output formats. For example, the table you use to output to the terminal can be switched to produce a Markdown document instead. You can also add your own render; e.g., to output HTML or paint a TUI/Curses screen.
+* **Pluggable renderers**: The clean separation of the table model from the render implementation lets you switch between output formats. For example, the table that you might output to the terminal can be switched to produce a Markdown document instead. You can also add your own render; e.g., to output HTML or paint a TUI/Curses screen.
 * **Ease of use**:  Simple things are easy to do and hard things are possible. Stanza offers both a fluid API for building "static" tables and an API for building a table programmatically.
 * **No standard library needed**: Stanza is `no_std`, meaning it can be used in embedded devices.
 * **Performance**: It takes ~10 µs to build the table model used in the screenshot above and ~200 µs to render it. (Markdown takes roughly half that time.) Efficiency mightn't sound like a concern in desktop and server use cases, but it makes a difference in low-powered devices.
@@ -152,6 +152,7 @@ let renderer = Markdown::default();
 
 Voilà, we have Markdown!
 
+## Styling
 This is a good segue into styles. Stanza is build around the philosophy of separating models from renderers. While this offers phenomenal flexibility, it does create a problem. Every renderer is different, which limits the effective use of styles. For example, the `Console` renderer supports a lot richer output than, say, `Markdown`.
 
 When forming the table model, we almost always have a particular output format in mind. Call it the "preferred" format. It's normal to decorate the table for the preferred format. What we'd also like is to render the table in some alternate format without breaking the output or, worse, causing a `panic` because the alternate render mightn't support some style modifier.
@@ -198,6 +199,84 @@ A style that can be assigned to a row is not necessarily assignable to a column,
 Finally, there are styles that may only be assigned to a table. These include `BorderFg` and `BorderBg` — used to alter the colour of all borders in the table.
 
 The assignability rule is enforced at runtime. Attempting to assign a nonassignable style will fail with a `panic`. As such, changing the returned `Assignability` value of a style to a more restrictive variant would constitute a breaking change.
+
+With all this in mind, let's create another table that demonstrates overriding styles.
+
+## Text handling
+We didn't have to work much to get our text laid out well. Often, all that's needed is a `MinWidth` column style and possibly a `HAlign`. Sometimes we might have lots of text, which pushes our column size out:
+
+```rust
+use stanza::renderer::console::Console;
+use stanza::renderer::Renderer;
+use stanza::style::{Header, MinWidth, Styles};
+use stanza::table::{Cell, Col, Row, Table};
+
+let table = Table::default()
+    .with_cols(vec![
+        Col::new(Styles::default().with(MinWidth(15))),
+        Col::new(Styles::default().with(MinWidth(30))),
+    ])
+    .with_row(Row::new(
+        Styles::default().with(Header(true)),
+        vec![Cell::from("Poem"), Cell::from("Extract")],
+    ))
+    .with_row(Row::new(
+        Styles::default(),
+        vec![Cell::from("Antigonish"), Cell::from("Yesterday, upon the stair, I met a man who wasn't there! He wasn't there again today, Oh how I wish he'd go away!")],
+    ))
+    .with_row(Row::new(
+        Styles::default(),
+        vec![Cell::from("The Raven"), Cell::from("Ah, distinctly I remember it was in the bleak December; And each separate dying ember wrought its ghost upon the floor.")],
+    ));
+
+println!("{}", Console::default().render(&table, &[]));
+```
+
+```c
+╔═══════════════╤═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+║Poem           │Extract                                                                                                                ║
+╠═══════════════╪═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╣
+║Antigonish     │Yesterday, upon the stair, I met a man who wasn't there! He wasn't there again today, Oh how I wish he'd go away!      ║
+╟───────────────┼───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╢
+║The Raven      │Ah, distinctly I remember it was in the bleak December; And each separate dying ember wrought its ghost upon the floor.║
+╚═══════════════╧═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+```
+
+As we expected, the "Extract" column is too wide. A simple way of dealing with this is to set `MaxWidth` style on the column. Simply append `.with(MaxWidth(40))` to the existing styles:
+
+```c
+╔═══════════════╤════════════════════════════════════════╗
+║Poem           │Extract                                 ║
+╠═══════════════╪════════════════════════════════════════╣
+║Antigonish     │Yesterday, upon the stair, I met a man  ║
+║               │who wasn't there! He wasn't there again ║
+║               │today, Oh how I wish he'd go away!      ║
+╟───────────────┼────────────────────────────────────────╢
+║The Raven      │Ah, distinctly I remember it was in the ║
+║               │bleak December; And each separate dying ║
+║               │ember wrought its ghost upon the floor. ║
+╚═══════════════╧════════════════════════════════════════╝
+```
+
+That's better! But since we're dealing with a poem, we should probably respect the author's choice of lines. Stanza supports newline characters, leading to line breaks exactly where you need them. Best of all, you can combine newline characters with `MaxWidth`, resulting in something like this:
+
+```c
+╔═══════════════╤════════════════════════════════════════╗
+║Poem           │Extract                                 ║
+╠═══════════════╪════════════════════════════════════════╣
+║Antigonish     │Yesterday, upon the stair,              ║
+║               │I met a man who wasn't there!           ║
+║               │He wasn't there again today,            ║
+║               │Oh how I wish he'd go away!             ║
+╟───────────────┼────────────────────────────────────────╢
+║The Raven      │Ah, distinctly I remember it was in the ║
+║               │bleak December;                         ║
+║               │And each separate dying ember wrought   ║
+║               │its ghost upon the floor.               ║
+╚═══════════════╧════════════════════════════════════════╝
+```
+
+
 
 `Table`
 

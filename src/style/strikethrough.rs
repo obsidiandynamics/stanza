@@ -18,8 +18,8 @@ impl<'a> From<&'a StyleKind> for Option<&'a Strikethrough> {
     }
 }
 
-impl Into<StyleKind> for Strikethrough {
-    fn into(self) -> StyleKind {
-        StyleKind::Strikethrough(self)
+impl From<Strikethrough> for StyleKind {
+    fn from(style: Strikethrough) -> Self {
+        StyleKind::Strikethrough(style)
     }
 }

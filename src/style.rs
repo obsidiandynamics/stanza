@@ -42,7 +42,7 @@ pub trait Style
 where
     Self: Clone,
     for<'a> Option<&'a Self>: From<&'a StyleKind>,
-    Self: Into<StyleKind>,
+    StyleKind: From<Self>,
 {
     fn id() -> Cow<'static, str> {
         Cow::Borrowed(any::type_name::<Self>())
@@ -71,6 +71,7 @@ where
 }
 
 #[derive(Debug, Clone)]
+#[allow(clippy::module_name_repetitions)]
 pub enum StyleKind {
     Blink(Blink),
     Bold(Bold),
@@ -125,7 +126,7 @@ struct Statics {
 }
 
 impl Statics {
-    fn capture<S: Style>() -> Self where for<'a> Option<&'a S>: From<&'a StyleKind> {
+    fn capture<S: Style>() -> Self where for<'a> Option<&'a S>: From<&'a StyleKind>, StyleKind: From<S> {
         Self {
             id: S::id(),
             assignability: S::assignability()
@@ -147,6 +148,7 @@ impl From<Vec<StyleKind>> for Styles {
 }
 
 impl Styles {
+    #[must_use]
     pub fn with<S: Into<StyleKind>>(mut self, style: S) -> Self {
         self.insert(style.into());
         self
@@ -157,7 +159,7 @@ impl Styles {
     }
 
     pub fn insert_all(&mut self, styles: &Styles) {
-        for (key, style) in styles.0.iter() {
+        for (key, style) in &styles.0 {
             self.0.insert(key.into(), style.clone());
         }
     }
@@ -169,10 +171,16 @@ impl Styles {
     pub fn take(&mut self, key: &str) -> Option<StyleKind> {
         self.0.remove(key)
     }
-    
+
+    /// Verifies the assignability of all styles by evaluating the given `check` predicate, panicking
+    /// if the predicate evaluates to `false` for any style. The type `S` is used purely for generating the
+    /// panic message.
+    ///
+    /// # Panics
+    /// If one of the styles is assignment-incompatible according to the predicate.
     pub fn assert_assignability<S>(&self, mut check: impl FnMut(Assignability) -> bool) {
         for entry in self {
-            assert!(check(entry.1.assignability()), "cannot assign style {} to a {}", entry.1.id(), any::type_name::<S>())
+            assert!(check(entry.1.assignability()), "cannot assign style {} to a {}", entry.1.id(), any::type_name::<S>());
         }
     }
 }

@@ -18,8 +18,8 @@ impl<'a> From<&'a StyleKind> for Option<&'a BorderFg> {
     }
 }
 
-impl Into<StyleKind> for BorderFg {
-    fn into(self) -> StyleKind {
-        StyleKind::BorderFg(self)
+impl From<BorderFg> for StyleKind {
+    fn from(style: BorderFg) -> Self {
+        StyleKind::BorderFg(style)
     }
 }
