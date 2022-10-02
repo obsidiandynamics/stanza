@@ -1,11 +1,29 @@
-use stanza::renderer::console::{Console};
+use criterion::{criterion_group, criterion_main, Criterion};
+use stanza::renderer::console::Console;
 use stanza::renderer::markdown::Markdown;
 use stanza::renderer::Renderer;
 use stanza::style::{Blink, Bold, BorderBg, FillBg, HAlign, Header, Italic, MaxWidth, MinWidth, Palette16, Strikethrough, Styles, TextBg, TextFg, Underline};
-use stanza::table::{Cell, Content, Col, Row, Table};
+use stanza::table::{Cell, Col, Content, Row, Table};
 
-fn main() {
-    let table = Table::with_styles(Styles::default().with(BorderBg(Palette16::Black)).with(FillBg(Palette16::Black)))
+fn criterion_benchmark(c: &mut Criterion) {
+    c.bench_function("build", |b| {
+        b.iter(|| build_table());
+    });
+
+    let table = build_table();
+    let renderer = Console::default();
+    c.bench_function("render/console", |b| {
+        b.iter(|| renderer.render(&table, &[]));
+    });
+
+    let renderer = Markdown::default();
+    c.bench_function("markdown/console", |b| {
+        b.iter(|| renderer.render(&table, &[]));
+    });
+}
+
+fn build_table() -> Table {
+    Table::with_styles(Styles::default().with(BorderBg(Palette16::Black)).with(FillBg(Palette16::Black)))
         .with_cols(vec![
             Col::new(Styles::default().with(HAlign::Left).with(MaxWidth(40))),
             Col::new(Styles::default().with(MinWidth(20)).with(HAlign::Centred)),
@@ -120,9 +138,7 @@ fn main() {
                     Content::from("The quick brown fox jumped over the lazy dog.\n\nThat's all folks!"),
                 ),
             ],
-        ));
-    println!("{}", Console::default().render(&table, &[]));
-    println!("{}", Markdown::default().render(&table, &[]));
+        ))
 }
 
 fn nested_table() -> Table {
@@ -144,3 +160,6 @@ fn nested_table() -> Table {
             vec![Cell::from("Water"), Cell::from(57.1)],
         ))
 }
+
+criterion_group!(benches, criterion_benchmark);
+criterion_main!(benches);
