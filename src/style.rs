@@ -20,11 +20,11 @@ use alloc::collections::btree_map::Iter;
 use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;
-use core::any;
+pub use blink::Blink;
 pub use bold::Bold;
 pub use border_bg::BorderBg;
 pub use border_fg::BorderFg;
-pub use blink::Blink;
+use core::any;
 pub use fill_bg::FillBg;
 pub use halign::HAlign;
 pub use header::Header;
@@ -94,11 +94,11 @@ impl StyleKind {
     pub fn id(&self) -> String {
         self.statics().id.into()
     }
-    
+
     pub fn assignability(&self) -> Assignability {
         self.statics().assignability
     }
-    
+
     fn statics(&self) -> Statics {
         match self {
             StyleKind::Blink(_) => Statics::capture::<Blink>(),
@@ -122,14 +122,18 @@ impl StyleKind {
 
 struct Statics {
     id: Cow<'static, str>,
-    assignability: Assignability
+    assignability: Assignability,
 }
 
 impl Statics {
-    fn capture<S: Style>() -> Self where for<'a> Option<&'a S>: From<&'a StyleKind>, StyleKind: From<S> {
+    fn capture<S: Style>() -> Self
+    where
+        for<'a> Option<&'a S>: From<&'a StyleKind>,
+        StyleKind: From<S>,
+    {
         Self {
             id: S::id(),
-            assignability: S::assignability()
+            assignability: S::assignability(),
         }
     }
 }
@@ -180,7 +184,12 @@ impl Styles {
     /// If one of the styles is assignment-incompatible according to the predicate.
     pub fn assert_assignability<S>(&self, mut check: impl FnMut(Assignability) -> bool) {
         for entry in self {
-            assert!(check(entry.1.assignability()), "cannot assign style {} to a {}", entry.1.id(), any::type_name::<S>());
+            assert!(
+                check(entry.1.assignability()),
+                "cannot assign style {} to a {}",
+                entry.1.id(),
+                any::type_name::<S>()
+            );
         }
     }
 }
@@ -213,16 +222,22 @@ pub enum Assignability {
     RowColTable,
 
     /// At the cell, row, column and table level.
-    CellRowColTable
+    CellRowColTable,
 }
 
 impl Assignability {
     pub fn at_col(&self) -> bool {
-        matches!(self, Assignability::ColTable | Assignability::RowColTable | Assignability::CellRowColTable)
+        matches!(
+            self,
+            Assignability::ColTable | Assignability::RowColTable | Assignability::CellRowColTable
+        )
     }
 
     pub fn at_row(&self) -> bool {
-        matches!(self, Assignability::RowTable | Assignability::RowColTable | Assignability::CellRowColTable)
+        matches!(
+            self,
+            Assignability::RowTable | Assignability::RowColTable | Assignability::CellRowColTable
+        )
     }
 
     pub fn at_cell(&self) -> bool {

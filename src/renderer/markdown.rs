@@ -45,7 +45,7 @@ fn print_header_format(table: &Table, col_widths: &[usize], buf: &mut String) {
                 let width = usize::max(2, width);
                 buf.push_str(&pad(":", '-', width, alignment));
             }
-            _ => {
+            HAlign::Centred => {
                 // the smallest format is `:-:`; i.e., no fewer than 3 characters wide
                 let width = usize::max(3, width);
                 buf.push(':');
@@ -64,7 +64,7 @@ fn print_row(renderer: &Markdown, table: &Table, col_widths: &[usize], row: usiz
         .into_iter()
         .map(|col| {
             let cell = table.cell(col, row);
-            let data = cell.as_ref().map(|cell| cell.data().render(renderer)).unwrap_or(Cow::Borrowed(""));
+            let data = cell.as_ref().map_or(Cow::Borrowed(""), |cell| cell.data().render(renderer));
             wrap(&data, col_widths[col])
         })
         .collect::<Vec<_>>();
@@ -79,11 +79,11 @@ fn print_row(renderer: &Markdown, table: &Table, col_widths: &[usize], row: usiz
         .collect::<Vec<_>>();
 
     // third pass: render each line in the row
-    let max_lines = cell_lines.iter().map(|lines| lines.len()).max().unwrap();
+    let max_lines = cell_lines.iter().map(Vec::len).max().unwrap();
     for line in 0..max_lines {
         buf.push('|');
         for col in 0..col_widths.len() {
-            let line = cell_lines[col].get(line).map(|line| &line[..]).unwrap_or("");
+            let line = cell_lines[col].get(line).map_or("", |line| &line[..]);
             let styles = &cell_styles[col];
             let alignment = HAlign::resolve_or_default(styles);
             let line = pad(line, ' ', col_widths[col], &alignment);

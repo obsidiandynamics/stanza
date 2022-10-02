@@ -1,10 +1,10 @@
-use alloc::borrow::Cow;
-use crate::renderer::{pad, wrap, Renderer, NEWLINE, RenderHint};
+use crate::renderer::{pad, wrap, RenderHint, Renderer, NEWLINE};
 use crate::style::{
     Blink, Bold, BorderBg, BorderFg, FillBg, HAlign, Header, Italic, Palette16, Separator,
     Strikethrough, Style, Styled, Styles, TextBg, TextFg, Underline,
 };
 use crate::table::Table;
+use alloc::borrow::Cow;
 use alloc::string::String;
 use alloc::vec::Vec;
 
@@ -91,6 +91,7 @@ impl Decor {
         }
     }
 
+    #[must_use]
     pub fn suppress_escape_codes(mut self) -> Self {
         self.print_escape_codes = false;
         self
@@ -158,14 +159,15 @@ pub struct Console(pub Decor);
 impl Renderer for Console {
     type Output = String;
 
+    #[allow(clippy::too_many_lines)]
     fn render(&self, table: &Table, hints: &[RenderHint]) -> Self::Output {
         assert!(!table.is_empty(), "table cannot be empty");
         let col_widths = table.col_widths(self);
         let decor = &self.0;
-        let grid = pre_render(self,table, &col_widths);
+        let grid = pre_render(self, table, &col_widths);
         let print_escape_codes = self.0.print_escape_codes && !hints.contains(&RenderHint::Nested);
-        let border_fg = BorderFg::resolve(&table.styles());
-        let border_bg = BorderBg::resolve(&table.styles());
+        let border_fg = BorderFg::resolve(table.styles());
+        let border_bg = BorderBg::resolve(table.styles());
         let mut buf = String::new();
 
         let is_header_col_pair = |col| grid.is_header_col(col) || grid.is_header_col(col + 1);
@@ -178,15 +180,15 @@ impl Renderer for Console {
         let horizontal_line = decor.lookup(Line::None, Line::Bold, Line::None, Line::Bold);
         for (col, &width) in col_widths.iter().enumerate() {
             // horizontal line
-            (0..width).for_each(|_| {
+            for _ in 0..width {
                 append_border(
                     &mut buf,
                     horizontal_line,
                     border_fg,
                     border_bg,
                     print_escape_codes,
-                )
-            });
+                );
+            }
 
             if col < col_widths.len() - 1 {
                 // junction between cells
@@ -243,8 +245,7 @@ impl Renderer for Console {
                     let line = grid_cell
                         .lines
                         .get(line)
-                        .map(|line| &line[..])
-                        .unwrap_or("");
+                        .map_or("", |line| &line[..]);
                     let alignment = HAlign::resolve_or_default(&grid_cell.styles);
                     let line = pad(line, ' ', col_widths[col], &alignment);
                     append_content(&mut buf, &line, &grid_cell.styles, print_escape_codes);
@@ -312,9 +313,9 @@ impl Renderer for Console {
                         (Line::Norm, Line::Norm)
                     };
                     let border = decor.lookup(Line::None, right, Line::None, left);
-                    (0..width).for_each(|_| {
-                        append_border(&mut buf, border, border_fg, border_bg, print_escape_codes)
-                    });
+                    for _ in 0..width {
+                        append_border(&mut buf, border, border_fg, border_bg, print_escape_codes);
+                    }
 
                     if col < col_widths.len() - 1 {
                         // junction between cells
@@ -390,15 +391,15 @@ impl Renderer for Console {
         );
         for (col, &width) in col_widths.iter().enumerate() {
             // horizontal line
-            (0..width).for_each(|_| {
+            for _ in 0..width {
                 append_border(
                     &mut buf,
                     horizontal_line,
                     border_fg,
                     border_bg,
                     print_escape_codes,
-                )
-            });
+                );
+            }
 
             if col < col_widths.len() - 1 {
                 // junction between cells
@@ -490,7 +491,7 @@ fn append_border(
             }
         }
     } else {
-        buf.push(b)
+        buf.push(b);
     }
 }
 
@@ -583,8 +584,7 @@ fn pre_render(renderer: &Console, table: &Table, col_widths: &[usize]) -> Grid {
                     let cell = table.cell(col, row);
                     let data = cell
                         .as_ref()
-                        .map(|cell| cell.data().render(renderer))
-                        .unwrap_or(Cow::Borrowed(""));
+                        .map_or(Cow::Borrowed(""), |cell| cell.data().render(renderer));
                     let lines = wrap(&data, col_widths[col]);
                     let styles = cell.blended_styles();
                     GridCell { lines, styles }

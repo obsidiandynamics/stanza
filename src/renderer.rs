@@ -18,7 +18,7 @@ pub trait Renderer {
     fn render(&self, table: &Table, hints: &[RenderHint]) -> Self::Output;
 }
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Eq)]
 pub enum RenderHint {
     Nested,
 }
@@ -95,14 +95,12 @@ pub fn pad<'a>(s: &'a str, p: char, width: usize, alignment: &HAlign) -> Cow<'a,
                 }
             }
             HAlign::Centred => {
-                let mut added = 0;
-                for _ in consumed..width {
-                    if added % 2 == 0 {
+                for (excess, _) in (consumed..width).enumerate() {
+                    if excess % 2 == 0 {
                         buf.push(p);
                     } else {
                         buf.insert(0, p);
                     }
-                    added += 1;
                 }
             }
             HAlign::Right => {

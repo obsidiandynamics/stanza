@@ -44,7 +44,7 @@ println!("{}", renderer.render(&table, &[]));
 ```
 
 The resulting output:
-```c
+```html
 ╔═══════════╤══════╗
 ║Department │Budget║
 ╟───────────┼──────╢
@@ -120,7 +120,7 @@ let renderer = Console::default();
 println!("{}", renderer.render(&table, &[]));
 ```
 
-```c
+```html
 ╔════════════════════╤═══════════════╗
 ║Department          │         Budget║
 ╠════════════════════╪═══════════════╣
@@ -143,7 +143,7 @@ let renderer = Markdown::default();
 // render ...
 ```
 
-```c
+```html
 |Department          |         Budget|
 |:-------------------|--------------:|
 |Sales               |          90000|
@@ -164,7 +164,7 @@ To organise styles, Stanza posits two basic rules: **specificity** and **assigna
 ### Specificity
 Styles cascade, much like their CSS counterparts. A style assigned at some higher-level element will automatically be applied to all elements in the layers below it. The _specificity_ hierarchy is shown below.
 
-```c
+```html
 Table
   └─> Col
        └─> Row
@@ -182,7 +182,7 @@ A style defined at the table level will apply to the table and everything contai
 ### Assignability
 Although styles cascade in a top-down manner, it doesn't mean that a style may be applied on any element. Take the `Header` style, for example. It may be applied to a row or to a column. (Stanza supports vertical headers.) Might a `Header` be assigned to the table as whole? Yes, in which case all rows and columns would be treated as headers. But a header cell makes no sense. Whether a style may be applied to a particular element can be determined by invoking the `S::assignability()` static trait method for some `S: Style`, returning a variant of the `Assignability` enum. The assignability hierarchy is shown below.
 
-```c
+```html
 Cell
  ├───> Col
  │       └─┐
@@ -222,17 +222,23 @@ let table = Table::default()
     ))
     .with_row(Row::new(
         Styles::default(),
-        vec![Cell::from("Antigonish"), Cell::from("Yesterday, upon the stair, I met a man who wasn't there! He wasn't there again today, Oh how I wish he'd go away!")],
+        vec![
+            Cell::from("Antigonish"), 
+            Cell::from("Yesterday, upon the stair, I met a man who wasn't there! He wasn't there again today, Oh how I wish he'd go away!")
+        ]
     ))
     .with_row(Row::new(
         Styles::default(),
-        vec![Cell::from("The Raven"), Cell::from("Ah, distinctly I remember it was in the bleak December; And each separate dying ember wrought its ghost upon the floor.")],
+        vec![
+            Cell::from("The Raven"), 
+            Cell::from("Ah, distinctly I remember it was in the bleak December; And each separate dying ember wrought its ghost upon the floor.")
+        ]
     ));
 
 println!("{}", Console::default().render(&table, &[]));
 ```
 
-```c
+```html
 ╔═══════════════╤═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
 ║Poem           │Extract                                                                                                                ║
 ╠═══════════════╪═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╣
@@ -244,7 +250,7 @@ println!("{}", Console::default().render(&table, &[]));
 
 As we expected, the "Extract" column is too wide. A simple way of dealing with this is to set `MaxWidth` style on the column. Simply append `.with(MaxWidth(40))` to the existing styles:
 
-```c
+```html
 ╔═══════════════╤════════════════════════════════════════╗
 ║Poem           │Extract                                 ║
 ╠═══════════════╪════════════════════════════════════════╣

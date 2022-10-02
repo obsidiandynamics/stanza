@@ -33,25 +33,30 @@ impl Table {
     }
 
     pub fn with_row<R: Into<Row>>(mut self, row: R) -> Self {
-        let row = row.into();
-        while self.cols.len() < row.1.len() {
-            self.cols.push(Col::new(Styles::default()))
-        }
         self.push_row(row);
         self
     }
 
+    /// Assigns columns to the table. The number of columns cannot be less (but may exceed)
+    /// the number of cells in the widest row.
+    ///
+    /// # Panics
+    /// If the number of columns is fewer than the number of cells in the widest row.
     pub fn set_cols(&mut self, cols: Vec<Col>) {
         let widest_row = self.compute_widest_row();
         assert!(
             cols.len() >= widest_row,
-            "Cannot assign fewer than {widest_row} columns"
+            "cannot assign fewer than {widest_row} columns"
         );
         self.cols = cols;
     }
 
-    pub fn push_row(&mut self, row: Row) {
-        self.rows.push(row)
+    pub fn push_row<R: Into<Row>>(&mut self, row: R) {
+        let row = row.into();
+        while self.cols.len() < row.1.len() {
+            self.cols.push(Col::new(Styles::default()));
+        }
+        self.rows.push(row);
     }
 
     pub fn num_rows(&self) -> usize {
@@ -164,7 +169,7 @@ impl<I> From<I> for Row where I: IntoIterator, I::Item: ToString {
     fn from(it: I) -> Self {
         Self(
             Styles::default(),
-            it.into_iter().map(|s| Cell::from(s)).collect(),
+            it.into_iter().map(Cell::from).collect(),
         )
     }
 }
