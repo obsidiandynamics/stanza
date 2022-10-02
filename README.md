@@ -152,7 +152,16 @@ let renderer = Markdown::default();
 
 Voilà, we have Markdown!
 
-This is a good segue into styles. Stanza is build around the philosophy of separating models from renderers. While this offers phenomenal flexibility, it does create a problem. Every renderer is different
+This is a good segue into styles. Stanza is build around the philosophy of separating models from renderers. While this offers phenomenal flexibility, it does create a problem. Every renderer is different, which limits the effective use of styles. For example, the `Console` renderer supports a lot richer output than, say, `Markdown`.
+
+When forming the table model, we almost always have a particular output format in mind. Call it the "preferred" format. It's normal to decorate the table for the preferred format. What we'd also like is to render the table in some alternate format without breaking the output or, worse, causing a `panic` because the alternate render mightn't support some style modifier.
+
+Styles are always optional; it is up to the renderer to make use of a style if it can do so meaningfully. Renderers ignore styles they don't understand and may downgrade a style that isn't fully supported, while preserving the legibility of the content. For example, `Markdown` is oblivious to the `Blink` style, but it will still render the text — albeit without the blinking effect. You might even create your own renderer someday and a bunch of styles that only that renderer understands. This won't affect the existing renderers in the slightest.
+
+To organise styles, Stanza posits two basic rules: **specificity** and **assignability**.
+
+### Specificity
+Styles cascade, much like their CSS counterparts. A style assigned at some higher-level element will automatically be applied to all elements in the layers below it. The _specificity_ hierarchy is shown below.
 
 ```c
 Table
@@ -160,6 +169,18 @@ Table
        └─ Row
             └─ Cell
 ```
+
+Generally, one element is considered to be higher than another if the former intersects with more elements than the latter. As an example, the table intersects all other elements, hence it is at the top of the specificity order. Conversely, a cell only intersects itself, one row, one column and one table, placing it firmly at the bottom.
+
+Rows and columns aren't so cut and dried, because a table could be very tall or very wide. However, tall tables are far more frequent. In fact, that's how one generally scales a table — by adding rows, not columns. A column will intersect more elements in more cases; therefore, it is higher in the specificity hierarchy.
+
+The specificity hierarchy is used to resolve conflicting styles. Say, we applied a `TextFg::Magenta` style at the table level and `TextFg::Cyan` to the cell. Which style should the cell render with? `Cyan`, of course. This is how a regular spreadsheet would behave. Although the cell inherits styles from the table, the column and the row, its own style overrides any of its parents'.
+
+A style defined at the table level will apply to the table and everything contained within, and may be overridden by any lower-level style. A style defined at the column level will apply to the column and all cells intersected by the column, and may be overridden by a cell style. Similarly, a style defined at the row level will apply to the row and all of its cells, and it may be overridden by the cells equivalently. But what happens when a cell inherit the same type of style from both the column and the row, but does not have an overriding style of its own? The row style takes precedence, as it is more specific.
+
+### Assignability
+Although styles cascade in a top-down manner, it doesn't mean that a style may be applied on any element.
+
 `Table`
 
 * Column
