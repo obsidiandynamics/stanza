@@ -165,9 +165,9 @@ Styles cascade, much like their CSS counterparts. A style assigned at some highe
 
 ```c
 Table
-  └─ Col
-       └─ Row
-            └─ Cell
+  └─> Col
+       └─> Row
+            └─> Cell
 ```
 
 Generally, one element is considered to be higher than another if the former intersects with more elements than the latter. As an example, the table intersects all other elements, hence it is at the top of the specificity order. Conversely, a cell only intersects itself, one row, one column and one table, placing it firmly at the bottom.
@@ -179,7 +179,25 @@ The specificity hierarchy is used to resolve conflicting styles. Say, we applied
 A style defined at the table level will apply to the table and everything contained within, and may be overridden by any lower-level style. A style defined at the column level will apply to the column and all cells intersected by the column, and may be overridden by a cell style. Similarly, a style defined at the row level will apply to the row and all of its cells, and it may be overridden by the cells equivalently. But what happens when a cell inherit the same type of style from both the column and the row, but does not have an overriding style of its own? The row style takes precedence, as it is more specific.
 
 ### Assignability
-Although styles cascade in a top-down manner, it doesn't mean that a style may be applied on any element.
+Although styles cascade in a top-down manner, it doesn't mean that a style may be applied on any element. Take the `Header` style, for example. It may be applied to a row or to a column. (Stanza supports vertical headers.) Might a `Header` be assigned to the table as whole? Yes, in which case all rows and columns would be treated as headers. But a header cell makes no sense. Whether a style may be applied to a particular element can be determined by invoking the `S::assignability()` static trait method for some `S: Style`, returning a variant of the `Assignability` enum. The assignability hierarchy is shown below.
+
+```c
+Cell
+ ├───> Col
+ │       └─┐
+ └─> Row   │
+      └────┴─> Table
+```
+
+A style that can be assigned to a cell can also be assigned to a row, a column and a table. Notable examples include text formatting styles — `Bold`, `Italic`, `Underline`, `Blink`, `Strikethrough`, `HAlign`, as well as some colouring styles — `TextFg`, `TextBg`, `FillBg`.
+
+Above the cell, the hierarchy is disjoint at the column and row elements. Any style that can be assigned to a row can also be applied to a table. Similarly, any style that can be applied to a column can also be assigned to a table. These include `Header` and `Separator`.
+
+A style that can be assigned to a row is not necessarily assignable to a column, and vice versa. For example, `MinWidth` and `MaxWidth` may only be assigned to a column — they make no sense at the row level. (And certainly not at the cell level.)
+
+Finally, there are styles that may only be assigned to a table. These include `BorderFg` and `BorderBg` — used to alter the colour of all borders in the table.
+
+The assignability rule is enforced at runtime. Attempting to assign a nonassignable style will fail with a `panic`. As such, changing the returned `Assignability` value of a style to a more restrictive variant would constitute a breaking change.
 
 `Table`
 
