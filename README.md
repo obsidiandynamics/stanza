@@ -624,11 +624,11 @@ let inner_renderer = Console({
     decor
 });
 
-let sensors =  Table::default()
+let sensors = Table::default()
     .with_row(Row::from(["Water", "19.3"]))
     .with_row(Row::from(["Oil", "65.1"]));
 
-let stocks =  Table::default()
+let stocks = Table::default()
     .with_row(Row::from(["AAPL", "138.20"]))
     .with_row(Row::from(["AMZN", "113.20"]))
     .with_row(Row::from(["IBM", "118.81"]));
