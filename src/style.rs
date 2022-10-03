@@ -210,7 +210,7 @@ pub trait Styled {
 /// Indicates the element types to which a particular [`Style`] may be assigned.
 pub enum Assignability {
     /// At the table level only.
-    Table,
+    TableOnly,
 
     /// At the column level and at the table level.
     ColTable,

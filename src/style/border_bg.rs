@@ -5,7 +5,7 @@ pub struct BorderBg(pub Palette16);
 
 impl Style for BorderBg {
     fn assignability() -> Assignability {
-        Assignability::Table
+        Assignability::TableOnly
     }
 }
 

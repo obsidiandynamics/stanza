@@ -7,7 +7,7 @@ use std::time::Duration;
 
 fn main() {
     fn current_time() -> String {
-        chrono::Utc::now().format("%Y-%m-%d %H:%M:%S").to_string()
+        chrono::Utc::now().format("%H:%M:%S").to_string()
     }
 
     // build the table model

@@ -61,6 +61,13 @@ The resulting output:
 ╚═══════════╧══════╝
 ```
 
+One can clearly appreciate that the printing of a table is split into two distinct steps:
+
+1. Building the table model.
+2. Invoking a renderer on the model to produce the output.
+
+The `render()` method takes an immutable reference to the `Table` and a slice of `Hint`s. Hints offer advanced control over the renderer's behaviour. Generally, you'll only ever need `&[]`; i.e., no hints — the render will correctly produce the output on its own.
+
 Not bad for a half-dozen lines. We used all the concepts above without specifying them explicitly. For example, we didn't refer to `Col`, `Cell` or `Content` types at all. Stanza offers a highly abridged syntax for building tables where the additional flexibility mightn't be needed. Still, it's worth understanding what happens under the hood. The exact same table model can be produced using the _fully explicit syntax_ below.
 
 ```rust
@@ -456,7 +463,7 @@ use stanza::style::{Header, Styles};
 use stanza::table::{Content, Row, Table};
 
 fn current_time() -> String {
-    chrono::Utc::now().format("%Y-%m-%d %H:%M:%S").to_string()
+    chrono::Utc::now().format("%H:%M:%S").to_string()
 }
 
 // build the table model
@@ -481,9 +488,117 @@ println!("{}", Console::default().render(&table, &[]));
 ```
 
 ```html
-╔═══════════════════╤═══════════════════╗
-║Early-bound        │Late-bound         ║
-╠═══════════════════╪═══════════════════╣
-║2022-10-03 07:13:56│2022-10-03 07:13:58║
-╚═══════════════════╧═══════════════════╝
+╔═══════════╤══════════╗
+║Early-bound│Late-bound║
+╠═══════════╪══════════╣
+║07:40:41   │07:40:43  ║
+╚═══════════╧══════════╝
+```
+
+## Nested tables
+The greatest layout flexibility comes from nested tables. Nesting essentially lets you combine differently structured content in the same overarching table.
+
+The next example combines two different data sets and adds a vertical separator for neatness.
+
+```rust
+use stanza::renderer::console::Console;
+use stanza::renderer::Renderer;
+use stanza::style::{HAlign, MinWidth, Separator, Styles};
+use stanza::table::{Col, Row, Table};
+
+let table = Table::with_styles(Styles::default().with(HAlign::Centred))
+    .with_cols(vec![
+        Col::default(),
+        Col::new(Styles::default().with(Separator(true)).with(MinWidth(5))),
+        Col::default()
+    ])
+    .with_row(Row::from(["Sensor temps", "", "Stock prices"]))
+    .with_row(Row::new(Styles::default(), vec![
+        Table::default()
+            .with_row(Row::from(["Water", "19.3"]))
+            .with_row(Row::from(["Oil", "65.1"]))
+            .into(),
+        "".into(),
+        Table::default()
+            .with_row(Row::from(["AAPL", "138.20"]))
+            .with_row(Row::from(["AMZN", "113.20"]))
+            .with_row(Row::from(["IBM", "118.81"]))
+            .into(),
+    ]));
+
+
+println!("{}", Console::default().render(&table, &[]));
+```
+
+```html
+╔════════════╤═════╤═════════════╗
+║Sensor temps│     │Stock prices ║
+╟────────────┤     ├─────────────╢
+║╔═════╤════╗│     │╔════╤══════╗║
+║║Water│19.3║│     │║AAPL│138.20║║
+║╟─────┼────╢│     │╟────┼──────╢║
+║║Oil  │65.1║│     │║AMZN│113.20║║
+║╚═════╧════╝│     │╟────┼──────╢║
+║            │     │║IBM │118.81║║
+║            │     │╚════╧══════╝║
+╚════════════╧═════╧═════════════╝
+```
+
+Note, nesting uses the `Content::Nested` behind the scenes, although we didn't have to use this enum variant explicitly in the example. That's because the abridged syntax uses `into()` to convert a `Table` into a `Content::Nested(Table)` for us. This is much the same as calling `into()` on any value that implements `ToString` — the value will be converted to a `Content::Label(String)` for us.
+
+## Composite content
+So far we employed various `Content` enum variants to assign content of different types — plain text, computed values and nested tables — to any given cell. What if we needed to combine content of several distinct types into a single cell? This is accomplished using the `Content::Composite` variant.
+
+Let's take the "nested tables" example above. Currently, it displays the labels "Sensor temps" and "Stock prices" in a separate row above the nested tables. Let's merge them into a single cell.
+
+```rust
+use stanza::renderer::console::Console;
+use stanza::renderer::Renderer;
+use stanza::style::{HAlign, MinWidth, Separator, Styles};
+use stanza::table::{Col, Content, Row, Table};
+
+let table = Table::with_styles(Styles::default().with(HAlign::Centred))
+    .with_cols(vec![
+        Col::default(),
+        Col::new(Styles::default().with(Separator(true)).with(MinWidth(5))),
+        Col::default(),
+    ])
+    .with_row(Row::new(
+        Styles::default(),
+        vec![
+            Content::Composite(vec![
+                "Sensor temps\n".into(),
+                Table::default()
+                    .with_row(Row::from(["Water", "19.3"]))
+                    .with_row(Row::from(["Oil", "65.1"]))
+                    .into(),
+            ])
+            .into(),
+            "".into(),
+            Content::Composite(vec![
+                "Stock prices\n".into(),
+                Table::default()
+                    .with_row(Row::from(["AAPL", "138.20"]))
+                    .with_row(Row::from(["AMZN", "113.20"]))
+                    .with_row(Row::from(["IBM", "118.81"]))
+                    .into(),
+            ])
+            .into(),
+        ],
+    ));
+
+println!("{}", Console::default().render(&table, &[]));
+```
+
+```html
+╔════════════╤═════╤═════════════╗
+║Sensor temps│     │Stock prices ║
+║╔═════╤════╗│     │╔════╤══════╗║
+║║Water│19.3║│     │║AAPL│138.20║║
+║╟─────┼────╢│     │╟────┼──────╢║
+║║Oil  │65.1║│     │║AMZN│113.20║║
+║╚═════╧════╝│     │╟────┼──────╢║
+║            │     │║IBM │118.81║║
+║            │     │╚════╧══════╝║
+╚════════════╧═════╧═════════════╝
 ```

@@ -2,9 +2,9 @@ use crate::style::Assignability;
 
 #[test]
 fn assignability() {
-    assert!(!Assignability::Table.at_col());
-    assert!(!Assignability::Table.at_row());
-    assert!(!Assignability::Table.at_cell());
+    assert!(!Assignability::TableOnly.at_col());
+    assert!(!Assignability::TableOnly.at_row());
+    assert!(!Assignability::TableOnly.at_cell());
 
     assert!(Assignability::ColTable.at_col());
     assert!(!Assignability::ColTable.at_row());
