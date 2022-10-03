@@ -50,6 +50,11 @@ let renderer = Console::default();
 println!("{}", renderer.render(&table));
 ```
 
+The printing of the table here is clearly split into two distinct steps:
+
+1. Building the table model.
+2. Invoking a renderer on the model to produce the output.
+
 The resulting output:
 ```html
 ╔═══════════╤══════╗
@@ -60,11 +65,6 @@ The resulting output:
 ║Engineering│270000║
 ╚═══════════╧══════╝
 ```
-
-One can clearly appreciate that the printing of a table is split into two distinct steps:
-
-1. Building the table model.
-2. Invoking a renderer on the model to produce the output.
 
 Not bad for a half-dozen lines. We used all the concepts above without specifying them explicitly. For example, we didn't refer to `Col`, `Cell` or `Content` types at all. Stanza offers a highly abridged syntax for building tables where the additional flexibility mightn't be needed. Still, it's worth understanding what happens under the hood. The exact same table model can be produced using the _fully explicit syntax_ below.
 
@@ -544,6 +544,8 @@ println!("{}", Console::default().render(&table));
 
 Note, nesting uses the `Content::Nested` behind the scenes, although we didn't have to use this enum variant explicitly in the example. That's because the abridged syntax uses `into()` to convert a `Table` into a `Content::Nested(Table)` for us. This is much the same as calling `into()` on any value that implements `ToString` — the value will be converted to a `Content::Label(String)` for us.
 
+A notable limitation of nested tables is that all character formatting of the inner table will be replaced with the format of the outer table cell. You may still use any of the layout styles (`HAlign`, `MinWidth`, `Header`, etc.), it's just the character formatting styles (`Bold`, `Italic`, `TextFg`, etc.) that will be ignored.
+
 ## Composite content
 So far we employed various `Content` enum variants to assign content of different types — plain text, computed values and nested tables — to any given cell. What if we needed to combine content of several distinct types into a single cell? This is accomplished using the `Content::Composite` variant.
 
@@ -602,4 +604,6 @@ println!("{}", Console::default().render(&table));
 ```
 
 ## Advanced rendering
-The `render()` method takes an immutable reference to the `Table` and a slice of `Hint`s. Hints offer advanced control over the renderer's behaviour. Generally, you'll only ever need `&[]`; i.e., no hints — the render will correctly produce the output on its own.
+There is an alternative to the `render()` method — `render_with_hints()` — that takes an immutable reference to the `Table` and a slice of `Hint`s. Hints offer advanced control over the renderer's behaviour. They are generally not needed — we flew through the previous examples while the renderer correctly did its thing.
+
+Hints are used internally within Stanza to feed additional context to the render that it mightn't be aware of. For example, when you use `Content::Nested`, the table will be rendered recursively. This presents a problem for inner tables that might be using character formatting styles, which output special ANSI escape sequences (when using the `Console` renderer). These escape sequences interfere with those generated in the course of styling the outer table cell.
