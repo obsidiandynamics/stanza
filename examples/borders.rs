@@ -63,7 +63,7 @@ fn main() {
         outer_table.push_row(Row::new(Styles::default(), row));
     }
 
-    print!("{}", renderer.render(&outer_table));
+    println!("{}", renderer.render(&outer_table));
 }
 
 fn widest_table(tables: &[(&str, Table)], renderer: &impl Renderer) -> usize {
