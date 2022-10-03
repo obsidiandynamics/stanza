@@ -49,12 +49,12 @@ fn main() {
         let name = example.0;
         let title = format!("{}) {name}\n", i + 1);
         let cell_data = Cell::from(Content::Composite(vec![
-            Content::Label(title),
-            Content::Nested(inner_table),
+            title.into(),
+            inner_table.into(),
         ]));
         row.push(cell_data);
         if i % num_cols == num_cols - 1 {
-            let current_row = mem::replace(&mut row, Vec::new());
+            let current_row = mem::take(&mut row);
             outer_table.push_row(Row::new(Styles::default(), current_row));
         }
     }
