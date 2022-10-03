@@ -14,7 +14,7 @@ fn main() {
             Styles::default(),
             vec![
                 Content::Composite(vec![
-                    "Sensor temps\n".into(),
+                    "Sensors\n".into(),
                     Table::default()
                         .with_row(Row::from(["Water", "19.3"]))
                         .with_row(Row::from(["Oil", "65.1"]))
@@ -23,7 +23,7 @@ fn main() {
                 .into(),
                 "".into(),
                 Content::Composite(vec![
-                    "Stock prices\n".into(),
+                    "Stocks\n".into(),
                     Table::default()
                         .with_row(Row::from(["AAPL", "138.20"]))
                         .with_row(Row::from(["AMZN", "113.20"]))

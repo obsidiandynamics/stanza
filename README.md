@@ -510,7 +510,7 @@ let table = Table::with_styles(Styles::default().with(HAlign::Centred))
         Col::new(Styles::default().with(Separator(true)).with(MinWidth(5))),
         Col::default()
     ])
-    .with_row(Row::from(["Sensor temps", "", "Stock prices"]))
+    .with_row(Row::from(["Sensors", "", "Stocks"]))
     .with_row(Row::new(Styles::default(), vec![
         Table::default()
             .with_row(Row::from(["Water", "19.3"]))
@@ -530,7 +530,7 @@ println!("{}", Console::default().render(&table));
 
 ```html
 ╔════════════╤═════╤═════════════╗
-║Sensor temps│     │Stock prices ║
+║  Sensors   │     │   Stocks    ║
 ╟────────────┤     ├─────────────╢
 ║╔═════╤════╗│     │╔════╤══════╗║
 ║║Water│19.3║│     │║AAPL│138.20║║
@@ -567,7 +567,7 @@ let table = Table::with_styles(Styles::default().with(HAlign::Centred))
         Styles::default(),
         vec![
             Content::Composite(vec![
-                "Sensor temps\n".into(),
+                "Sensors\n".into(),
                 Table::default()
                     .with_row(Row::from(["Water", "19.3"]))
                     .with_row(Row::from(["Oil", "65.1"]))
@@ -576,7 +576,7 @@ let table = Table::with_styles(Styles::default().with(HAlign::Centred))
             .into(),
             "".into(),
             Content::Composite(vec![
-                "Stock prices\n".into(),
+                "Stocks\n".into(),
                 Table::default()
                     .with_row(Row::from(["AAPL", "138.20"]))
                     .with_row(Row::from(["AMZN", "113.20"]))
@@ -592,7 +592,7 @@ println!("{}", Console::default().render(&table));
 
 ```html
 ╔════════════╤═════╤═════════════╗
-║Sensor temps│     │Stock prices ║
+║  Sensors   │     │   Stocks    ║
 ║╔═════╤════╗│     │╔════╤══════╗║
 ║║Water│19.3║│     │║AAPL│138.20║║
 ║╟─────┼────╢│     │╟────┼──────╢║
@@ -604,6 +604,63 @@ println!("{}", Console::default().render(&table));
 ```
 
 ## Advanced rendering
-There is an alternative to the `render()` method — `render_with_hints()` — that takes an immutable reference to the `Table` and a slice of `Hint`s. Hints offer advanced control over the renderer's behaviour. They are generally not needed — we flew through the previous examples while the renderer correctly did its thing.
+There is a more elaborate alternative to the `render()` method — `render_with_hints()`, which takes an immutable reference to the `Table` and a slice of `RenderHint`s. Hints offer advanced control over the renderer's behaviour. They are generally not needed for most use cases — we flew through the previous examples while the renderer correctly did its thing.
 
-Hints are used internally within Stanza to feed additional context to the render that it mightn't be aware of. For example, when you use `Content::Nested`, the table will be rendered recursively. This presents a problem for inner tables that might be using character formatting styles, which output special ANSI escape sequences (when using the `Console` renderer). These escape sequences interfere with those generated in the course of styling the outer table cell.
+Hints are used internally within Stanza to feed additional context to the render that it mightn't be aware of. For example, when you use `Content::Nested`, the table will be rendered recursively. This presents a problem for inner tables that might be using character formatting styles, which output special [ANSI escape sequences](https://en.wikipedia.org/wiki/ANSI_escape_code) (when using the `Console` renderer). These escape sequences interfere with those generated in the course of styling the outer table cell. To solve this problem, the outer rendering routine passes in `RenderHint::Nested` during recursion, telling the inner rendering routine to suppress these escape sequences.
+
+Why use hints when the renderer takes care of this automatically? Take nested tables. Although the `Content::Nested` enum variant is convenient, it is highly inflexible. Using it implies that the nested table will be drawn using the same renderer that is used for the outer table. Which is why in our previous examples, the inner tables had the same overall look and feel as each other and as the outer table.
+
+To gain full control over the table styles, we essentially need to pre-render the inner tables before embedding the rendered output into the outer table. This way we can control all aspects of the inner render. In fact, we might use a different type of renderer altogether. In the following example, we use two different `Console` renderers: the outer renderer keeps the default configuration, while the inner renderer is stripped of the outer borders.
+
+```rust
+use stanza::renderer::console::{Console, Decor};
+use stanza::renderer::{Renderer, RenderHint};
+use stanza::style::{HAlign, MinWidth, Separator, Styles};
+use stanza::table::{Col, Row, Table};
+
+let inner_renderer = Console({
+    let mut decor = Decor::default();
+    decor.draw_outer_border = false;
+    decor
+});
+
+let sensors =  Table::default()
+    .with_row(Row::from(["Water", "19.3"]))
+    .with_row(Row::from(["Oil", "65.1"]));
+
+let stocks =  Table::default()
+    .with_row(Row::from(["AAPL", "138.20"]))
+    .with_row(Row::from(["AMZN", "113.20"]))
+    .with_row(Row::from(["IBM", "118.81"]));
+
+let outer = Table::with_styles(Styles::default().with(HAlign::Centred))
+    .with_cols(vec![
+        Col::default(),
+        Col::new(Styles::default().with(Separator(true)).with(MinWidth(5))),
+        Col::default(),
+    ])
+    .with_row(Row::from(["Sensors", "", "Stocks"]))
+    .with_row(Row::new(
+        Styles::default(),
+        vec![
+            inner_renderer.render_with_hints(&sensors, &[RenderHint::Nested]).into(),
+            "".into(),
+            inner_renderer.render_with_hints(&stocks, &[RenderHint::Nested]).into()
+        ],
+    ));
+
+println!("{}", Console::default().render(&outer));
+```
+
+```html
+╔══════════╤═════╤═══════════╗
+║ Sensors  │     │  Stocks   ║
+╟──────────┤     ├───────────╢
+║Water│19.3│     │AAPL│138.20║
+║─────┼────│     │────┼──────║
+║Oil  │65.1│     │AMZN│113.20║
+║          │     │────┼──────║
+║          │     │IBM │118.81║
+╚══════════╧═════╧═══════════╝
+```
+

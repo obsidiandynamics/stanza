@@ -1,5 +1,5 @@
-use stanza::renderer::console::Console;
-use stanza::renderer::Renderer;
+use stanza::renderer::console::{Console};
+use stanza::renderer::{Renderer};
 use stanza::style::{HAlign, MinWidth, Separator, Styles};
 use stanza::table::{Col, Row, Table};
 
@@ -10,7 +10,7 @@ fn main() {
             Col::new(Styles::default().with(Separator(true)).with(MinWidth(5))),
             Col::default(),
         ])
-        .with_row(Row::from(["Sensor temps", "", "Stock prices"]))
+        .with_row(Row::from(["Sensors", "", "Stocks"]))
         .with_row(Row::new(
             Styles::default(),
             vec![
