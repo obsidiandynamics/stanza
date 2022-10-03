@@ -216,7 +216,7 @@ We didn't have to work much to get our text laid out well. Often, all that's nee
 use stanza::renderer::console::Console;
 use stanza::renderer::Renderer;
 use stanza::style::{Header, MinWidth, Styles};
-use stanza::table::{Cell, Col, Row, Table};
+use stanza::table::{Col, Row, Table};
 
 let table = Table::default()
     .with_cols(vec![
@@ -225,7 +225,7 @@ let table = Table::default()
     ])
     .with_row(Row::new(
         Styles::default().with(Header(true)),
-        vec![Cell::from("Poem"), Cell::from("Extract")],
+        vec!["Poem".into(), "Extract".into()]
     ))
     .with_row(Row::from([
         "Antigonish",
@@ -290,17 +290,17 @@ The ability to support multiple row and column headers is a feature unique to St
 use stanza::renderer::console::Console;
 use stanza::renderer::Renderer;
 use stanza::style::{HAlign, Header, MinWidth, Styles};
-use stanza::table::{Cell, Col, Row, Table};
+use stanza::table::{Col, Row, Table};
 
-const NUMS: i8 = 6;            // the table will multiply from 1 to NUMS
+const NUMS: i8 = 6; // the table will multiply from 1 to NUMS
 
 // builds just the header row -- there should be two (top and bottom)
 fn build_header_row() -> Row {
-    let mut cells = vec![Cell::from("")];
+    let mut cells = vec!["".into()];
     for col in 1..=NUMS {
-        cells.push(Cell::from(col));
+        cells.push(col.into());
     }
-    cells.push(Cell::from(""));
+    cells.push("".into());
     Row::new(Styles::default().with(Header(true)), cells)
 }
 
@@ -308,11 +308,11 @@ fn build_header_row() -> Row {
 fn build_body_rows() -> Vec<Row> {
     (1..=NUMS)
         .map(|row| {
-            let mut cells = vec![Cell::from(row)];
+            let mut cells = vec![row.into()];
             for col in 1..=NUMS {
-                cells.push(Cell::from(row * col));
+                cells.push((row * col).into());
             }
-            cells.push(Cell::from(row));
+            cells.push(row.into());
             Row::new(Styles::default(), cells)
         })
         .collect()
@@ -320,15 +320,15 @@ fn build_body_rows() -> Vec<Row> {
 
 let mut table = Table::with_styles(
     Styles::default()
-        .with(HAlign::Right)   // numbers should be right-aligned
-        .with(MinWidth(5)),    // give each column some space
+        .with(HAlign::Right) // numbers should be right-aligned
+        .with(MinWidth(5)), // give each column some space
 )
 .with_cols(
     (0..NUMS + 2)
         .map(|col| {
             Col::new(
                 // only the first and last columns are headers
-                Styles::default().with(Header(col == 0 || col == NUMS + 1)), 
+                Styles::default().with(Header(col == 0 || col == NUMS + 1)),
             )
         })
         .collect(),

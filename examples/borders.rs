@@ -104,11 +104,11 @@ fn cross_headers() -> Table {
         .with_row(Row::new(
             Styles::default().with(Header(true)),
             vec![
-                Cell::from("W"),
-                Cell::from(""),
-                Cell::from("C"),
-                Cell::from(""),
-                Cell::from("E"),
+                "W".into(),
+                "".into(),
+                "C".into(),
+                "".into(),
+                "E".into(),
             ],
         ))
         .with_row(Row::default())
@@ -127,11 +127,11 @@ fn outer_headers() -> Table {
         .with_row(Row::new(
             Styles::default().with(Header(true)),
             vec![
-                Cell::from("NW"),
-                Cell::from(""),
-                Cell::from("N"),
-                Cell::from(""),
-                Cell::from("NE"),
+                "NW".into(),
+                "".into(),
+                "N".into(),
+                "".into(),
+                "NE".into(),
             ],
         ))
         .with_row(Row::default())
@@ -140,11 +140,11 @@ fn outer_headers() -> Table {
         .with_row(Row::new(
             Styles::default().with(Header(true)),
             vec![
-                Cell::from("SW"),
-                Cell::from(""),
-                Cell::from("S"),
-                Cell::from(""),
-                Cell::from("SE"),
+                "SW".into(),
+                "".into(),
+                "S".into(),
+                "".into(),
+                "SE".into(),
             ],
         ))
 }
@@ -234,11 +234,11 @@ fn grid_separators_outer_headers() -> Table {
         .with_row(Row::new(
             Styles::default().with(Header(true)),
             vec![
-                Cell::from("NW"),
-                Cell::from(""),
-                Cell::from("N"),
-                Cell::from(""),
-                Cell::from("NE"),
+                "NW".into(),
+                "".into(),
+                "N".into(),
+                "".into(),
+                "NE".into(),
             ],
         ))
         .with_row(Row::separator())
@@ -247,11 +247,11 @@ fn grid_separators_outer_headers() -> Table {
         .with_row(Row::new(
             Styles::default().with(Header(true)),
             vec![
-                Cell::from("SW"),
-                Cell::from(""),
-                Cell::from("S"),
-                Cell::from(""),
-                Cell::from("SE"),
+                "SW".into(),
+                "".into(),
+                "S".into(),
+                "".into(),
+                "SE".into(),
             ],
         ))
 }
@@ -270,11 +270,11 @@ fn grid_seps_cross_headers() -> Table {
         .with_row(Row::new(
             Styles::default().with(Header(true)),
             vec![
-                Cell::from("W"),
-                Cell::from(""),
-                Cell::from("C"),
-                Cell::from(""),
-                Cell::from("E"),
+                "W".into(),
+                "".into(),
+                "C".into(),
+                "".into(),
+                "E".into(),
             ],
         ))
         .with_row(Row::separator())
@@ -331,14 +331,14 @@ fn dual_col_separators() -> Table {
         .with_row(Row::default())
         .with_row(Row::from(["W", "", "", "E"]))
         .with_row(Row::default())
-        .with_row(Row::from(["SW", "", "", "EE"]))
+        .with_row(Row::from(["SW", "", "", "SE"]))
 }
 
 fn single_row() -> Table {
     Table::with_styles(table_styles())
         .with_row(Row::new(
             Styles::default(),
-            vec![Cell::from("x"), Cell::from("y"), Cell::from("z")],
+            vec!["x".into(), "y".into(), "z".into()],
         ))
 }
 

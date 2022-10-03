@@ -1,18 +1,18 @@
 use stanza::renderer::console::Console;
 use stanza::renderer::Renderer;
 use stanza::style::{HAlign, Header, MinWidth, Styles};
-use stanza::table::{Cell, Col, Row, Table};
+use stanza::table::{Col, Row, Table};
 
 fn main() {
-    const NUMS: i8 = 6;            // the table will multiply from 1 to NUMS
+    const NUMS: i8 = 6; // the table will multiply from 1 to NUMS
 
     // builds just the header row -- there should be two (top and bottom)
     fn build_header_row() -> Row {
-        let mut cells = vec![Cell::from("")];
+        let mut cells = vec!["".into()];
         for col in 1..=NUMS {
-            cells.push(Cell::from(col));
+            cells.push(col.into());
         }
-        cells.push(Cell::from(""));
+        cells.push("".into());
         Row::new(Styles::default().with(Header(true)), cells)
     }
 
@@ -20,11 +20,11 @@ fn main() {
     fn build_body_rows() -> Vec<Row> {
         (1..=NUMS)
             .map(|row| {
-                let mut cells = vec![Cell::from(row)];
+                let mut cells = vec![row.into()];
                 for col in 1..=NUMS {
-                    cells.push(Cell::from(row * col));
+                    cells.push((row * col).into());
                 }
-                cells.push(Cell::from(row));
+                cells.push(row.into());
                 Row::new(Styles::default(), cells)
             })
             .collect()
@@ -33,7 +33,7 @@ fn main() {
     let mut table = Table::with_styles(
         Styles::default()
             .with(HAlign::Right) // numbers should be right-aligned
-            .with(MinWidth(5)),         // give each column some space
+            .with(MinWidth(5)), // give each column some space
     )
     .with_cols(
         (0..NUMS + 2)

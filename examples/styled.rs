@@ -7,7 +7,7 @@ fn main() {
     let table = Table::default()
         .with_cols(vec![
             Col::new(Styles::default().with(MinWidth(20))),
-            Col::new(Styles::default().with(MinWidth(15)).with(HAlign::Right))
+            Col::new(Styles::default().with(MinWidth(15)).with(HAlign::Right)),
         ])
         .with_row(Row::new(
             Styles::default().with(Header(true)),
