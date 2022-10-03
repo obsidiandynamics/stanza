@@ -377,4 +377,65 @@ The handling of row and column headers is entirely renderer-specific. `Markdown`
 ```
 
 ## Separators
-Separators are a means of subdividing a table into logical sections. There could be multiple such sections, and the division might be horizontal, vertical, or both. A separator is created by either assigning a `Separator` style to a `Row` or `Col`, or instantiating the `Row`/`Col` using the `separator()` convenience method. The latter is generally preferred due to brevity; the former allows you to specify additional styles for added flexibility.
+Separators are a means of subdividing a table into logical sections. There could be multiple such sections, and the division might be horizontal, vertical, or both. A separator is created by either assigning a `Separator` style to a `Row` or `Col`, or instantiating the `Row`/`Col` using the `separator()` convenience method. The latter is generally preferred due to brevity; the former allows you to specify additional styles for added flexibility. Let's try this on a basic Sudoku puzzle:
+
+```rust
+use stanza::renderer::console::Console;
+use stanza::renderer::Renderer;
+use stanza::style::{HAlign, MinWidth, Styles};
+use stanza::table::{Col, Row, Table};
+
+let table = Table::with_styles(Styles::default().with(MinWidth(3)).with(HAlign::Centred))
+    .with_cols(vec![
+        Col::default(),
+        Col::default(),
+        Col::default(),
+        Col::separator(),
+        Col::default(),
+        Col::default(),
+        Col::default(),
+        Col::separator(),
+        Col::default(),
+        Col::default(),
+        Col::default(),
+    ])
+    .with_row(["5", "3", " ", "", " ", "7", " ", "", " ", " ", " "])
+    .with_row(["6", " ", " ", "", "1", "9", "5", "", " ", " ", " "])
+    .with_row([" ", "9", "8", "", " ", " ", " ", "", " ", "6", " "])
+    .with_row(Row::separator())
+    .with_row(["8", " ", " ", "", " ", "6", " ", "", " ", " ", "3"])
+    .with_row(["4", " ", " ", "", "8", " ", "3", "", " ", " ", "1"])
+    .with_row(["7", " ", " ", "", " ", "2", " ", "", " ", " ", "6"])
+    .with_row(Row::separator())
+    .with_row([" ", "6", " ", "", " ", " ", " ", "", " ", "2", "8"])
+    .with_row([" ", " ", " ", "", "4", "1", "9", "", " ", " ", "5"])
+    .with_row([" ", " ", " ", "", " ", "8", " ", "", " ", "7", "9"]);
+
+println!("{}", Console::default().render(&table, &[]));
+```
+
+```html
+╔═══╤═══╤═══╤═══╤═══╤═══╤═══╤═══╤═══╤═══╤═══╗
+║ 5 │ 3 │   │   │   │ 7 │   │   │   │   │   ║
+╟───┼───┼───┤   ├───┼───┼───┤   ├───┼───┼───╢
+║ 6 │   │   │   │ 1 │ 9 │ 5 │   │   │   │   ║
+╟───┼───┼───┤   ├───┼───┼───┤   ├───┼───┼───╢
+║   │ 9 │ 8 │   │   │   │   │   │   │ 6 │   ║
+╟───┴───┴───┘   └───┴───┴───┘   └───┴───┴───╢
+║                                           ║
+╟───┬───┬───┐   ┌───┬───┬───┐   ┌───┬───┬───╢
+║ 8 │   │   │   │   │ 6 │   │   │   │   │ 3 ║
+╟───┼───┼───┤   ├───┼───┼───┤   ├───┼───┼───╢
+║ 4 │   │   │   │ 8 │   │ 3 │   │   │   │ 1 ║
+╟───┼───┼───┤   ├───┼───┼───┤   ├───┼───┼───╢
+║ 7 │   │   │   │   │ 2 │   │   │   │   │ 6 ║
+╟───┴───┴───┘   └───┴───┴───┘   └───┴───┴───╢
+║                                           ║
+╟───┬───┬───┐   ┌───┬───┬───┐   ┌───┬───┬───╢
+║   │ 6 │   │   │   │   │   │   │   │ 2 │ 8 ║
+╟───┼───┼───┤   ├───┼───┼───┤   ├───┼───┼───╢
+║   │   │   │   │ 4 │ 1 │ 9 │   │   │   │ 5 ║
+╟───┼───┼───┤   ├───┼───┼───┤   ├───┼───┼───╢
+║   │   │   │   │   │ 8 │   │   │   │ 7 │ 9 ║
+╚═══╧═══╧═══╧═══╧═══╧═══╧═══╧═══╧═══╧═══╧═══╝
+```

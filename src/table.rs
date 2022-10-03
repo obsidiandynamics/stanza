@@ -1,4 +1,4 @@
-use crate::style::{MinWidth, Separator, Styled, Styles};
+use crate::style::{Separator, Styled, Styles};
 use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec;
@@ -134,12 +134,8 @@ impl Col {
         Self(styles)
     }
 
-    pub fn separator(min_width: usize) -> Self {
-        Self(
-            Styles::default()
-                .with(Separator(true))
-                .with(MinWidth(min_width)),
-        )
+    pub fn separator() -> Self {
+        Self::new(Styles::default().with(Separator(true)))
     }
 }
 
@@ -166,7 +162,7 @@ impl Row {
     // }
 
     pub fn separator() -> Self {
-        Self(Styles::default().with(Separator(true)), vec![])
+        Self::new(Styles::default().with(Separator(true)), vec![])
     }
 
     pub fn cells(&self) -> &[Cell] {

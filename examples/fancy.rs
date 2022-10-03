@@ -1,10 +1,7 @@
 use stanza::renderer::console::Console;
 use stanza::renderer::markdown::Markdown;
 use stanza::renderer::Renderer;
-use stanza::style::{
-    Blink, Bold, BorderBg, FillBg, HAlign, Header, Italic, MaxWidth, MinWidth, Palette16,
-    Strikethrough, Styles, TextBg, TextFg, Underline,
-};
+use stanza::style::{Blink, Bold, BorderBg, FillBg, HAlign, Header, Italic, MaxWidth, MinWidth, Palette16, Separator, Strikethrough, Styles, TextBg, TextFg, Underline};
 use stanza::table::{Cell, Col, Content, Row, Table};
 
 fn main() {
@@ -22,7 +19,7 @@ fn main() {
                 .with(MinWidth(10))
                 .with(MaxWidth(20)),
         ),
-        Col::separator(5),
+        Col::new(Styles::default().with(Separator(true)).with(MinWidth(5))),
         Col::new(Styles::default().with(MinWidth(10)).with(MaxWidth(20))),
     ])
     .with_row(Row::new(

@@ -163,7 +163,7 @@ fn inner_col_separator() -> Table {
         .with_cols(vec![
             Col::default(),
             Col::default(),
-            Col::separator(5),
+            Col::separator(),
             Col::default(),
             Col::default(),
         ])
@@ -179,7 +179,7 @@ fn cross_separators() -> Table {
         .with_cols(vec![
             Col::default(),
             Col::default(),
-            Col::separator(5),
+            Col::separator(),
             Col::default(),
             Col::default(),
         ])
@@ -193,11 +193,11 @@ fn cross_separators() -> Table {
 fn window_separators() -> Table {
     Table::with_styles(table_styles())
         .with_cols(vec![
-            Col::separator(5),
+            Col::separator(),
             Col::default(),
-            Col::separator(5),
+            Col::separator(),
             Col::default(),
-            Col::separator(5),
+            Col::separator(),
         ])
         .with_row(Row::separator())
         .with_row(Row::from(["", "NW", "", "NE", ""]))
@@ -210,9 +210,9 @@ fn grid_separators() -> Table {
     Table::with_styles(table_styles())
         .with_cols(vec![
             Col::default(),
-            Col::separator(5),
+            Col::separator(),
             Col::default(),
-            Col::separator(5),
+            Col::separator(),
             Col::default(),
         ])
         .with_row(Row::from(["NW", "", "N", "", "NE"]))
@@ -226,9 +226,9 @@ fn grid_separators_outer_headers() -> Table {
     Table::with_styles(table_styles())
         .with_cols(vec![
             Col::new(Styles::default().with(Header(true))),
-            Col::separator(5),
+            Col::separator(),
             Col::default(),
-            Col::separator(5),
+            Col::separator(),
             Col::new(Styles::default().with(Header(true))),
         ])
         .with_row(Row::new(
@@ -260,9 +260,9 @@ fn grid_seps_cross_headers() -> Table {
     Table::with_styles(table_styles())
         .with_cols(vec![
             Col::default(),
-            Col::separator(5),
+            Col::separator(),
             Col::new(Styles::default().with(Header(true))),
-            Col::separator(5),
+            Col::separator(),
             Col::default(),
         ])
         .with_row(Row::from(["NW", "", "N", "", "NE"]))
@@ -299,10 +299,10 @@ fn outer_row_separators() -> Table {
 fn outer_col_separators() -> Table {
     Table::with_styles(table_styles())
         .with_cols(vec![
-            Col::separator(5),
+            Col::separator(),
             Col::default(),
             Col::default(),
-            Col::separator(5),
+            Col::separator(),
         ])
         .with_row(Row::from(["", "NNW", "NNE", ""]))
         .with_row(Row::default())
@@ -323,8 +323,8 @@ fn dual_col_separators() -> Table {
     Table::with_styles(table_styles())
         .with_cols(vec![
             Col::default(),
-            Col::separator(5),
-            Col::separator(5),
+            Col::separator(),
+            Col::separator(),
             Col::default(),
         ])
         .with_row(Row::from(["NW", "", "", "NE"]))
@@ -361,7 +361,7 @@ fn single_row_separator() -> Table {
 
 fn single_col_separator() -> Table {
     Table::with_styles(table_styles())
-        .with_cols(vec![Col::separator(5)])
+        .with_cols(vec![Col::separator()])
         .with_row(Row::default())
         .with_row(Row::default())
         .with_row(Row::default())
@@ -369,7 +369,7 @@ fn single_col_separator() -> Table {
 
 fn two_by_two_up() -> Table {
     Table::with_styles(table_styles())
-        .with_cols(vec![Col::separator(5), Col::separator(5)])
+        .with_cols(vec![Col::separator(), Col::separator()])
         .with_row(Row::from(["NW", "NE"]))
         .with_row(Row::separator())
 }
@@ -377,7 +377,7 @@ fn two_by_two_up() -> Table {
 fn two_by_two_right() -> Table {
     Table::with_styles(table_styles())
         .with_cols(vec![
-            Col::separator(5),
+            Col::separator(),
             Col::default(),
         ])
         .with_row(Row::separator())
@@ -386,7 +386,7 @@ fn two_by_two_right() -> Table {
 
 fn two_by_two_down() -> Table {
     Table::with_styles(table_styles())
-        .with_cols(vec![Col::separator(5), Col::separator(5)])
+        .with_cols(vec![Col::separator(), Col::separator()])
         .with_row(Row::separator())
         .with_row(Row::from(["SW", "SE"]))
 }
@@ -395,7 +395,7 @@ fn two_by_two_left() -> Table {
     Table::with_styles(table_styles())
         .with_cols(vec![
             Col::default(),
-            Col::separator(5),
+            Col::separator(),
         ])
         .with_row(Row::separator())
         .with_row(Row::separator())
