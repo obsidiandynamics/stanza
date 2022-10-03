@@ -7,6 +7,7 @@ An abstract table model written in Rust, with customisable text formatting and r
 [![codecov](https://img.shields.io/codecov/c/github/obsidiandynamics/stanza/master?style=flat-square&logo=codecov)](https://codecov.io/gh/obsidiandynamics/stanza)
 ![no_std](https://img.shields.io/badge/linking-no__std-9cf?style=flat-square)
 
+![Screenshot](https://github.com/obsidiandynamics/stanza/images/fancy.gif)
 
 # Why Stanza
 * **Feature-complete**: Stanza supports a broad range of styling features — various text formatting controls, foreground/background/fill colours, border styles, multiple horizontal and vertical headers and separators, and even nested tables, to name a few.
@@ -610,7 +611,7 @@ Hints are used internally within Stanza to feed additional context to the render
 
 Why use hints when the renderer takes care of this automatically? Take nested tables. Although the `Content::Nested` enum variant is convenient, it is highly inflexible. Using it implies that the nested table will be drawn using the same renderer that is used for the outer table. Which is why in our previous examples, the inner tables had the same overall look and feel as each other and as the outer table.
 
-To gain full control over the table styles, we essentially need to pre-render the inner tables before embedding the rendered output into the outer table. This way we can control all aspects of the inner render. In fact, we might use a different type of renderer altogether. In the following example, we use two different `Console` renderers: the outer renderer keeps the default configuration, while the inner renderer is stripped of the outer borders.
+To gain full control over the table styles, we need to pre-render the inner tables before embedding the output into the outer table. This way we can control all aspects of the inner render. In fact, one might use a different type of renderer altogether. In the following example, we use two different `Console` renderers: the outer renderer maintains the default configuration, while the inner renderer is stripped of the outer borders.
 
 ```rust
 use stanza::renderer::console::{Console, Decor};
