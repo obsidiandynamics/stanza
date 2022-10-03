@@ -88,40 +88,19 @@ fn term_width() -> usize {
     term_size::dimensions().unwrap().0
 }
 
+fn table_styles() -> Styles { Styles::default().with(MinWidth(5)).with(HAlign::Centred) }
+
 fn cross_headers() -> Table {
-    Table::default()
+    Table::with_styles(table_styles())
         .with_cols(vec![
-            Col::new(Styles::default().with(MinWidth(5)).with(HAlign::Centred)),
-            Col::new(Styles::default().with(MinWidth(5)).with(HAlign::Centred)),
-            Col::new(
-                Styles::default()
-                    .with(Header(true))
-                    .with(MinWidth(5))
-                    .with(HAlign::Centred),
-            ),
-            Col::new(Styles::default().with(MinWidth(5)).with(HAlign::Centred)),
-            Col::new(Styles::default().with(MinWidth(5)).with(HAlign::Centred)),
+            Col::default(),
+            Col::default(),
+            Col::new(Styles::default().with(Header(true))),
+            Col::default(),
+            Col::default(),
         ])
-        .with_row(Row::new(
-            Styles::default(),
-            vec![
-                Cell::from("NW"),
-                Cell::from(""),
-                Cell::from("N"),
-                Cell::from(""),
-                Cell::from("NE"),
-            ],
-        ))
-        .with_row(Row::new(
-            Styles::default(),
-            vec![
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
-            ],
-        ))
+        .with_row(Row::from(["NW", "", "N", "", "NE"]))
+        .with_row(Row::default())
         .with_row(Row::new(
             Styles::default().with(Header(true)),
             vec![
@@ -132,46 +111,18 @@ fn cross_headers() -> Table {
                 Cell::from("E"),
             ],
         ))
-        .with_row(Row::new(
-            Styles::default(),
-            vec![
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
-            ],
-        ))
-        .with_row(Row::new(
-            Styles::default(),
-            vec![
-                Cell::from("SW"),
-                Cell::from(""),
-                Cell::from("S"),
-                Cell::from(""),
-                Cell::from("SE"),
-            ],
-        ))
+        .with_row(Row::default())
+        .with_row(Row::from(["SW", "", "S", "", "SE"]))
 }
 
 fn outer_headers() -> Table {
-    Table::default()
+    Table::with_styles(table_styles())
         .with_cols(vec![
-            Col::new(
-                Styles::default()
-                    .with(Header(true))
-                    .with(MinWidth(5))
-                    .with(HAlign::Centred),
-            ),
-            Col::new(Styles::default().with(MinWidth(5)).with(HAlign::Centred)),
-            Col::new(Styles::default().with(MinWidth(5)).with(HAlign::Centred)),
-            Col::new(Styles::default().with(MinWidth(5)).with(HAlign::Centred)),
-            Col::new(
-                Styles::default()
-                    .with(Header(true))
-                    .with(MinWidth(5))
-                    .with(HAlign::Centred),
-            ),
+            Col::new(Styles::default().with(Header(true))),
+            Col::default(),
+            Col::default(),
+            Col::default(),
+            Col::new(Styles::default().with(Header(true))),
         ])
         .with_row(Row::new(
             Styles::default().with(Header(true)),
@@ -183,36 +134,9 @@ fn outer_headers() -> Table {
                 Cell::from("NE"),
             ],
         ))
-        .with_row(Row::new(
-            Styles::default(),
-            vec![
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
-            ],
-        ))
-        .with_row(Row::new(
-            Styles::default(),
-            vec![
-                Cell::from("W"),
-                Cell::from(""),
-                Cell::from("C"),
-                Cell::from(""),
-                Cell::from("E"),
-            ],
-        ))
-        .with_row(Row::new(
-            Styles::default(),
-            vec![
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
-            ],
-        ))
+        .with_row(Row::default())
+        .with_row(Row::from(["W", "", "C", "", "E"]))
+        .with_row(Row::default())
         .with_row(Row::new(
             Styles::default().with(Header(true)),
             vec![
@@ -226,265 +150,86 @@ fn outer_headers() -> Table {
 }
 
 fn inner_row_separator() -> Table {
-    Table::default()
-        .with_cols(vec![
-            Col::new(Styles::default().with(MinWidth(5)).with(HAlign::Centred)),
-            Col::new(Styles::default().with(MinWidth(5)).with(HAlign::Centred)),
-            Col::new(Styles::default().with(MinWidth(5)).with(HAlign::Centred)),
-            Col::new(Styles::default().with(MinWidth(5)).with(HAlign::Centred)),
-            Col::new(Styles::default().with(MinWidth(5)).with(HAlign::Centred)),
-        ])
-        .with_row(Row::new(
-            Styles::default(),
-            vec![
-                Cell::from("NW"),
-                Cell::from(""),
-                Cell::from("N"),
-                Cell::from(""),
-                Cell::from("NE"),
-            ],
-        ))
-        .with_row(Row::new(
-            Styles::default(),
-            vec![
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
-            ],
-        ))
+    Table::with_styles(table_styles())
+        .with_row(Row::from(["NW", "", "N", "", "NE"]))
+        .with_row(Row::default())
         .with_row(Row::separator())
-        .with_row(Row::new(
-            Styles::default(),
-            vec![
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
-            ],
-        ))
-        .with_row(Row::new(
-            Styles::default(),
-            vec![
-                Cell::from("SW"),
-                Cell::from(""),
-                Cell::from("S"),
-                Cell::from(""),
-                Cell::from("SE"),
-            ],
-        ))
+        .with_row(Row::default())
+        .with_row(Row::from(["SW", "", "S", "", "SE"]))
 }
 
 fn inner_col_separator() -> Table {
-    Table::default()
+    Table::with_styles(table_styles())
         .with_cols(vec![
-            Col::new(Styles::default().with(MinWidth(5)).with(HAlign::Centred)),
-            Col::new(Styles::default().with(MinWidth(5)).with(HAlign::Centred)),
+            Col::default(),
+            Col::default(),
             Col::separator(5),
-            Col::new(Styles::default().with(MinWidth(5)).with(HAlign::Centred)),
-            Col::new(Styles::default().with(MinWidth(5)).with(HAlign::Centred)),
+            Col::default(),
+            Col::default(),
         ])
-        .with_row(Row::new(
-            Styles::default(),
-            vec![
-                Cell::from("NW"),
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from("NE"),
-            ],
-        ))
-        .with_row(Row::new(
-            Styles::default(),
-            vec![
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
-            ],
-        ))
-        .with_row(Row::new(
-            Styles::default(),
-            vec![
-                Cell::from("W"),
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from("E"),
-            ],
-        ))
-        .with_row(Row::new(
-            Styles::default(),
-            vec![
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
-            ],
-        ))
-        .with_row(Row::new(
-            Styles::default(),
-            vec![
-                Cell::from("SW"),
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from("SE"),
-            ],
-        ))
+        .with_row(Row::from(["NW", "", "", "", "NE"]))
+        .with_row(Row::default())
+        .with_row(Row::from(["W", "", "", "", "E"]))
+        .with_row(Row::default())
+        .with_row(Row::from(["SW", "", "", "", "SE"]))
 }
 
 fn cross_separators() -> Table {
-    Table::default()
+    Table::with_styles(table_styles())
         .with_cols(vec![
-            Col::new(Styles::default().with(MinWidth(5)).with(HAlign::Centred)),
-            Col::new(Styles::default().with(MinWidth(5)).with(HAlign::Centred)),
+            Col::default(),
+            Col::default(),
             Col::separator(5),
-            Col::new(Styles::default().with(MinWidth(5)).with(HAlign::Centred)),
-            Col::new(Styles::default().with(MinWidth(5)).with(HAlign::Centred)),
+            Col::default(),
+            Col::default(),
         ])
-        .with_row(Row::new(
-            Styles::default(),
-            vec![
-                Cell::from("NW"),
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from("NE"),
-            ],
-        ))
-        .with_row(Row::new(
-            Styles::default(),
-            vec![
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
-            ],
-        ))
+        .with_row(Row::from(["NW", "", "", "", "NE"]))
+        .with_row(Row::default())
         .with_row(Row::separator())
-        .with_row(Row::new(
-            Styles::default(),
-            vec![
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
-            ],
-        ))
-        .with_row(Row::new(
-            Styles::default(),
-            vec![
-                Cell::from("SW"),
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from("SE"),
-            ],
-        ))
+        .with_row(Row::default())
+        .with_row(Row::from(["SW", "", "", "", "SE"]))
 }
 
 fn window_separators() -> Table {
-    Table::default()
+    Table::with_styles(table_styles())
         .with_cols(vec![
             Col::separator(5),
-            Col::new(Styles::default().with(MinWidth(5)).with(HAlign::Centred)),
+            Col::default(),
             Col::separator(5),
-            Col::new(Styles::default().with(MinWidth(5)).with(HAlign::Centred)),
+            Col::default(),
             Col::separator(5),
         ])
         .with_row(Row::separator())
-        .with_row(Row::new(
-            Styles::default(),
-            vec![
-                Cell::from(""),
-                Cell::from("NW"),
-                Cell::from(""),
-                Cell::from("NE"),
-                Cell::from(""),
-            ],
-        ))
+        .with_row(Row::from(["", "NW", "", "NE", ""]))
         .with_row(Row::separator())
-        .with_row(Row::new(
-            Styles::default(),
-            vec![
-                Cell::from(""),
-                Cell::from("SW"),
-                Cell::from(""),
-                Cell::from("SE"),
-                Cell::from(""),
-            ],
-        ))
+        .with_row(Row::from(["", "SW", "", "SE", ""]))
         .with_row(Row::separator())
 }
 
 fn grid_separators() -> Table {
-    Table::default()
+    Table::with_styles(table_styles())
         .with_cols(vec![
-            Col::new(Styles::default().with(MinWidth(5)).with(HAlign::Centred)),
+            Col::default(),
             Col::separator(5),
-            Col::new(Styles::default().with(MinWidth(5)).with(HAlign::Centred)),
+            Col::default(),
             Col::separator(5),
-            Col::new(Styles::default().with(MinWidth(5)).with(HAlign::Centred)),
+            Col::default(),
         ])
-        .with_row(Row::new(
-            Styles::default(),
-            vec![
-                Cell::from("NW"),
-                Cell::from(""),
-                Cell::from("N"),
-                Cell::from(""),
-                Cell::from("NE"),
-            ],
-        ))
+        .with_row(Row::from(["NW", "", "N", "", "NE"]))
         .with_row(Row::separator())
-        .with_row(Row::new(
-            Styles::default(),
-            vec![
-                Cell::from("W"),
-                Cell::from(""),
-                Cell::from("C"),
-                Cell::from(""),
-                Cell::from("E"),
-            ],
-        ))
+        .with_row(Row::from(["W", "", "C", "", "E"]))
         .with_row(Row::separator())
-        .with_row(Row::new(
-            Styles::default(),
-            vec![
-                Cell::from("SW"),
-                Cell::from(""),
-                Cell::from("S"),
-                Cell::from(""),
-                Cell::from("SE"),
-            ],
-        ))
+        .with_row(Row::from(["SW", "", "S", "", "SE"]))
 }
 
 fn grid_separators_outer_headers() -> Table {
-    Table::default()
+    Table::with_styles(table_styles())
         .with_cols(vec![
-            Col::new(
-                Styles::default()
-                    .with(Header(true))
-                    .with(MinWidth(5))
-                    .with(HAlign::Centred),
-            ),
+            Col::new(Styles::default().with(Header(true))),
             Col::separator(5),
-            Col::new(Styles::default().with(MinWidth(5)).with(HAlign::Centred)),
+            Col::default(),
             Col::separator(5),
-            Col::new(
-                Styles::default()
-                    .with(Header(true))
-                    .with(MinWidth(5))
-                    .with(HAlign::Centred),
-            ),
+            Col::new(Styles::default().with(Header(true))),
         ])
         .with_row(Row::new(
             Styles::default().with(Header(true)),
@@ -497,16 +242,7 @@ fn grid_separators_outer_headers() -> Table {
             ],
         ))
         .with_row(Row::separator())
-        .with_row(Row::new(
-            Styles::default(),
-            vec![
-                Cell::from("W"),
-                Cell::from(""),
-                Cell::from("C"),
-                Cell::from(""),
-                Cell::from("E"),
-            ],
-        ))
+        .with_row(Row::from(["W", "", "C", "", "E"]))
         .with_row(Row::separator())
         .with_row(Row::new(
             Styles::default().with(Header(true)),
@@ -521,29 +257,15 @@ fn grid_separators_outer_headers() -> Table {
 }
 
 fn grid_seps_cross_headers() -> Table {
-    Table::default()
+    Table::with_styles(table_styles())
         .with_cols(vec![
-            Col::new(Styles::default().with(MinWidth(5)).with(HAlign::Centred)),
+            Col::default(),
             Col::separator(5),
-            Col::new(
-                Styles::default()
-                    .with(Header(true))
-                    .with(MinWidth(5))
-                    .with(HAlign::Centred),
-            ),
+            Col::new(Styles::default().with(Header(true))),
             Col::separator(5),
-            Col::new(Styles::default().with(MinWidth(5)).with(HAlign::Centred)),
+            Col::default(),
         ])
-        .with_row(Row::new(
-            Styles::default(),
-            vec![
-                Cell::from("NW"),
-                Cell::from(""),
-                Cell::from("N"),
-                Cell::from(""),
-                Cell::from("NE"),
-            ],
-        ))
+        .with_row(Row::from(["NW", "", "N", "", "NE"]))
         .with_row(Row::separator())
         .with_row(Row::new(
             Styles::default().with(Header(true)),
@@ -556,201 +278,64 @@ fn grid_seps_cross_headers() -> Table {
             ],
         ))
         .with_row(Row::separator())
-        .with_row(Row::new(
-            Styles::default(),
-            vec![
-                Cell::from("SW"),
-                Cell::from(""),
-                Cell::from("S"),
-                Cell::from(""),
-                Cell::from("SE"),
-            ],
-        ))
+        .with_row(Row::from(["SW", "", "S", "", "SE"]))
 }
 
 fn outer_row_separators() -> Table {
-    Table::default()
+    Table::with_styles(table_styles())
         .with_cols(vec![
-            Col::new(Styles::default().with(MinWidth(5)).with(HAlign::Centred)),
-            Col::new(Styles::default().with(MinWidth(5)).with(HAlign::Centred)),
-            Col::new(Styles::default().with(MinWidth(5)).with(HAlign::Centred)),
-            Col::new(Styles::default().with(MinWidth(5)).with(HAlign::Centred)),
-            Col::new(Styles::default().with(MinWidth(5)).with(HAlign::Centred)),
+            Col::default(),
+            Col::default(),
+            Col::default(),
+            Col::default(),
+            Col::default(),
         ])
         .with_row(Row::separator())
-        .with_row(Row::new(
-            Styles::default(),
-            vec![
-                Cell::from("WNW"),
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from("ENE"),
-            ],
-        ))
-        .with_row(Row::new(
-            Styles::default(),
-            vec![
-                Cell::from("WSW"),
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from("ESE"),
-            ],
-        ))
+        .with_row(Row::from(["WNW", "", "", "", "ENE"]))
+        .with_row(Row::from(["WSW", "", "", "", "ESE"]))
         .with_row(Row::separator())
 }
 
 fn outer_col_separators() -> Table {
-    Table::default()
+    Table::with_styles(table_styles())
         .with_cols(vec![
             Col::separator(5),
-            Col::new(Styles::default().with(MinWidth(5)).with(HAlign::Centred)),
-            Col::new(Styles::default().with(MinWidth(5)).with(HAlign::Centred)),
+            Col::default(),
+            Col::default(),
             Col::separator(5),
         ])
-        .with_row(Row::new(
-            Styles::default(),
-            vec![
-                Cell::from(""),
-                Cell::from("NNW"),
-                Cell::from("NNE"),
-                Cell::from(""),
-            ],
-        ))
-        .with_row(Row::new(
-            Styles::default(),
-            vec![
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
-            ],
-        ))
-        .with_row(Row::new(
-            Styles::default(),
-            vec![
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
-            ],
-        ))
-        .with_row(Row::new(
-            Styles::default(),
-            vec![
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
-            ],
-        ))
-        .with_row(Row::new(
-            Styles::default(),
-            vec![
-                Cell::from(""),
-                Cell::from("SSW"),
-                Cell::from("SSE"),
-                Cell::from(""),
-            ],
-        ))
+        .with_row(Row::from(["", "NNW", "NNE", ""]))
+        .with_row(Row::default())
+        .with_row(Row::default())
+        .with_row(Row::default())
+        .with_row(Row::from(["", "SSW", "SSE", ""]))
 }
 
 fn dual_row_separators() -> Table {
-    Table::default()
-        .with_cols(vec![
-            Col::new(Styles::default().with(MinWidth(5)).with(HAlign::Centred)),
-            Col::new(Styles::default().with(MinWidth(5)).with(HAlign::Centred)),
-            Col::new(Styles::default().with(MinWidth(5)).with(HAlign::Centred)),
-            Col::new(Styles::default().with(MinWidth(5)).with(HAlign::Centred)),
-            Col::new(Styles::default().with(MinWidth(5)).with(HAlign::Centred)),
-        ])
-        .with_row(Row::new(
-            Styles::default(),
-            vec![
-                Cell::from("NW"),
-                Cell::from(""),
-                Cell::from("N"),
-                Cell::from(""),
-                Cell::from("NE"),
-            ],
-        ))
+    Table::with_styles(table_styles())
+        .with_row(Row::from(["NW", "", "N", "", "NE"]))
         .with_row(Row::separator())
         .with_row(Row::separator())
-        .with_row(Row::new(
-            Styles::default(),
-            vec![
-                Cell::from("SW"),
-                Cell::from(""),
-                Cell::from("S"),
-                Cell::from(""),
-                Cell::from("SE"),
-            ],
-        ))
+        .with_row(Row::from(["SW", "", "S", "", "SE"]))
 }
 
 fn dual_col_separators() -> Table {
-    Table::default()
+    Table::with_styles(table_styles())
         .with_cols(vec![
-            Col::new(Styles::default().with(MinWidth(5)).with(HAlign::Centred)),
+            Col::default(),
             Col::separator(5),
             Col::separator(5),
-            Col::new(Styles::default().with(MinWidth(5)).with(HAlign::Centred)),
+            Col::default(),
         ])
-        .with_row(Row::new(
-            Styles::default(),
-            vec![
-                Cell::from("NW"),
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from("NE"),
-            ],
-        ))
-        .with_row(Row::new(
-            Styles::default(),
-            vec![
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
-            ],
-        ))
-        .with_row(Row::new(
-            Styles::default(),
-            vec![
-                Cell::from("W"),
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from("E"),
-            ],
-        ))
-        .with_row(Row::new(
-            Styles::default(),
-            vec![
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from(""),
-            ],
-        ))
-        .with_row(Row::new(
-            Styles::default(),
-            vec![
-                Cell::from("SW"),
-                Cell::from(""),
-                Cell::from(""),
-                Cell::from("SE"),
-            ],
-        ))
+        .with_row(Row::from(["NW", "", "", "NE"]))
+        .with_row(Row::default())
+        .with_row(Row::from(["W", "", "", "E"]))
+        .with_row(Row::default())
+        .with_row(Row::from(["SW", "", "", "EE"]))
 }
 
 fn single_row() -> Table {
-    Table::default()
-        .with_cols(vec![
-            Col::new(Styles::default().with(MinWidth(5)).with(HAlign::Centred)),
-            Col::new(Styles::default().with(MinWidth(5)).with(HAlign::Centred)),
-            Col::new(Styles::default().with(MinWidth(5)).with(HAlign::Centred)),
-        ])
+    Table::with_styles(table_styles())
         .with_row(Row::new(
             Styles::default(),
             vec![Cell::from("x"), Cell::from("y"), Cell::from("z")],
@@ -758,67 +343,58 @@ fn single_row() -> Table {
 }
 
 fn single_col() -> Table {
-    Table::default()
-        .with_cols(vec![Col::new(
-            Styles::default().with(MinWidth(5)).with(HAlign::Centred),
-        )])
-        .with_row(Row::new(Styles::default(), vec![Cell::from("x")]))
-        .with_row(Row::new(Styles::default(), vec![Cell::from("y")]))
-        .with_row(Row::new(Styles::default(), vec![Cell::from("z")]))
+    Table::with_styles(table_styles())
+        .with_row(Row::from(["x"]))
+        .with_row(Row::from(["y"]))
+        .with_row(Row::from(["z"]))
 }
 
 fn single_row_separator() -> Table {
-    Table::default()
+    Table::with_styles(table_styles())
         .with_cols(vec![
-            Col::new(Styles::default().with(MinWidth(5)).with(HAlign::Centred)),
-            Col::new(Styles::default().with(MinWidth(5)).with(HAlign::Centred)),
-            Col::new(Styles::default().with(MinWidth(5)).with(HAlign::Centred)),
+            Col::default(),
+            Col::default(),
+            Col::default(),
         ])
         .with_row(Row::separator())
 }
 
 fn single_col_separator() -> Table {
-    Table::default()
+    Table::with_styles(table_styles())
         .with_cols(vec![Col::separator(5)])
-        .with_row(Row::new(Styles::default(), vec![Cell::from("")]))
-        .with_row(Row::new(Styles::default(), vec![Cell::from("")]))
-        .with_row(Row::new(Styles::default(), vec![Cell::from("")]))
+        .with_row(Row::default())
+        .with_row(Row::default())
+        .with_row(Row::default())
 }
 
 fn two_by_two_up() -> Table {
-    Table::default()
+    Table::with_styles(table_styles())
         .with_cols(vec![Col::separator(5), Col::separator(5)])
-        .with_row(Row::new(
-            Styles::default().with(HAlign::Centred),
-            vec![Cell::from("NW"), Cell::from("NE")],
-        ))
+        .with_row(Row::from(["NW", "NE"]))
         .with_row(Row::separator())
 }
 
 fn two_by_two_right() -> Table {
-    Table::default()
+    Table::with_styles(table_styles())
         .with_cols(vec![
             Col::separator(5),
-            Col::new(Styles::default().with(MinWidth(5))),
+            Col::default(),
         ])
         .with_row(Row::separator())
         .with_row(Row::separator())
 }
 
 fn two_by_two_down() -> Table {
-    Table::default()
+    Table::with_styles(table_styles())
         .with_cols(vec![Col::separator(5), Col::separator(5)])
         .with_row(Row::separator())
-        .with_row(Row::new(
-            Styles::default().with(HAlign::Centred),
-            vec![Cell::from("SW"), Cell::from("SE")],
-        ))
+        .with_row(Row::from(["SW", "SE"]))
 }
 
 fn two_by_two_left() -> Table {
-    Table::default()
+    Table::with_styles(table_styles())
         .with_cols(vec![
-            Col::new(Styles::default().with(MinWidth(5))),
+            Col::default(),
             Col::separator(5),
         ])
         .with_row(Row::separator())

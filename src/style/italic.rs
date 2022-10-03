@@ -12,7 +12,7 @@ impl Style for Italic {
 impl<'a> From<&'a StyleKind> for Option<&'a Italic> {
     fn from(kind: &'a StyleKind) -> Self {
         match kind {
-            StyleKind::Italic(style) => Some(style),
+            StyleKind::__Italic(style) => Some(style),
             _ => None,
         }
     }
@@ -20,6 +20,6 @@ impl<'a> From<&'a StyleKind> for Option<&'a Italic> {
 
 impl From<Italic> for StyleKind {
     fn from(style: Italic) -> Self {
-        StyleKind::Italic(style)
+        StyleKind::__Italic(style)
     }
 }

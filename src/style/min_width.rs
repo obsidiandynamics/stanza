@@ -12,7 +12,7 @@ impl Style for MinWidth {
 impl<'a> From<&'a StyleKind> for Option<&'a MinWidth> {
     fn from(kind: &'a StyleKind) -> Self {
         match kind {
-            StyleKind::MinWidth(style) => Some(style),
+            StyleKind::__MinWidth(style) => Some(style),
             _ => None,
         }
     }
@@ -20,6 +20,6 @@ impl<'a> From<&'a StyleKind> for Option<&'a MinWidth> {
 
 impl From<MinWidth> for StyleKind {
     fn from(style: MinWidth) -> Self {
-        StyleKind::MinWidth(style)
+        StyleKind::__MinWidth(style)
     }
 }

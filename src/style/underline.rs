@@ -12,7 +12,7 @@ impl Style for Underline {
 impl<'a> From<&'a StyleKind> for Option<&'a Underline> {
     fn from(kind: &'a StyleKind) -> Self {
         match kind {
-            StyleKind::Underline(style) => Some(style),
+            StyleKind::__Underline(style) => Some(style),
             _ => None,
         }
     }
@@ -20,6 +20,6 @@ impl<'a> From<&'a StyleKind> for Option<&'a Underline> {
 
 impl From<Underline> for StyleKind {
     fn from(style: Underline) -> Self {
-        StyleKind::Underline(style)
+        StyleKind::__Underline(style)
     }
 }

@@ -12,7 +12,7 @@ impl Style for BorderBg {
 impl<'a> From<&'a StyleKind> for Option<&'a BorderBg> {
     fn from(kind: &'a StyleKind) -> Self {
         match kind {
-            StyleKind::BorderBg(style) => Some(style),
+            StyleKind::__BorderBg(style) => Some(style),
             _ => None,
         }
     }
@@ -20,6 +20,6 @@ impl<'a> From<&'a StyleKind> for Option<&'a BorderBg> {
 
 impl From<BorderBg> for StyleKind {
     fn from(style: BorderBg) -> Self {
-        StyleKind::BorderBg(style)
+        StyleKind::__BorderBg(style)
     }
 }

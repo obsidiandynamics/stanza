@@ -12,7 +12,7 @@ impl Style for Bold {
 impl<'a> From<&'a StyleKind> for Option<&'a Bold> {
     fn from(kind: &'a StyleKind) -> Self {
         match kind {
-            StyleKind::Bold(style) => Some(style),
+            StyleKind::__Bold(style) => Some(style),
             _ => None,
         }
     }
@@ -20,6 +20,6 @@ impl<'a> From<&'a StyleKind> for Option<&'a Bold> {
 
 impl From<Bold> for StyleKind {
     fn from(style: Bold) -> Self {
-        StyleKind::Bold(style)
+        StyleKind::__Bold(style)
     }
 }

@@ -12,7 +12,7 @@ impl Style for Strikethrough {
 impl<'a> From<&'a StyleKind> for Option<&'a Strikethrough> {
     fn from(kind: &'a StyleKind) -> Self {
         match kind {
-            StyleKind::Strikethrough(style) => Some(style),
+            StyleKind::__Strikethrough(style) => Some(style),
             _ => None,
         }
     }
@@ -20,6 +20,6 @@ impl<'a> From<&'a StyleKind> for Option<&'a Strikethrough> {
 
 impl From<Strikethrough> for StyleKind {
     fn from(style: Strikethrough) -> Self {
-        StyleKind::Strikethrough(style)
+        StyleKind::__Strikethrough(style)
     }
 }

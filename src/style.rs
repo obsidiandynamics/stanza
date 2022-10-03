@@ -73,21 +73,21 @@ where
 #[derive(Debug, Clone)]
 #[allow(clippy::module_name_repetitions)]
 pub enum StyleKind {
-    Blink(Blink),
-    Bold(Bold),
-    BorderBg(BorderBg),
-    BorderFg(BorderFg),
-    FillBg(FillBg),
-    HAlign(HAlign),
-    Header(Header),
-    Italic(Italic),
-    MaxWidth(MaxWidth),
-    MinWidth(MinWidth),
-    Separator(Separator),
-    Strikethrough(Strikethrough),
-    TextFg(TextFg),
-    TextBg(TextBg),
-    Underline(Underline),
+    __Blink(Blink),
+    __Bold(Bold),
+    __BorderBg(BorderBg),
+    __BorderFg(BorderFg),
+    __FillBg(FillBg),
+    __HAlign(HAlign),
+    __Header(Header),
+    __Italic(Italic),
+    __MaxWidth(MaxWidth),
+    __MinWidth(MinWidth),
+    __Separator(Separator),
+    __Strikethrough(Strikethrough),
+    __TextFg(TextFg),
+    __TextBg(TextBg),
+    __Underline(Underline),
 }
 
 impl StyleKind {
@@ -101,21 +101,21 @@ impl StyleKind {
 
     fn statics(&self) -> Statics {
         match self {
-            StyleKind::Blink(_) => Statics::capture::<Blink>(),
-            StyleKind::Bold(_) => Statics::capture::<Bold>(),
-            StyleKind::BorderBg(_) => Statics::capture::<BorderBg>(),
-            StyleKind::BorderFg(_) => Statics::capture::<BorderFg>(),
-            StyleKind::FillBg(_) => Statics::capture::<FillBg>(),
-            StyleKind::HAlign(_) => Statics::capture::<HAlign>(),
-            StyleKind::Header(_) => Statics::capture::<Header>(),
-            StyleKind::Italic(_) => Statics::capture::<Italic>(),
-            StyleKind::MaxWidth(_) => Statics::capture::<MaxWidth>(),
-            StyleKind::MinWidth(_) => Statics::capture::<MinWidth>(),
-            StyleKind::Separator(_) => Statics::capture::<Separator>(),
-            StyleKind::Strikethrough(_) => Statics::capture::<Strikethrough>(),
-            StyleKind::TextBg(_) => Statics::capture::<TextBg>(),
-            StyleKind::TextFg(_) => Statics::capture::<TextFg>(),
-            StyleKind::Underline(_) => Statics::capture::<Underline>(),
+            StyleKind::__Blink(_) => Statics::capture::<Blink>(),
+            StyleKind::__Bold(_) => Statics::capture::<Bold>(),
+            StyleKind::__BorderBg(_) => Statics::capture::<BorderBg>(),
+            StyleKind::__BorderFg(_) => Statics::capture::<BorderFg>(),
+            StyleKind::__FillBg(_) => Statics::capture::<FillBg>(),
+            StyleKind::__HAlign(_) => Statics::capture::<HAlign>(),
+            StyleKind::__Header(_) => Statics::capture::<Header>(),
+            StyleKind::__Italic(_) => Statics::capture::<Italic>(),
+            StyleKind::__MaxWidth(_) => Statics::capture::<MaxWidth>(),
+            StyleKind::__MinWidth(_) => Statics::capture::<MinWidth>(),
+            StyleKind::__Separator(_) => Statics::capture::<Separator>(),
+            StyleKind::__Strikethrough(_) => Statics::capture::<Strikethrough>(),
+            StyleKind::__TextBg(_) => Statics::capture::<TextBg>(),
+            StyleKind::__TextFg(_) => Statics::capture::<TextFg>(),
+            StyleKind::__Underline(_) => Statics::capture::<Underline>(),
         }
     }
 }

@@ -12,7 +12,7 @@ impl Style for Header {
 impl<'a> From<&'a StyleKind> for Option<&'a Header> {
     fn from(kind: &'a StyleKind) -> Self {
         match kind {
-            StyleKind::Header(style) => Some(style),
+            StyleKind::__Header(style) => Some(style),
             _ => None,
         }
     }
@@ -20,6 +20,6 @@ impl<'a> From<&'a StyleKind> for Option<&'a Header> {
 
 impl From<Header> for StyleKind {
     fn from(style: Header) -> Self {
-        StyleKind::Header(style)
+        StyleKind::__Header(style)
     }
 }

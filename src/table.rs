@@ -158,6 +158,13 @@ impl Row {
         Self(styles, cells)
     }
 
+    // #[must_use]
+    // pub fn with_styles(mut self, styles: Styles) -> Self {
+    //     styles.assert_assignability::<Self>(|assignability| assignability.at_row());
+    //     self.0 = styles;
+    //     self
+    // }
+
     pub fn separator() -> Self {
         Self(Styles::default().with(Separator(true)), vec![])
     }

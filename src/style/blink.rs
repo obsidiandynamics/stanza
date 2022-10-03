@@ -12,7 +12,7 @@ impl Style for Blink {
 impl<'a> From<&'a StyleKind> for Option<&'a Blink> {
     fn from(kind: &'a StyleKind) -> Self {
         match kind {
-            StyleKind::Blink(style) => Some(style),
+            StyleKind::__Blink(style) => Some(style),
             _ => None,
         }
     }
@@ -20,6 +20,6 @@ impl<'a> From<&'a StyleKind> for Option<&'a Blink> {
 
 impl From<Blink> for StyleKind {
     fn from(style: Blink) -> Self {
-        StyleKind::Blink(style)
+        StyleKind::__Blink(style)
     }
 }

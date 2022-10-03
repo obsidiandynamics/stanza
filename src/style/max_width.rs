@@ -18,7 +18,7 @@ impl Style for MaxWidth {
 impl<'a> From<&'a StyleKind> for Option<&'a MaxWidth> {
     fn from(kind: &'a StyleKind) -> Self {
         match kind {
-            StyleKind::MaxWidth(style) => Some(style),
+            StyleKind::__MaxWidth(style) => Some(style),
             _ => None,
         }
     }
@@ -26,6 +26,6 @@ impl<'a> From<&'a StyleKind> for Option<&'a MaxWidth> {
 
 impl From<MaxWidth> for StyleKind {
     fn from(style: MaxWidth) -> Self {
-        StyleKind::MaxWidth(style)
+        StyleKind::__MaxWidth(style)
     }
 }

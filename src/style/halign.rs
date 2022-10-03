@@ -22,7 +22,7 @@ impl Style for HAlign {
 impl<'a> From<&'a StyleKind> for Option<&'a HAlign> {
     fn from(kind: &'a StyleKind) -> Self {
         match kind {
-            StyleKind::HAlign(style) => Some(style),
+            StyleKind::__HAlign(style) => Some(style),
             _ => None,
         }
     }
@@ -30,6 +30,6 @@ impl<'a> From<&'a StyleKind> for Option<&'a HAlign> {
 
 impl From<HAlign> for StyleKind {
     fn from(style: HAlign) -> Self {
-        StyleKind::HAlign(style)
+        StyleKind::__HAlign(style)
     }
 }

@@ -12,7 +12,7 @@ impl Style for FillBg {
 impl<'a> From<&'a StyleKind> for Option<&'a FillBg> {
     fn from(kind: &'a StyleKind) -> Self {
         match kind {
-            StyleKind::FillBg(style) => Some(style),
+            StyleKind::__FillBg(style) => Some(style),
             _ => None,
         }
     }
@@ -20,6 +20,6 @@ impl<'a> From<&'a StyleKind> for Option<&'a FillBg> {
 
 impl From<FillBg> for StyleKind {
     fn from(style: FillBg) -> Self {
-        StyleKind::FillBg(style)
+        StyleKind::__FillBg(style)
     }
 }

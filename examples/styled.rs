@@ -13,8 +13,8 @@ fn main() {
             Styles::default().with(Header(true)),
             vec![Cell::from("Department"), Cell::from("Budget")],
         ))
-        .with_row(vec!["Sales", "90000"])
-        .with_row(vec!["Engineering", "270000"]);
+        .with_row(["Sales", "90000"])
+        .with_row(["Engineering", "270000"]);
 
     let renderer = Console::default();
     println!("{}", renderer.render(&table, &[]));

@@ -39,9 +39,9 @@ use stanza::table::Table;
 
 // build a table model
 let table = Table::default()
-    .with_row(vec!["Department", "Budget"])
-    .with_row(vec!["Sales", "90000"])
-    .with_row(vec!["Engineering", "270000"]);
+    .with_row(["Department", "Budget"])
+    .with_row(["Sales", "90000"])
+    .with_row(["Engineering", "270000"]);
 
 // configure a renderer that will later turn the model into a string
 let renderer = Console::default();
@@ -120,8 +120,8 @@ let table = Table::default()
         Styles::default().with(Header(true)),
         vec![Cell::from("Department"), Cell::from("Budget")],
     ))
-    .with_row(vec!["Sales", "90000"])
-    .with_row(vec!["Engineering", "270000"]);
+    .with_row(["Sales", "90000"])
+    .with_row(["Engineering", "270000"]);
 
 let renderer = Console::default();
 println!("{}", renderer.render(&table, &[]));
@@ -227,20 +227,14 @@ let table = Table::default()
         Styles::default().with(Header(true)),
         vec![Cell::from("Poem"), Cell::from("Extract")],
     ))
-    .with_row(Row::new(
-        Styles::default(),
-        vec![
-            Cell::from("Antigonish"), 
-            Cell::from("Yesterday, upon the stair, I met a man who wasn't there! He wasn't there again today, Oh how I wish he'd go away!")
-        ]
-    ))
-    .with_row(Row::new(
-        Styles::default(),
-        vec![
-            Cell::from("The Raven"), 
-            Cell::from("Ah, distinctly I remember it was in the bleak December; And each separate dying ember wrought its ghost upon the floor.")
-        ]
-    ));
+    .with_row(Row::from([
+        "Antigonish",
+        "Yesterday, upon the stair, I met a man who wasn't there! He wasn't there again today, Oh how I wish he'd go away!"
+    ]))
+    .with_row(Row::from([
+        "The Raven",
+        "Ah, distinctly I remember it was in the bleak December; And each separate dying ember wrought its ghost upon the floor."
+    ]));
 
 println!("{}", Console::default().render(&table, &[]));
 ```
@@ -347,8 +341,6 @@ table.push_row(build_header_row());
 println!("{}", Console::default().render(&table, &[]));
 ```
 
-The handling of row and column headers is entirely renderer-specific. `Markdown`, for example, supports at most one header row, being the first row in the table. It nonetheless renders the content correctly, albeit not as nicely as `Console`:
-
 ```html
 ╔═════╦═════╤═════╤═════╤═════╤═════╤═════╦═════╗
 ║     ║    1│    2│    3│    4│    5│    6║     ║
@@ -369,6 +361,9 @@ The handling of row and column headers is entirely renderer-specific. `Markdown`
 ╚═════╩═════╧═════╧═════╧═════╧═════╧═════╩═════╝
 ```
 
+The handling of row and column headers is entirely renderer-specific. `Markdown`, for example, supports at most one header row, being the first row in the table. It nonetheless renders the content correctly, albeit not as nicely as `Console`.
+
+
 ```html
 |     |    1|    2|    3|    4|    5|    6|     |
 |----:|----:|----:|----:|----:|----:|----:|----:|
@@ -382,4 +377,4 @@ The handling of row and column headers is entirely renderer-specific. `Markdown`
 ```
 
 ## Separators
-
+Separators are a means of subdividing a table into logical sections. There could be multiple such sections, and the division might be horizontal, vertical, or both. A separator is created by either assigning a `Separator` style to a `Row` or `Col`, or instantiating the `Row`/`Col` using the `separator()` convenience method. The latter is generally preferred due to brevity; the former allows you to specify additional styles for added flexibility.

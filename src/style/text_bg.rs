@@ -12,7 +12,7 @@ impl Style for TextBg {
 impl<'a> From<&'a StyleKind> for Option<&'a TextBg> {
     fn from(kind: &'a StyleKind) -> Self {
         match kind {
-            StyleKind::TextBg(style) => Some(style),
+            StyleKind::__TextBg(style) => Some(style),
             _ => None,
         }
     }
@@ -20,6 +20,6 @@ impl<'a> From<&'a StyleKind> for Option<&'a TextBg> {
 
 impl From<TextBg> for StyleKind {
     fn from(style: TextBg) -> Self {
-        StyleKind::TextBg(style)
+        StyleKind::__TextBg(style)
     }
 }

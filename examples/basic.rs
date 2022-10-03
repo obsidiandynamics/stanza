@@ -11,9 +11,9 @@ fn main() {
 fn basic_minimalistic() {
     // build a table model
     let table = Table::default()
-        .with_row(vec!["Department", "Budget"])
-        .with_row(vec!["Sales", "90000"])
-        .with_row(vec!["Engineering", "270000"]);
+        .with_row(["Department", "Budget"])
+        .with_row(["Sales", "90000"])
+        .with_row(["Engineering", "270000"]);
 
     // configure a renderer that will later turn the model into a string
     let renderer = Console::default();
