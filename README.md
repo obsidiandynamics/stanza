@@ -7,7 +7,7 @@ An abstract table model written in Rust, with customisable text formatting and r
 [![codecov](https://img.shields.io/codecov/c/github/obsidiandynamics/stanza/master?style=flat-square&logo=codecov)](https://codecov.io/gh/obsidiandynamics/stanza)
 ![no_std](https://img.shields.io/badge/linking-no__std-9cf?style=flat-square)
 
-![Screenshot](https://github.com/obsidiandynamics/stanza/images/fancy.gif)
+![Screenshot](https://github.com/obsidiandynamics/stanza/blob/master/images/fancy.gif?raw=true)
 
 # Why Stanza
 * **Feature-complete**: Stanza supports a broad range of styling features — various text formatting controls, foreground/background/fill colours, border styles, multiple horizontal and vertical headers and separators, and even nested tables, to name a few.
