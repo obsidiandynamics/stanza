@@ -28,5 +28,5 @@ fn main() {
     thread::sleep(Duration::from_secs(2));
 
     // render the table
-    println!("{}", Console::default().render(&table, &[]));
+    println!("{}", Console::default().render(&table));
 }

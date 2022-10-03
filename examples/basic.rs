@@ -19,7 +19,7 @@ fn basic_minimalistic() {
     let renderer = Console::default();
 
     // render the table, outputting to stdout
-    println!("{}", renderer.render(&table, &[]));
+    println!("{}", renderer.render(&table));
 }
 
 fn basic_expanded() {
@@ -57,5 +57,5 @@ fn basic_expanded() {
         ));
 
     let renderer = Console::default();
-    println!("{}", renderer.render(&table, &[]));
+    println!("{}", renderer.render(&table));
 }

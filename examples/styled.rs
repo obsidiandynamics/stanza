@@ -17,5 +17,5 @@ fn main() {
         .with_row(["Engineering", "270000"]);
 
     let renderer = Console::default();
-    println!("{}", renderer.render(&table, &[]));
+    println!("{}", renderer.render(&table));
 }

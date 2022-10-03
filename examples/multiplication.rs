@@ -50,5 +50,5 @@ fn main() {
     table.push_rows(build_body_rows());
     table.push_row(build_header_row());
 
-    println!("{}", Console::default().render(&table, &[]));
+    println!("{}", Console::default().render(&table));
 }

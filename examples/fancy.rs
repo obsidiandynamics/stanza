@@ -130,8 +130,8 @@ fn main() {
             ),
         ],
     ));
-    println!("{}", Console::default().render(&table, &[]));
-    println!("{}", Markdown::default().render(&table, &[]));
+    println!("{}", Console::default().render(&table));
+    println!("{}", Markdown::default().render(&table));
 }
 
 fn nested_table() -> Table {

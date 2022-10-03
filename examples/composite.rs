@@ -34,5 +34,5 @@ fn main() {
             ],
         ));
 
-    println!("{}", Console::default().render(&table, &[]));
+    println!("{}", Console::default().render(&table));
 }

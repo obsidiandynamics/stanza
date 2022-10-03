@@ -30,5 +30,5 @@ fn main() {
         .with_row([" ", " ", " ", "", "4", "1", "9", "", " ", " ", "5"])
         .with_row([" ", " ", " ", "", " ", "8", " ", "", " ", "7", "9"]);
 
-    println!("{}", Console::default().render(&table, &[]));
+    println!("{}", Console::default().render(&table));
 }

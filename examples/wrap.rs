@@ -22,5 +22,5 @@ fn main() {
             "Ah, distinctly I remember it was in the bleak December;\nAnd each separate dying ember wrought its ghost upon the floor."
         ]));
 
-    println!("{}", Console::default().render(&table, &[]));
+    println!("{}", Console::default().render(&table));
 }

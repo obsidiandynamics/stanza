@@ -47,7 +47,7 @@ let table = Table::default()
 let renderer = Console::default();
 
 // render the table, outputting to stdout
-println!("{}", renderer.render(&table, &[]));
+println!("{}", renderer.render(&table));
 ```
 
 The resulting output:
@@ -65,8 +65,6 @@ One can clearly appreciate that the printing of a table is split into two distin
 
 1. Building the table model.
 2. Invoking a renderer on the model to produce the output.
-
-The `render()` method takes an immutable reference to the `Table` and a slice of `Hint`s. Hints offer advanced control over the renderer's behaviour. Generally, you'll only ever need `&[]`; i.e., no hints — the render will correctly produce the output on its own.
 
 Not bad for a half-dozen lines. We used all the concepts above without specifying them explicitly. For example, we didn't refer to `Col`, `Cell` or `Content` types at all. Stanza offers a highly abridged syntax for building tables where the additional flexibility mightn't be needed. Still, it's worth understanding what happens under the hood. The exact same table model can be produced using the _fully explicit syntax_ below.
 
@@ -131,7 +129,7 @@ let table = Table::default()
     .with_row(["Engineering", "270000"]);
 
 let renderer = Console::default();
-println!("{}", renderer.render(&table, &[]));
+println!("{}", renderer.render(&table));
 ```
 
 ```html
@@ -243,7 +241,7 @@ let table = Table::default()
         "Ah, distinctly I remember it was in the bleak December; And each separate dying ember wrought its ghost upon the floor."
     ]));
 
-println!("{}", Console::default().render(&table, &[]));
+println!("{}", Console::default().render(&table));
 ```
 
 ```html
@@ -345,7 +343,7 @@ table.push_row(build_header_row());
 table.push_rows(build_body_rows());
 table.push_row(build_header_row());
 
-println!("{}", Console::default().render(&table, &[]));
+println!("{}", Console::default().render(&table));
 ```
 
 ```html
@@ -418,7 +416,7 @@ let table = Table::with_styles(Styles::default().with(MinWidth(3)).with(HAlign::
     .with_row([" ", " ", " ", "", "4", "1", "9", "", " ", " ", "5"])
     .with_row([" ", " ", " ", "", " ", "8", " ", "", " ", "7", "9"]);
 
-println!("{}", Console::default().render(&table, &[]));
+println!("{}", Console::default().render(&table));
 ```
 
 ```html
@@ -484,7 +482,7 @@ let table = Table::default()
 thread::sleep(Duration::from_secs(2));
 
 // render the table
-println!("{}", Console::default().render(&table, &[]));
+println!("{}", Console::default().render(&table));
 ```
 
 ```html
@@ -527,7 +525,7 @@ let table = Table::with_styles(Styles::default().with(HAlign::Centred))
     ]));
 
 
-println!("{}", Console::default().render(&table, &[]));
+println!("{}", Console::default().render(&table));
 ```
 
 ```html
@@ -587,7 +585,7 @@ let table = Table::with_styles(Styles::default().with(HAlign::Centred))
         ],
     ));
 
-println!("{}", Console::default().render(&table, &[]));
+println!("{}", Console::default().render(&table));
 ```
 
 ```html
@@ -602,3 +600,6 @@ println!("{}", Console::default().render(&table, &[]));
 ║            │     │╚════╧══════╝║
 ╚════════════╧═════╧═════════════╝
 ```
+
+## Advanced rendering
+The `render()` method takes an immutable reference to the `Table` and a slice of `Hint`s. Hints offer advanced control over the renderer's behaviour. Generally, you'll only ever need `&[]`; i.e., no hints — the render will correctly produce the output on its own.

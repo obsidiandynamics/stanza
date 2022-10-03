@@ -15,7 +15,12 @@ pub const NEWLINE: &str = "\n";
 pub trait Renderer {
     type Output: Display;
 
-    fn render(&self, table: &Table, hints: &[RenderHint]) -> Self::Output;
+    #[inline]
+    fn render(&self, table: &Table) -> Self::Output {
+        self.render_with_hints(table, &[])
+    }
+
+    fn render_with_hints(&self, table: &Table, hints: &[RenderHint]) -> Self::Output;
 }
 
 #[derive(PartialEq, Eq)]
@@ -29,7 +34,7 @@ impl Content {
             Content::Label(s) => Cow::Borrowed(s),
             Content::Computed(f) => Cow::Owned(f()),
             Content::Nested(table) => {
-                Cow::Owned(format!("{}", renderer.render(table, &[RenderHint::Nested])))
+                Cow::Owned(format!("{}", renderer.render_with_hints(table, &[RenderHint::Nested])))
             }
             Content::Composite(contents) => {
                 let mut buf = String::new();
