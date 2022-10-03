@@ -1,7 +1,7 @@
 use stanza::renderer::console::Console;
 use stanza::renderer::Renderer;
 use stanza::style::{HAlign, Header, MinWidth, Styles};
-use stanza::table::{Cell, Col, Row, Table};
+use stanza::table::{Col, Row, Table};
 
 fn main() {
     let table = Table::default()
@@ -11,7 +11,7 @@ fn main() {
         ])
         .with_row(Row::new(
             Styles::default().with(Header(true)),
-            vec![Cell::from("Department"), Cell::from("Budget")],
+            vec!["Department".into(), "Budget".into()],
         ))
         .with_row(["Sales", "90000"])
         .with_row(["Engineering", "270000"]);

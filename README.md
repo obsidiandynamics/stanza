@@ -61,7 +61,7 @@ The resulting output:
 ╚═══════════╧══════╝
 ```
 
-Not bad for a half-dozen of lines. We used all the concepts above without specifying them explicitly. For example, we didn't refer to `Col`, `Cell` or `Content` types at all. Stanza offers a highly abridged syntax for building tables where the additional flexibility mightn't be needed. Still, it's worth understanding what happens under the hood. The exact same table model can be produced using the _fully explicit syntax_ below.
+Not bad for a half-dozen lines. We used all the concepts above without specifying them explicitly. For example, we didn't refer to `Col`, `Cell` or `Content` types at all. Stanza offers a highly abridged syntax for building tables where the additional flexibility mightn't be needed. Still, it's worth understanding what happens under the hood. The exact same table model can be produced using the _fully explicit syntax_ below.
 
 ```rust
 use stanza::style::Styles;
@@ -118,7 +118,7 @@ let table = Table::default()
     ])
     .with_row(Row::new(
         Styles::default().with(Header(true)),
-        vec![Cell::from("Department"), Cell::from("Budget")],
+        vec!["Department".into(), "Budget".into()],
     ))
     .with_row(["Sales", "90000"])
     .with_row(["Engineering", "270000"]);
@@ -438,4 +438,52 @@ println!("{}", Console::default().render(&table, &[]));
 ╟───┼───┼───┤   ├───┼───┼───┤   ├───┼───┼───╢
 ║   │   │   │   │   │ 8 │   │   │   │ 7 │ 9 ║
 ╚═══╧═══╧═══╧═══╧═══╧═══╧═══╧═══╧═══╧═══╧═══╝
+```
+
+## Dynamic content
+The data we've been tabulating thus far has been determined at the point of `Table` creation, using `Content::Label` under the hood. More often than not, the table model is built as the last step in some process, once all the necessary data is available, and is rendered immediately thereafter.
+
+There is another way, wherein the table model is used purely as a placeholder layout, with maybe a handful of static labels (e.g., headers). The rest of the data can be computed at the point of rendering. This "late bound" approach is made possible by `Content::Computed`.
+
+The following example shows the difference between an early-bound cell value and a late-bound one. The value in the bottom-left cell is taken by calling `current_time()` at model build-time. The bottom-right cell uses `Content::Computed` to embed a closure, which is evaluated when `render()` is called. The example purposely injects a 2-second wait time so that the two values differ.
+
+```rust
+use std::thread;
+use std::time::Duration;
+use stanza::renderer::console::Console;
+use stanza::renderer::Renderer;
+use stanza::style::{Header, Styles};
+use stanza::table::{Content, Row, Table};
+
+fn current_time() -> String {
+    chrono::Utc::now().format("%Y-%m-%d %H:%M:%S").to_string()
+}
+
+// build the table model
+let table = Table::default()
+    .with_row(Row::new(
+        Styles::default().with(Header(true)),
+        vec!["Early-bound".into(), "Late-bound".into()],
+    ))
+    .with_row(Row::new(
+        Styles::default(),
+        vec![
+            current_time().into(),
+            Content::Computed(Box::new(current_time)).into(),
+        ],
+    ));
+
+// wait a little
+thread::sleep(Duration::from_secs(2));
+
+// render the table
+println!("{}", Console::default().render(&table, &[]));
+```
+
+```html
+╔═══════════════════╤═══════════════════╗
+║Early-bound        │Late-bound         ║
+╠═══════════════════╪═══════════════════╣
+║2022-10-03 07:13:56│2022-10-03 07:13:58║
+╚═══════════════════╧═══════════════════╝
 ```
