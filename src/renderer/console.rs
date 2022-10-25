@@ -43,7 +43,8 @@ pub struct Decor {
     pub down_norm: char,
     pub left_norm: char,
     pub print_escape_codes: bool,
-    pub draw_outer_border: bool
+    pub draw_outer_border: bool,
+    pub draw_inner_horizontal_border: bool
 }
 
 impl Default for Decor {
@@ -89,7 +90,8 @@ impl Decor {
             down_norm: '╷',
             left_norm: '╴',
             print_escape_codes: true,
-            draw_outer_border: true
+            draw_outer_border: true,
+            draw_inner_horizontal_border: true
         }
     }
 
@@ -288,63 +290,15 @@ impl Renderer for Console {
                 buf.push_str(NEWLINE);
             }
 
-            // border below the row
-            if row < table.num_rows() - 1 {
-                let header_row_pair = is_header_row_pair(row);
-                let row_separator_below = grid.is_separator_row(row + 1);
+            if decor.draw_inner_horizontal_border {
+                // border below the row
+                if row < table.num_rows() - 1 {
+                    let header_row_pair = is_header_row_pair(row);
+                    let row_separator_below = grid.is_separator_row(row + 1);
 
-                if decor.draw_outer_border {
-                    // vertical line with possible right junction
-                    let col_separator_right = grid.is_separator_col(0);
-                    let right = if header_row_pair {
-                        Line::Bold
-                    } else if col_separator_right {
-                        Line::None
-                    } else {
-                        Line::Norm
-                    };
-                    append_border(
-                        &mut buf,
-                        decor.lookup(Line::Bold, right, Line::Bold, Line::None),
-                        border_fg,
-                        border_bg,
-                        print_escape_codes,
-                    );
-                }
-
-                // horizontal line below the cell
-                for (col, &width) in col_widths.iter().enumerate() {
-                    let col_separator = grid.is_separator_col(col);
-                    let (right, left) = if header_row_pair {
-                        (Line::Bold, Line::Bold)
-                    } else if col_separator {
-                        (Line::None, Line::None)
-                    } else {
-                        (Line::Norm, Line::Norm)
-                    };
-                    let border = decor.lookup(Line::None, right, Line::None, left);
-                    for _ in 0..width {
-                        append_border(&mut buf, border, border_fg, border_bg, print_escape_codes);
-                    }
-
-                    if col < col_widths.len() - 1 {
-                        // junction between cells
-                        let header_col_pair = is_header_col_pair(col);
-                        let col_separator_right = grid.is_separator_col(col + 1);
-                        let up = if header_col_pair {
-                            Line::Bold
-                        } else if row_separator {
-                            Line::None
-                        } else {
-                            Line::Norm
-                        };
-                        let down = if header_col_pair {
-                            Line::Bold
-                        } else if row_separator_below {
-                            Line::None
-                        } else {
-                            Line::Norm
-                        };
+                    if decor.draw_outer_border {
+                        // vertical line with possible right junction
+                        let col_separator_right = grid.is_separator_col(0);
                         let right = if header_row_pair {
                             Line::Bold
                         } else if col_separator_right {
@@ -352,42 +306,92 @@ impl Renderer for Console {
                         } else {
                             Line::Norm
                         };
+                        append_border(
+                            &mut buf,
+                            decor.lookup(Line::Bold, right, Line::Bold, Line::None),
+                            border_fg,
+                            border_bg,
+                            print_escape_codes,
+                        );
+                    }
+
+                    // horizontal line below the cell
+                    for (col, &width) in col_widths.iter().enumerate() {
+                        let col_separator = grid.is_separator_col(col);
+                        let (right, left) = if header_row_pair {
+                            (Line::Bold, Line::Bold)
+                        } else if col_separator {
+                            (Line::None, Line::None)
+                        } else {
+                            (Line::Norm, Line::Norm)
+                        };
+                        let border = decor.lookup(Line::None, right, Line::None, left);
+                        for _ in 0..width {
+                            append_border(&mut buf, border, border_fg, border_bg, print_escape_codes);
+                        }
+
+                        if col < col_widths.len() - 1 {
+                            // junction between cells
+                            let header_col_pair = is_header_col_pair(col);
+                            let col_separator_right = grid.is_separator_col(col + 1);
+                            let up = if header_col_pair {
+                                Line::Bold
+                            } else if row_separator {
+                                Line::None
+                            } else {
+                                Line::Norm
+                            };
+                            let down = if header_col_pair {
+                                Line::Bold
+                            } else if row_separator_below {
+                                Line::None
+                            } else {
+                                Line::Norm
+                            };
+                            let right = if header_row_pair {
+                                Line::Bold
+                            } else if col_separator_right {
+                                Line::None
+                            } else {
+                                Line::Norm
+                            };
+                            let left = if header_row_pair {
+                                Line::Bold
+                            } else if col_separator {
+                                Line::None
+                            } else {
+                                Line::Norm
+                            };
+                            append_border(
+                                &mut buf,
+                                decor.lookup(up, right, down, left),
+                                border_fg,
+                                border_bg,
+                                print_escape_codes,
+                            );
+                        }
+                    }
+
+                    if decor.draw_outer_border {
+                        // vertical line with possible left junction
+                        let col_separator_left = grid.is_separator_col(col_widths.len() - 1);
                         let left = if header_row_pair {
                             Line::Bold
-                        } else if col_separator {
+                        } else if col_separator_left {
                             Line::None
                         } else {
                             Line::Norm
                         };
                         append_border(
                             &mut buf,
-                            decor.lookup(up, right, down, left),
+                            decor.lookup(Line::Bold, Line::None, Line::Bold, left),
                             border_fg,
                             border_bg,
                             print_escape_codes,
                         );
                     }
+                    buf.push_str(NEWLINE);
                 }
-
-                if decor.draw_outer_border {
-                    // vertical line with possible left junction
-                    let col_separator_left = grid.is_separator_col(col_widths.len() - 1);
-                    let left = if header_row_pair {
-                        Line::Bold
-                    } else if col_separator_left {
-                        Line::None
-                    } else {
-                        Line::Norm
-                    };
-                    append_border(
-                        &mut buf,
-                        decor.lookup(Line::Bold, Line::None, Line::Bold, left),
-                        border_fg,
-                        border_bg,
-                        print_escape_codes,
-                    );
-                }
-                buf.push_str(NEWLINE);
             }
         }
 
