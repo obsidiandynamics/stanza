@@ -8,6 +8,7 @@ use alloc::borrow::Cow;
 use alloc::string::String;
 use alloc::vec::Vec;
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Decor {
     pub blank: char,
     pub up_bold_down_bold: char,
@@ -16,35 +17,37 @@ pub struct Decor {
     pub down_bold_left_bold: char,
     pub up_bold_right_bold: char,
     pub up_bold_left_bold: char,
-    pub up_bold_right_norm_down_bold: char,
+    pub up_bold_right_thin_down_bold: char,
     pub up_bold_right_bold_down_bold: char,
-    pub up_bold_down_bold_left_norm: char,
+    pub up_bold_down_bold_left_thin: char,
     pub up_bold_down_bold_left_bold: char,
-    pub right_bold_down_norm_left_bold: char,
+    pub right_bold_down_thin_left_bold: char,
     pub right_bold_down_bold_left_bold: char,
-    pub up_norm_right_bold_left_bold: char,
+    pub up_thin_right_bold_left_bold: char,
     pub up_bold_right_bold_left_bold: char,
-    pub up_norm_right_bold_down_norm_left_bold: char,
-    pub up_bold_right_norm_down_bold_left_norm: char,
+    pub up_thin_right_bold_down_thin_left_bold: char,
+    pub up_bold_right_thin_down_bold_left_thin: char,
     pub up_bold_right_bold_down_bold_left_bold: char,
-    pub right_norm_left_norm: char,
-    pub up_norm_down_norm: char,
-    pub right_norm_down_norm: char,
-    pub down_norm_left_norm: char,
-    pub up_norm_right_norm: char,
-    pub up_norm_left_norm: char,
-    pub up_norm_right_norm_down_norm: char,
-    pub up_norm_down_norm_left_norm: char,
-    pub right_norm_down_norm_left_norm: char,
-    pub up_norm_right_norm_left_norm: char,
-    pub up_norm_right_norm_down_norm_left_norm: char,
-    pub up_norm: char,
-    pub right_norm: char,
-    pub down_norm: char,
-    pub left_norm: char,
+    pub right_thin_left_thin: char,
+    pub up_thin_down_thin: char,
+    pub right_thin_down_thin: char,
+    pub down_thin_left_thin: char,
+    pub up_thin_right_thin: char,
+    pub up_thin_left_thin: char,
+    pub up_thin_right_thin_down_thin: char,
+    pub up_thin_down_thin_left_thin: char,
+    pub right_thin_down_thin_left_thin: char,
+    pub up_thin_right_thin_left_thin: char,
+    pub up_thin_right_thin_down_thin_left_thin: char,
+    pub up_thin: char,
+    pub right_thin: char,
+    pub down_thin: char,
+    pub left_thin: char,
     pub print_escape_codes: bool,
     pub draw_outer_border: bool,
-    pub draw_inner_horizontal_border: bool
+    pub draw_inner_horizontal_border: bool,
+    pub thin_to: Line,
+    pub bold_to: Line,
 }
 
 impl Default for Decor {
@@ -63,35 +66,37 @@ impl Decor {
             down_bold_left_bold: '╗',
             up_bold_right_bold: '╚',
             up_bold_left_bold: '╝',
-            up_bold_right_norm_down_bold: '╟',
+            up_bold_right_thin_down_bold: '╟',
             up_bold_right_bold_down_bold: '╠',
-            up_bold_down_bold_left_norm: '╢',
+            up_bold_down_bold_left_thin: '╢',
             up_bold_down_bold_left_bold: '╣',
-            right_bold_down_norm_left_bold: '╤',
+            right_bold_down_thin_left_bold: '╤',
             right_bold_down_bold_left_bold: '╦',
-            up_norm_right_bold_left_bold: '╧',
+            up_thin_right_bold_left_bold: '╧',
             up_bold_right_bold_left_bold: '╩',
-            up_norm_right_bold_down_norm_left_bold: '╪',
-            up_bold_right_norm_down_bold_left_norm: '╫',
+            up_thin_right_bold_down_thin_left_bold: '╪',
+            up_bold_right_thin_down_bold_left_thin: '╫',
             up_bold_right_bold_down_bold_left_bold: '╬',
-            right_norm_left_norm: '─',
-            up_norm_down_norm: '│',
-            right_norm_down_norm: '┌',
-            down_norm_left_norm: '┐',
-            up_norm_right_norm: '└',
-            up_norm_left_norm: '┘',
-            up_norm_right_norm_down_norm: '├',
-            up_norm_down_norm_left_norm: '┤',
-            right_norm_down_norm_left_norm: '┬',
-            up_norm_right_norm_left_norm: '┴',
-            up_norm_right_norm_down_norm_left_norm: '┼',
-            up_norm: '╵',
-            right_norm: '╶',
-            down_norm: '╷',
-            left_norm: '╴',
+            right_thin_left_thin: '─',
+            up_thin_down_thin: '│',
+            right_thin_down_thin: '┌',
+            down_thin_left_thin: '┐',
+            up_thin_right_thin: '└',
+            up_thin_left_thin: '┘',
+            up_thin_right_thin_down_thin: '├',
+            up_thin_down_thin_left_thin: '┤',
+            right_thin_down_thin_left_thin: '┬',
+            up_thin_right_thin_left_thin: '┴',
+            up_thin_right_thin_down_thin_left_thin: '┼',
+            up_thin: '╵',
+            right_thin: '╶',
+            down_thin: '╷',
+            left_thin: '╴',
             print_escape_codes: true,
             draw_outer_border: true,
-            draw_inner_horizontal_border: true
+            draw_inner_horizontal_border: true,
+            thin_to: Line::Thin,
+            bold_to: Line::Bold
         }
     }
 
@@ -101,7 +106,39 @@ impl Decor {
         self
     }
 
+    #[must_use]
+    pub fn suppress_outer_border(mut self) -> Self {
+        self.draw_outer_border = false;
+        self
+    }
+
+    #[must_use]
+    pub fn suppress_inner_horizontal_border(mut self) -> Self {
+        self.draw_inner_horizontal_border = false;
+        self
+    }
+
+    #[must_use]
+    pub fn suppress_all_lines(mut self) -> Self {
+        self.thin_to = Line::None;
+        self.bold_to = Line::None;
+        self
+    }
+
+    fn remap_line(&self, line: Line) -> Line {
+        match line {
+            Line::None => Line::None,
+            Line::Thin => self.thin_to,
+            Line::Bold => self.bold_to
+        }
+    }
+
     fn lookup(&self, up: Line, right: Line, down: Line, left: Line) -> char {
+        let up = self.remap_line(up);
+        let right = self.remap_line(right);
+        let down = self.remap_line(down);
+        let left = self.remap_line(left);
+
         // dbg!(&up, &right, &down, &left);
         match (up, right, down, left) {
             (Line::None, Line::None, Line::None, Line::None) => self.blank,
@@ -111,49 +148,49 @@ impl Decor {
             (Line::None, Line::None, Line::Bold, Line::Bold) => self.down_bold_left_bold,
             (Line::Bold, Line::Bold, Line::None, Line::None) => self.up_bold_right_bold,
             (Line::Bold, Line::None, Line::None, Line::Bold) => self.up_bold_left_bold,
-            (Line::Bold, Line::Norm, Line::Bold, Line::None) => self.up_bold_right_norm_down_bold,
+            (Line::Bold, Line::Thin, Line::Bold, Line::None) => self.up_bold_right_thin_down_bold,
             (Line::Bold, Line::Bold, Line::Bold, Line::None) => self.up_bold_right_bold_down_bold,
-            (Line::Bold, Line::None, Line::Bold, Line::Norm) => self.up_bold_down_bold_left_norm,
+            (Line::Bold, Line::None, Line::Bold, Line::Thin) => self.up_bold_down_bold_left_thin,
             (Line::Bold, Line::None, Line::Bold, Line::Bold) => self.up_bold_down_bold_left_bold,
-            (Line::None, Line::Bold, Line::Norm, Line::Bold) => self.right_bold_down_norm_left_bold,
+            (Line::None, Line::Bold, Line::Thin, Line::Bold) => self.right_bold_down_thin_left_bold,
             (Line::None, Line::Bold, Line::Bold, Line::Bold) => self.right_bold_down_bold_left_bold,
-            (Line::Norm, Line::Bold, Line::None, Line::Bold) => self.up_norm_right_bold_left_bold,
+            (Line::Thin, Line::Bold, Line::None, Line::Bold) => self.up_thin_right_bold_left_bold,
             (Line::Bold, Line::Bold, Line::None, Line::Bold) => self.up_bold_right_bold_left_bold,
-            (Line::Norm, Line::Bold, Line::Norm, Line::Bold) => {
-                self.up_norm_right_bold_down_norm_left_bold
+            (Line::Thin, Line::Bold, Line::Thin, Line::Bold) => {
+                self.up_thin_right_bold_down_thin_left_bold
             }
-            (Line::Bold, Line::Norm, Line::Bold, Line::Norm) => {
-                self.up_bold_right_norm_down_bold_left_norm
+            (Line::Bold, Line::Thin, Line::Bold, Line::Thin) => {
+                self.up_bold_right_thin_down_bold_left_thin
             }
             (Line::Bold, Line::Bold, Line::Bold, Line::Bold) => {
                 self.up_bold_right_bold_down_bold_left_bold
             }
-            (Line::None, Line::Norm, Line::None, Line::Norm) => self.right_norm_left_norm,
-            (Line::Norm, Line::None, Line::Norm, Line::None) => self.up_norm_down_norm,
-            (Line::None, Line::Norm, Line::Norm, Line::None) => self.right_norm_down_norm,
-            (Line::None, Line::None, Line::Norm, Line::Norm) => self.down_norm_left_norm,
-            (Line::Norm, Line::Norm, Line::None, Line::None) => self.up_norm_right_norm,
-            (Line::Norm, Line::None, Line::None, Line::Norm) => self.up_norm_left_norm,
-            (Line::Norm, Line::Norm, Line::Norm, Line::None) => self.up_norm_right_norm_down_norm,
-            (Line::Norm, Line::None, Line::Norm, Line::Norm) => self.up_norm_down_norm_left_norm,
-            (Line::None, Line::Norm, Line::Norm, Line::Norm) => self.right_norm_down_norm_left_norm,
-            (Line::Norm, Line::Norm, Line::None, Line::Norm) => self.up_norm_right_norm_left_norm,
-            (Line::Norm, Line::Norm, Line::Norm, Line::Norm) => {
-                self.up_norm_right_norm_down_norm_left_norm
+            (Line::None, Line::Thin, Line::None, Line::Thin) => self.right_thin_left_thin,
+            (Line::Thin, Line::None, Line::Thin, Line::None) => self.up_thin_down_thin,
+            (Line::None, Line::Thin, Line::Thin, Line::None) => self.right_thin_down_thin,
+            (Line::None, Line::None, Line::Thin, Line::Thin) => self.down_thin_left_thin,
+            (Line::Thin, Line::Thin, Line::None, Line::None) => self.up_thin_right_thin,
+            (Line::Thin, Line::None, Line::None, Line::Thin) => self.up_thin_left_thin,
+            (Line::Thin, Line::Thin, Line::Thin, Line::None) => self.up_thin_right_thin_down_thin,
+            (Line::Thin, Line::None, Line::Thin, Line::Thin) => self.up_thin_down_thin_left_thin,
+            (Line::None, Line::Thin, Line::Thin, Line::Thin) => self.right_thin_down_thin_left_thin,
+            (Line::Thin, Line::Thin, Line::None, Line::Thin) => self.up_thin_right_thin_left_thin,
+            (Line::Thin, Line::Thin, Line::Thin, Line::Thin) => {
+                self.up_thin_right_thin_down_thin_left_thin
             }
-            (Line::Norm, Line::None, Line::None, Line::None) => self.up_norm,
-            (Line::None, Line::Norm, Line::None, Line::None) => self.right_norm,
-            (Line::None, Line::None, Line::Norm, Line::None) => self.down_norm,
-            (Line::None, Line::None, Line::None, Line::Norm) => self.left_norm,
+            (Line::Thin, Line::None, Line::None, Line::None) => self.up_thin,
+            (Line::None, Line::Thin, Line::None, Line::None) => self.right_thin,
+            (Line::None, Line::None, Line::Thin, Line::None) => self.down_thin,
+            (Line::None, Line::None, Line::None, Line::Thin) => self.left_thin,
             _ => unreachable!(),
         }
     }
 }
 
-#[derive(Debug)]
-enum Line {
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum Line {
     None,
-    Norm,
+    Thin,
     Bold,
 }
 
@@ -203,7 +240,7 @@ impl Renderer for Console {
                     } else if row_separator_below {
                         Line::None
                     } else {
-                        Line::Norm
+                        Line::Thin
                     };
                     append_border(
                         &mut buf,
@@ -265,7 +302,7 @@ impl Renderer for Console {
                         } else if row_separator {
                             (Line::None, Line::None)
                         } else {
-                            (Line::Norm, Line::Norm)
+                            (Line::Thin, Line::Thin)
                         };
                         append_border(
                             &mut buf,
@@ -304,7 +341,7 @@ impl Renderer for Console {
                         } else if col_separator_right {
                             Line::None
                         } else {
-                            Line::Norm
+                            Line::Thin
                         };
                         append_border(
                             &mut buf,
@@ -323,7 +360,7 @@ impl Renderer for Console {
                         } else if col_separator {
                             (Line::None, Line::None)
                         } else {
-                            (Line::Norm, Line::Norm)
+                            (Line::Thin, Line::Thin)
                         };
                         let border = decor.lookup(Line::None, right, Line::None, left);
                         for _ in 0..width {
@@ -339,28 +376,28 @@ impl Renderer for Console {
                             } else if row_separator {
                                 Line::None
                             } else {
-                                Line::Norm
+                                Line::Thin
                             };
                             let down = if header_col_pair {
                                 Line::Bold
                             } else if row_separator_below {
                                 Line::None
                             } else {
-                                Line::Norm
+                                Line::Thin
                             };
                             let right = if header_row_pair {
                                 Line::Bold
                             } else if col_separator_right {
                                 Line::None
                             } else {
-                                Line::Norm
+                                Line::Thin
                             };
                             let left = if header_row_pair {
                                 Line::Bold
                             } else if col_separator {
                                 Line::None
                             } else {
-                                Line::Norm
+                                Line::Thin
                             };
                             append_border(
                                 &mut buf,
@@ -380,7 +417,7 @@ impl Renderer for Console {
                         } else if col_separator_left {
                             Line::None
                         } else {
-                            Line::Norm
+                            Line::Thin
                         };
                         append_border(
                             &mut buf,
@@ -426,7 +463,7 @@ impl Renderer for Console {
                     } else if row_separator_above {
                         Line::None
                     } else {
-                        Line::Norm
+                        Line::Thin
                     };
                     append_border(
                         &mut buf,

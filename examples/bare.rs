@@ -1,6 +1,6 @@
 use stanza::renderer::console::{Console, Decor};
 use stanza::renderer::Renderer;
-use stanza::table::{Table};
+use stanza::table::Table;
 
 fn main() {
     // build a table model
@@ -10,12 +10,12 @@ fn main() {
         .with_row(["Engineering", "270000"]);
 
     // configure a renderer that will later turn the model into a string
-    let renderer = Console({
-        let mut decor = Decor::default();
-        decor.draw_outer_border = false;
-        decor.draw_inner_horizontal_border = false;
-        decor
-    });
+    let renderer = Console(
+        Decor::default()
+            .suppress_outer_border()
+            .suppress_inner_horizontal_border()
+            .suppress_all_lines(),
+    );
 
     // render the table, outputting to stdout
     println!("{}", renderer.render(&table));
