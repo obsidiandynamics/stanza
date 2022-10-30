@@ -46,8 +46,8 @@ pub struct Decor {
     pub print_escape_codes: bool,
     pub draw_outer_border: bool,
     pub draw_inner_horizontal_border: bool,
-    pub thin_to: Line,
-    pub bold_to: Line,
+    pub remap_thin_to: Line,
+    pub remap_bold_to: Line,
 }
 
 impl Default for Decor {
@@ -95,8 +95,8 @@ impl Decor {
             print_escape_codes: true,
             draw_outer_border: true,
             draw_inner_horizontal_border: true,
-            thin_to: Line::Thin,
-            bold_to: Line::Bold
+            remap_thin_to: Line::Thin,
+            remap_bold_to: Line::Bold
         }
     }
 
@@ -120,16 +120,16 @@ impl Decor {
 
     #[must_use]
     pub fn suppress_all_lines(mut self) -> Self {
-        self.thin_to = Line::None;
-        self.bold_to = Line::None;
+        self.remap_thin_to = Line::None;
+        self.remap_bold_to = Line::None;
         self
     }
 
     fn remap_line(&self, line: Line) -> Line {
         match line {
             Line::None => Line::None,
-            Line::Thin => self.thin_to,
-            Line::Bold => self.bold_to
+            Line::Thin => self.remap_thin_to,
+            Line::Bold => self.remap_bold_to
         }
     }
 

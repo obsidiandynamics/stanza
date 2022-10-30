@@ -38,9 +38,8 @@ pub use text_bg::TextBg;
 pub use text_fg::TextFg;
 pub use underline::Underline;
 
-pub trait Style
+pub trait Style: Clone
 where
-    Self: Clone,
     for<'a> Option<&'a Self>: From<&'a StyleKind>,
     StyleKind: From<Self>,
 {
