@@ -137,7 +137,7 @@ impl Statics {
     }
 }
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct Styles(BTreeMap<String, StyleKind>);
 
 impl From<Vec<StyleKind>> for Styles {
@@ -159,6 +159,12 @@ impl Styles {
 
     pub fn insert(&mut self, style: StyleKind) -> Option<StyleKind> {
         self.0.insert(style.id(), style)
+    }
+
+    #[must_use]
+    pub fn with_all(mut self, styles: &Styles) -> Self {
+        self.insert_all(styles);
+        self
     }
 
     pub fn insert_all(&mut self, styles: &Styles) {
