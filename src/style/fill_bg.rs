@@ -1,25 +1,10 @@
-use crate::style::{Assignability, Palette16, Style, StyleKind};
+use crate::style::{Assignability, Palette16, Style};
 
 #[derive(Debug, Clone)]
 pub struct FillBg(pub Palette16);
 
 impl Style for FillBg {
-    fn assignability() -> Assignability {
+    fn assignability(&self) -> Assignability {
         Assignability::CellRowColTable
-    }
-}
-
-impl<'a> From<&'a StyleKind> for Option<&'a FillBg> {
-    fn from(kind: &'a StyleKind) -> Self {
-        match kind {
-            StyleKind::__FillBg(style) => Some(style),
-            _ => None,
-        }
-    }
-}
-
-impl From<FillBg> for StyleKind {
-    fn from(style: FillBg) -> Self {
-        StyleKind::__FillBg(style)
     }
 }

@@ -1,25 +1,10 @@
-use crate::style::{Assignability, Style, StyleKind};
+use crate::style::{Assignability, Style};
 
 #[derive(Debug, Clone, Default)]
 pub struct MinWidth(pub usize);
 
 impl Style for MinWidth {
-    fn assignability() -> Assignability {
+    fn assignability(&self) -> Assignability {
         Assignability::ColTable
-    }
-}
-
-impl<'a> From<&'a StyleKind> for Option<&'a MinWidth> {
-    fn from(kind: &'a StyleKind) -> Self {
-        match kind {
-            StyleKind::__MinWidth(style) => Some(style),
-            _ => None,
-        }
-    }
-}
-
-impl From<MinWidth> for StyleKind {
-    fn from(style: MinWidth) -> Self {
-        StyleKind::__MinWidth(style)
     }
 }

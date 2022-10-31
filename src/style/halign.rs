@@ -1,4 +1,4 @@
-use crate::style::{Assignability, Style, StyleKind};
+use crate::style::{Assignability, Style};
 
 #[derive(Debug, Clone)]
 pub enum HAlign {
@@ -14,22 +14,7 @@ impl Default for HAlign {
 }
 
 impl Style for HAlign {
-    fn assignability() -> Assignability {
+    fn assignability(&self) -> Assignability {
         Assignability::CellRowColTable
-    }
-}
-
-impl<'a> From<&'a StyleKind> for Option<&'a HAlign> {
-    fn from(kind: &'a StyleKind) -> Self {
-        match kind {
-            StyleKind::__HAlign(style) => Some(style),
-            _ => None,
-        }
-    }
-}
-
-impl From<HAlign> for StyleKind {
-    fn from(style: HAlign) -> Self {
-        StyleKind::__HAlign(style)
     }
 }

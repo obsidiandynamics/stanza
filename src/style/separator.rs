@@ -1,25 +1,10 @@
-use crate::style::{Assignability, Style, StyleKind};
+use crate::style::{Assignability, Style};
 
 #[derive(Debug, Clone, Default)]
 pub struct Separator(pub bool);
 
 impl Style for Separator {
-    fn assignability() -> Assignability {
+    fn assignability(&self) -> Assignability {
         Assignability::RowColTable
-    }
-}
-
-impl<'a> From<&'a StyleKind> for Option<&'a Separator> {
-    fn from(kind: &'a StyleKind) -> Self {
-        match kind {
-            StyleKind::__Separator(style) => Some(style),
-            _ => None,
-        }
-    }
-}
-
-impl From<Separator> for StyleKind {
-    fn from(style: Separator) -> Self {
-        StyleKind::__Separator(style)
     }
 }

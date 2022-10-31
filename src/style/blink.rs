@@ -1,25 +1,10 @@
-use crate::style::{Assignability, Style, StyleKind};
+use crate::style::{Assignability, Style};
 
 #[derive(Debug, Clone, Default)]
 pub struct Blink(pub bool);
 
 impl Style for Blink {
-    fn assignability() -> Assignability {
+    fn assignability(&self) -> Assignability {
         Assignability::CellRowColTable
-    }
-}
-
-impl<'a> From<&'a StyleKind> for Option<&'a Blink> {
-    fn from(kind: &'a StyleKind) -> Self {
-        match kind {
-            StyleKind::__Blink(style) => Some(style),
-            _ => None,
-        }
-    }
-}
-
-impl From<Blink> for StyleKind {
-    fn from(style: Blink) -> Self {
-        StyleKind::__Blink(style)
     }
 }

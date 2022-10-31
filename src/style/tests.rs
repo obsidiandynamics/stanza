@@ -1,4 +1,4 @@
-use crate::style::Assignability;
+use crate::style::{Assignability, Style, Styles};
 
 #[test]
 fn assignability() {
@@ -21,4 +21,29 @@ fn assignability() {
     assert!(Assignability::CellRowColTable.at_col());
     assert!(Assignability::CellRowColTable.at_row());
     assert!(Assignability::CellRowColTable.at_cell());
+}
+
+#[derive(Debug, Clone)]
+struct SampleStyleOne;
+
+#[derive(Debug, Clone)]
+struct SampleStyleTwo;
+
+impl Style for SampleStyleOne {
+    fn assignability(&self) -> Assignability {
+        unimplemented!()
+    }
+}
+
+impl Style for SampleStyleTwo {
+    fn assignability(&self) -> Assignability {
+        unimplemented!()
+    }
+}
+
+#[test]
+fn resolve() {
+    let styles = Styles::default().with(SampleStyleOne);
+    assert!(SampleStyleOne::resolve(&styles).is_some());
+    assert!(SampleStyleTwo::resolve(&styles).is_none());
 }

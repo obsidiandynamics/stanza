@@ -11,6 +11,7 @@ keywords = ["cli", "terminal", "table", "format", "no_std"]
 exclude = ["/images", "/bin", "/.idea", "/.github", "/coverage", "/doc", "/examples"]
 
 [dependencies]
+maybe-owned = "0.3.4"
 
 [dev-dependencies]
 chrono = "0.4.22"
