@@ -28,7 +28,6 @@ pub use border_bg::BorderBg;
 pub use border_fg::BorderFg;
 use core::any;
 use core::any::Any;
-use maybe_owned::MaybeOwned;
 pub use fill_bg::FillBg;
 pub use fill_invert::FillInvert;
 pub use halign::HAlign;
@@ -44,19 +43,22 @@ pub use text_fg::TextFg;
 pub use text_invert::TextInvert;
 pub use underline::Underline;
 
-pub trait Replica {
-    fn replicate(&self) -> Box<dyn Style>;
-}
-
-impl<C: Clone + Style> Replica for C {
-    fn replicate(&self) -> Box<dyn Style> {
-        Box::new(self.clone())
-    }
-}
-
 mod private {
-    use core::any::Any;
+    use alloc::boxed::Box;
     use super::Style;
+    use core::any::Any;
+
+    /// An object-safe variant of [`Clone`].
+    pub trait Replica {
+        fn replicate(&self) -> Box<dyn Style>;
+    }
+
+    /// Blanket implementation of [`Replica`] for every [`Style`] that is also [`Clone`].
+    impl<C: Clone + Style> Replica for C {
+        fn replicate(&self) -> Box<dyn Style> {
+            Box::new(self.clone())
+        }
+    }
 
     /// Conversion from an arbitrary trait to a [`&dyn Any`] for subsequent downcasting
     /// (or other uses of the [`Any`] type).
@@ -73,33 +75,37 @@ mod private {
     }
 }
 
-pub trait Style: Any + Replica + private::Upcast {
-    fn id() -> Cow<'static, str> where Self: Sized {
+pub trait Style: Any + private::Replica + private::Upcast {
+    fn assignability(&self) -> Assignability;
+
+    fn id() -> Cow<'static, str>
+    where
+        Self: Sized,
+    {
         Cow::Borrowed(any::type_name::<Self>())
     }
 
-    fn resolve(styles: &Styles) -> Option<&Self> where Self: Sized {
+    fn resolve(styles: &Styles) -> Option<&Self>
+    where
+        Self: Sized,
+    {
         let style_for_id = styles.get(&Self::id());
         match style_for_id {
             None => None,
-            Some(style) => {
-                style.as_any_ref().downcast_ref::<Self>()
-            }
+            Some(style) => style.as_any_ref().downcast_ref(),
         }
     }
 
-    fn resolve_or_default(styles: &Styles) -> MaybeOwned<Self>
+    fn resolve_or_default(styles: &Styles) -> Cow<Self>
     where
-        Self: Default + Sized,
+        Self: Default + Sized + Clone,
     {
         let style = Self::resolve(styles);
         match style {
-            None => MaybeOwned::Owned(Self::default()),
-            Some(style) => MaybeOwned::Borrowed(style),
+            None => Cow::Owned(Self::default()),
+            Some(style) => Cow::Borrowed(style),
         }
     }
-
-    fn assignability(&self) -> Assignability;
 }
 
 #[derive(Default)]
