@@ -3,6 +3,7 @@ pub mod bold;
 pub mod border_bg;
 pub mod border_fg;
 pub mod fill_bg;
+pub mod fill_invert;
 pub mod halign;
 pub mod header;
 pub mod italic;
@@ -13,6 +14,7 @@ pub mod separator;
 pub mod strikethrough;
 pub mod text_bg;
 pub mod text_fg;
+pub mod text_invert;
 pub mod underline;
 
 use alloc::borrow::Cow;
@@ -28,6 +30,7 @@ use core::any;
 use core::any::Any;
 use maybe_owned::MaybeOwned;
 pub use fill_bg::FillBg;
+pub use fill_invert::FillInvert;
 pub use halign::HAlign;
 pub use header::Header;
 pub use italic::Italic;
@@ -38,6 +41,7 @@ pub use separator::Separator;
 pub use strikethrough::Strikethrough;
 pub use text_bg::TextBg;
 pub use text_fg::TextFg;
+pub use text_invert::TextInvert;
 pub use underline::Underline;
 
 pub trait Replica {

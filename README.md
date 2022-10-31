@@ -203,7 +203,7 @@ Cell
       └────┴─> Table
 ```
 
-A style that can be assigned to a cell can also be assigned to a row, a column and a table. Notable examples include text formatting styles — `Bold`, `Italic`, `Underline`, `Blink`, `Strikethrough`, `HAlign`, as well as some colouring styles — `TextFg`, `TextBg`, `FillBg`.
+A style that can be assigned to a cell can also be assigned to a row, a column and a table. Notable examples include text formatting styles — `Bold`, `Italic`, `Underline`, `Blink`, `Strikethrough`, `HAlign`, as well as some colouring styles — `TextFg`, `TextBg`, `TextInvert`, `FillBg` and `FillInvert`.
 
 Above the cell, the hierarchy is disjoint at the column and row elements. Any style that can be assigned to a row can also be assigned to a table. Similarly, any style that can be assigned to a column can also be assigned to a table. These include `Header` and `Separator`.
 

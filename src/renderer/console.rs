@@ -1,8 +1,5 @@
 use crate::renderer::{pad, wrap, RenderHint, Renderer, NEWLINE};
-use crate::style::{
-    Blink, Bold, BorderBg, BorderFg, FillBg, HAlign, Header, Italic, Palette16, Separator,
-    Strikethrough, Style, Styled, Styles, TextBg, TextFg, Underline,
-};
+use crate::style::{Blink, Bold, BorderBg, BorderFg, FillBg, FillInvert, HAlign, Header, Italic, Palette16, Separator, Strikethrough, Style, Styled, Styles, TextBg, TextFg, TextInvert, Underline};
 use crate::table::Table;
 use alloc::borrow::Cow;
 use alloc::string::String;
@@ -518,6 +515,7 @@ mod ansi {
     pub const ITALIC: &str = "\x1b[3m";
     pub const UNDERLINE: &str = "\x1b[4m";
     pub const BLINK: &str = "\x1b[5m";
+    pub const REVERSE: &str = "\x1b[7m";
     pub const STRIKETHROUGH: &str = "\x1b[9m";
 
     pub const RESET: &str = "\x1b[0m";
@@ -563,6 +561,9 @@ fn append_content(buf: &mut String, s: &str, styles: &Styles, print_escape_codes
         if let Some(bg) = FillBg::resolve(styles) {
             line_format.push_str(bg.0.escape_codes().1);
         }
+        if FillInvert::resolve_or_default(styles).0 {
+            line_format.push_str(ansi::REVERSE);
+        }
 
         // formatting only of the printable characters
         let mut char_format = line_format.clone();
@@ -583,6 +584,9 @@ fn append_content(buf: &mut String, s: &str, styles: &Styles, print_escape_codes
         }
         if let Some(fg) = TextFg::resolve(styles) {
             char_format.push_str(fg.0.escape_codes().0);
+        }
+        if TextInvert::resolve_or_default(styles).0 {
+            char_format.push_str(ansi::REVERSE);
         }
         if Underline::resolve_or_default(styles).0 {
             char_format.push_str(ansi::UNDERLINE);

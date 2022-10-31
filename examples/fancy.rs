@@ -1,10 +1,7 @@
 use stanza::renderer::console::Console;
 use stanza::renderer::markdown::Markdown;
 use stanza::renderer::Renderer;
-use stanza::style::{
-    Blink, Bold, BorderBg, FillBg, HAlign, Header, Italic, MaxWidth, MinWidth, Palette16,
-    Separator, Strikethrough, Styles, TextBg, TextFg, Underline,
-};
+use stanza::style::{Blink, Bold, BorderBg, FillBg, FillInvert, HAlign, Header, Italic, MaxWidth, MinWidth, Palette16, Separator, Strikethrough, Styles, TextBg, TextFg, TextInvert, Underline};
 use stanza::table::{Cell, Col, Content, Row, Table};
 
 fn main() {
@@ -91,7 +88,9 @@ fn main() {
             Cell::new(
                 Styles::default()
                     .with(Bold(true))
-                    .with(TextBg(Palette16::BrightRed))
+                    .with(TextFg(Palette16::BrightRed))
+                    .with(TextBg(Palette16::White))
+                    .with(TextInvert(true))
                     .with(Blink(true)),
                 "WARNING".into(),
             ),
@@ -108,7 +107,11 @@ fn main() {
                 Content::Computed(Box::new(|| "fill".into())), // deferred computation
             ),
             "".into(),
-            "".into(),
+            Cell::new(
+                Styles::default()
+                    .with(FillInvert(true)),
+                "Inverted fill".into(),
+            ),
         ],
     ))
     .with_row(Row::new(
