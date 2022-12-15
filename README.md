@@ -3,7 +3,7 @@ An abstract table model written in Rust, with customisable text formatting and r
 
 [![Crates.io](https://img.shields.io/crates/v/stanza?style=flat-square&logo=rust)](https://crates.io/crates/stanza)
 [![docs.rs](https://img.shields.io/badge/docs.rs-stanza-blue?style=flat-square&logo=docs.rs)](https://docs.rs/stanza)
-[![Build Status](https://img.shields.io/github/workflow/status/obsidiandynamics/stanza/Cargo%20build?style=flat-square&logo=github)](https://github.com/obsidiandynamics/stanza/actions/workflows/master.yml)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/obsidiandynamics/stanza/master.yml?branch=master&style=flat-square&logo=github)](https://github.com/obsidiandynamics/stanza/actions/workflows/master.yml)
 [![codecov](https://img.shields.io/codecov/c/github/obsidiandynamics/stanza/master?style=flat-square&logo=codecov)](https://codecov.io/gh/obsidiandynamics/stanza)
 ![no_std](https://img.shields.io/badge/linking-no__std-9cf?style=flat-square)
 
