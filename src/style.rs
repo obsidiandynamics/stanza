@@ -160,6 +160,17 @@ impl Styles {
     }
 }
 
+impl Clone for Styles {
+    fn clone(&self) -> Self {
+        let mut clone = BTreeMap::new();
+        for (key, style) in &self.0 {
+            clone.insert(key.clone(), style.replicate());
+        }
+
+        Self(clone)
+    }
+}
+
 impl<'a> IntoIterator for &'a Styles {
     type Item = (&'a String, &'a Box<dyn Style>);
     type IntoIter = Iter<'a, String, Box<dyn Style>>;

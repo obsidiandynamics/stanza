@@ -47,3 +47,9 @@ fn resolve() {
     assert!(SampleStyleOne::resolve(&styles).is_some());
     assert!(SampleStyleTwo::resolve(&styles).is_none());
 }
+
+#[test]
+fn can_clone() {
+    let styles = Styles::default().with(SampleStyleOne);
+    let _ = styles.clone();
+}

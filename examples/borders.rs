@@ -85,7 +85,7 @@ fn table_width(table: &Table, renderer: &impl Renderer) -> usize {
 }
 
 fn term_width() -> usize {
-    term_size::dimensions().unwrap().0
+    terminal_size::terminal_size().unwrap().0.0 as usize
 }
 
 fn table_styles() -> Styles { Styles::default().with(MinWidth(5)).with(HAlign::Centred) }

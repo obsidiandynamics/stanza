@@ -39,6 +39,15 @@ impl Table {
         self
     }
 
+    #[must_use]
+    pub fn with_rows(self, rows: impl IntoIterator<Item = Row>) -> Self {
+        let mut s = self;
+        for row in rows {
+            s = s.with_row(row);
+        }
+        s
+    }
+
     /// Assigns columns to the table. The number of columns cannot be less (but may exceed)
     /// the number of cells in the widest row.
     ///
@@ -61,7 +70,7 @@ impl Table {
         self.rows.push(row);
     }
 
-    pub fn push_rows<I: IntoIterator<Item = Row>>(&mut self, it: I) {
+    pub fn push_rows(&mut self, it: impl IntoIterator<Item = Row>) {
         for row in it {
             self.push_row(row);
         }
