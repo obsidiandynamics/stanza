@@ -1,3 +1,5 @@
+use alloc::boxed::Box;
+
 /// A colour palette optimised for use with ANSI in-band terminal signalling. While designed for
 /// terminal environments, this palette may be mapped to alternate colour spaces.
 
@@ -19,5 +21,7 @@ pub enum Palette16 {
     BrightBlue,
     BrightMagenta,
     BrightCyan,
-    BrightWhite
+    BrightWhite,
+    Default,
+    Hidden
 }

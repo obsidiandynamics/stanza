@@ -36,7 +36,7 @@ fn main() {
     let col_width = widest_table(&examples, &renderer) + 1;
     let num_cols = (term_width - 1) / col_width;
     let mut outer_table =
-        Table::with_styles(Styles::default().with(BorderFg(Palette16::BrightBlack)));
+        Table::with_styles(Styles::default().with(BorderFg(Palette16::Hidden)));
     let cols = (0..num_cols)
         .into_iter()
         .map(|_| Col::new(Styles::default().with(HAlign::Centred)))

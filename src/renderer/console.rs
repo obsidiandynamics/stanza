@@ -506,6 +506,8 @@ impl Palette16 {
             Palette16::BrightMagenta => ("\x1b[35;1m", "\x1b[45;1m"),
             Palette16::BrightCyan => ("\x1b[36;1m", "\x1b[46;1m"),
             Palette16::BrightWhite => ("\x1b[37;1m", "\x1b[47;1m"),
+            Palette16::Default => ("\x1b[0m", ""),
+            Palette16::Hidden => ("\x1b[8m", ""),
         }
     }
 }
