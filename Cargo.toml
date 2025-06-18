@@ -1,6 +1,6 @@
 [package]
 name = "stanza"
-version = "0.5.1"
+version = "0.5.2"
 edition = "2021"
 readme = "README.md"
 authors = ["Emil Koutanov"]
@@ -13,9 +13,9 @@ exclude = ["/images", "/bin", "/.idea", "/.github", "/coverage", "/doc", "/examp
 [dependencies]
 
 [dev-dependencies]
-chrono = "0.4.31"
-criterion = { version = "0.5.1", features = ["html_reports"] }
-terminal_size = "0.3.0"
+chrono = "0.4.41"
+criterion = { version = "0.6.0", features = ["html_reports"] }
+terminal_size = "0.4.2"
 
 [[bench]]
 name = "paint_fancy"
